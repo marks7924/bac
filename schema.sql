@@ -112,7 +112,7 @@ create policy "Users manage own meta" on public.user_meta
 -- SCHEDULE DATA RLS
 drop policy if exists "Users manage own schedule data" on public.schedule_data;
 create policy "Users manage own schedule data" on public.schedule_data
-  for all using (auth.uid() = user_id || user_id is null) with check (auth.uid() = user_id || user_id is null);
+  for all using (auth.uid() = user_id or user_id is null) with check (auth.uid() = user_id or user_id is null);
 
 -- 7. SUBJECTS TABLE (Curriculum & subject metrics)
 create table if not exists public.subjects (
