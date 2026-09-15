@@ -1,0 +1,2264 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baccalaureate Schedules — Master Study Planner</title>
+<meta name="description" content="Ultimate Baccalaureate Study Planner with customizable columns, academic progress, exam calendar, spaced revision, and cloud synchronization.">
+<!-- Font Awesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Supabase JS Client CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --navy: #1b2a4a;
+  --gold: #d4af37;
+  --bg-color: #eef2f5;
+  --border-color: #c5d0dc;
+  --border-dark: #8a9bb0;
+
+  /* Card colors */
+  --green-bg: #d4edda; --green-border: #a3d9a5; --green-text: #155724;
+  --pink-bg:  #f8d7da; --pink-border:  #f5c6cb; --pink-text:  #721c24;
+  --amber-bg: #fff3cd; --amber-border: #ffeeba; --amber-text: #856404;
+  --gray-bg:  #e2e3e5; --gray-border:  #d6d8db; --gray-text:  #383d41;
+}
+
+[dir="rtl"] {
+  text-align: right;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--navy);
+  padding: 12px;
+  min-height: 100vh;
+}
+
+.wrap {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* TOP TOOLBAR & CONTROLS */
+.toolbar {
+  position: sticky;
+  top: 10px;
+  z-index: 995;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  border-radius: 16px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+  transition: all 0.25s ease;
+}
+
+.toolbar .left, .toolbar .toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.nav-btn, .print-btn, .auth-btn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  padding: 7px 12px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #1e293b;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+  white-space: nowrap;
+}
+
+.nav-btn:hover, .print-btn:hover, .auth-btn:hover {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #94a3b8;
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+.nav-btn:active, .print-btn:active, .auth-btn:active {
+  transform: translateY(0);
+}
+
+/* Primary Action Button Highlights */
+.auth-btn#auth-trigger {
+  background: linear-gradient(135deg, #1b2a4a 0%, #2e6fdb 100%);
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 3px 10px rgba(46, 111, 219, 0.25);
+}
+.auth-btn#auth-trigger:hover {
+  background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%);
+  box-shadow: 0 6px 16px rgba(46, 111, 219, 0.35);
+  color: #ffffff;
+}
+
+.auth-btn#lang-btn {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #0f172a;
+  font-weight: 700;
+}
+.auth-btn#lang-btn:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+}
+
+#today-label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #1e293b;
+  padding: 5px 10px;
+  background: #f1f5f9;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+/* MOBILE HAMBURGER MENU BUTTON (=) */
+.mobile-menu-btn {
+  display: none;
+  background: var(--navy);
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(27, 42, 74, 0.2);
+  transition: all 0.2s ease;
+}
+.mobile-menu-btn:hover {
+  background: #0f172a;
+}
+
+/* HEADER BANNER */
+.banner {
+  background: linear-gradient(135deg, #1b2a4a 0%, #0f172a 100%);
+  color: #fff;
+  text-align: center;
+  padding: 20px 15px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+.banner h1 {
+  font-size: 24px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.banner .rule {
+  height: 3px;
+  width: 70px;
+  background: var(--gold);
+  margin: 6px auto;
+  border-radius: 2px;
+}
+.banner .sub {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  font-weight: 700;
+}
+
+/* ACADEMIC YEAR PROGRESS BAR */
+.academic-banner {
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 10px 16px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+.academic-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.academic-title {
+  font-weight: 700;
+  color: var(--navy);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.academic-sub {
+  color: #64748b;
+  font-size: 12px;
+}
+.academic-progress-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  max-width: 320px;
+  min-width: 180px;
+}
+.academic-bar-track {
+  flex: 1;
+  height: 9px;
+  background: #e2e8f0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.academic-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #2e6fdb, #219653);
+  border-radius: 6px;
+  transition: width 0.4s ease;
+}
+.academic-pct {
+  font-weight: 800;
+  color: var(--navy);
+  font-size: 13px;
+  min-width: 38px;
+  text-align: right;
+}
+
+/* MISSED DAYS BANNER */
+.missed-banner {
+  background: #fff3cd;
+  border: 1px solid #ffeeba;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #856404;
+  gap: 10px;
+}
+.missed-banner .msg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.missed-banner button {
+  background: #856404;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* DASHBOARD STATS */
+.dash {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.stat {
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+.stat .icon {
+  width: 38px; height: 38px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.stat.streak .icon  { background: #ffeaa7; color: #d63031; }
+.stat.perfect .icon { background: #e3f2fd; color: #1976d2; }
+.stat.best .icon    { background: #e8f5e9; color: #2e7d32; }
+.stat.progress .icon{ background: #f3e5f5; color: #7b1fa2; }
+.stat .label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; }
+.stat .value { font-size: 18px; font-weight: 800; color: var(--navy); margin-top: 2px; }
+.stat.progress { flex-direction: column; align-items: stretch; justify-content: center; gap: 6px; }
+.stat.progress .top-row { display: flex; align-items: center; gap: 10px; }
+.stat.progress .bar-track { height: 7px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
+.stat.progress .bar-fill  { height: 100%; background: #219653; border-radius: 4px; transition: width 0.3s ease; }
+.stat.progress .hint { font-size: 10px; color: #94a3b8; text-align: right; }
+
+/* TABLE LAYOUT */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+  border: 1px solid var(--border-color);
+}
+th {
+  background: var(--navy);
+  color: #fff;
+  padding: 12px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-right: 1px solid rgba(255,255,255,0.1);
+  text-align: center;
+}
+th:last-child { border-right: none; }
+th i { margin-right: 6px; color: var(--gold); }
+[dir="rtl"] th i { margin-right: 0; margin-left: 6px; }
+
+td {
+  border: 1px solid var(--border-color);
+  padding: 8px;
+  vertical-align: top;
+  width: 18%;
+}
+td:first-child {
+  width: 10%;
+  background: #f8fafc;
+  font-weight: 700;
+  text-align: center;
+  vertical-align: middle;
+}
+tr.today td:first-child {
+  background: #1b2a4a;
+  color: #fff;
+}
+.day-name { font-size: 15px; }
+.day-date { font-size: 11px; font-weight: 600; opacity: 0.8; margin-top: 2px; }
+
+/* SCHEDULE BLOCKS & GOALS */
+.cell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 70px;
+}
+.block {
+  border-radius: 7px;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  border-left: 4px solid transparent;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  transition: all 0.15s ease;
+  user-select: none;
+}
+[dir="rtl"] .block {
+  border-left: none;
+  border-right: 4px solid transparent;
+}
+.block:hover { transform: translateY(-1px); box-shadow: 0 3px 6px rgba(0,0,0,0.08); }
+
+.block.green { background: var(--green-bg); border-color: #27ae60; color: var(--green-text); }
+.block.pink  { background: var(--pink-bg);  border-color: #e74c3c; color: var(--pink-text);  }
+.block.amber { background: var(--amber-bg); border-color: #f39c12; color: var(--amber-text); }
+.block.gray  { background: var(--gray-bg);  border-color: #95a5a6; color: var(--gray-text);  }
+
+.block.done { opacity: 0.55; text-decoration: line-through; }
+.block.missed { border: 2px dashed #e74c3c !important; }
+
+.block .handle { cursor: grab; color: #94a3b8; font-size: 11px; }
+.block .chk { cursor: pointer; width: 14px; height: 14px; }
+.block .type-icon { font-size: 13px; }
+.block .details { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.block .txt { cursor: pointer; word-break: break-word; }
+.block .sub-info { font-size: 10px; opacity: 0.85; display: flex; gap: 6px; flex-wrap: wrap; }
+.block .del, .block .pin-btn { cursor: pointer; font-size: 11px; opacity: 0.4; transition: opacity 0.15s; }
+.block:hover .del, .block:hover .pin-btn { opacity: 1; }
+.block.pinned .pin-btn { color: #d63031; opacity: 1; }
+
+.add-btn {
+  border: 1px dashed var(--border-color);
+  border-radius: 6px;
+  padding: 5px;
+  text-align: center;
+  color: #64748b;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+.add-btn:hover { background: #f1f5f9; color: var(--navy); }
+
+/* DAILY GOALS */
+.goal-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  padding: 5px 8px;
+  background: #f8fafc;
+  border-radius: 5px;
+  border: 1px solid #e2e8f0;
+}
+.goal-item.done { text-decoration: line-through; opacity: 0.6; }
+.goal-item span { flex: 1; word-break: break-word; cursor: pointer; }
+.goal-item .del { cursor: pointer; font-size: 11px; color: #94a3b8; }
+.goal-item .del:hover { color: #e74c3c; }
+
+/* MODALS & POPOVERS */
+.overlay {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: 998;
+}
+.popover {
+  position: fixed;
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  width: 320px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  z-index: 999;
+}
+.popover label {
+  font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; display: block; margin: 8px 0 4px;
+}
+.popover input[type="text"], .popover input[type="email"], .popover input[type="password"], .popover input[type="number"], .popover input[type="date"] {
+  width: 100%; padding: 7px 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; outline: none;
+}
+.popover input:focus { border-color: var(--navy); }
+
+.swatch-row { display: flex; gap: 8px; margin-top: 6px; }
+.swatch { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
+.swatch.green { background: #27ae60; }
+.swatch.pink  { background: #e74c3c; }
+.swatch.amber { background: #f39c12; }
+.swatch.gray  { background: #95a5a6; }
+.swatch.selected { border-color: var(--navy); transform: scale(1.15); }
+
+.icon-row { display: flex; gap: 8px; margin-top: 6px; }
+.icon-choice {
+  width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--border-color);
+  display: flex; align-items: center; justify-content: center; cursor: pointer; color: #475569;
+}
+.icon-choice.selected { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+.popover-actions { display: flex; justify-content: space-between; gap: 8px; margin-top: 14px; }
+.btn {
+  padding: 7px 12px; border-radius: 6px; border: none; font-size: 12px; font-weight: 700; cursor: pointer;
+}
+.btn-save { background: var(--navy); color: #fff; }
+.btn-save:hover { background: #0f172a; }
+.btn-delete { background: #fee2e2; color: #c0392b; }
+.btn-delete:hover { background: #fca5a5; }
+
+/* AUTH TABS */
+.auth-tabs { display: flex; border-bottom: 1px solid #e2e8f0; margin-bottom: 12px; }
+.auth-tab {
+  flex: 1; text-align: center; padding: 8px; font-size: 13px; font-weight: 700; cursor: pointer; color: #64748b;
+  border-bottom: 2px solid transparent;
+}
+.auth-tab.active { color: var(--navy); border-color: var(--navy); }
+.auth-msg { font-size: 12px; margin-top: 8px; display: none; padding: 6px 10px; border-radius: 5px; }
+.auth-msg.error { background: #fee2e2; color: #c0392b; display: block; }
+.auth-msg.success { background: #dcfce7; color: #15803d; display: block; }
+
+/* SUBJECT CARDS */
+.subject-card {
+  background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-bottom: 8px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.subject-title { font-weight: 700; font-size: 13px; color: var(--navy); }
+.badge { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 10px; text-transform: uppercase; }
+.badge.ahead { background: #dcfce7; color: #15803d; }
+.badge.ontrack { background: #e0f2fe; color: #0369a1; }
+.badge.behind { background: #fee2e2; color: #b91c1c; }
+
+/* DRAG PLACEHOLDER */
+.drag-placeholder { border: 2px dashed #cbd5e1; border-radius: 7px; background: #f8fafc; margin-bottom: 6px; }
+
+/* PRINT STYLES */
+@media print {
+  body { background: #fff; padding: 0; font-size: 10pt; }
+  .toolbar, .academic-banner, .missed-banner, .add-btn, .del, .chk, .pin-btn { display: none !important; }
+  .banner { padding: 10px; }
+  table { border: 1px solid #000; box-shadow: none; }
+  th, td { border: 1px solid #000 !important; }
+  th { background: #eee !important; color: #000 !important; }
+  .block { border: 1px solid #999 !important; background: #fff !important; color: #000 !important; box-shadow: none !important; }
+}
+
+/* MOBILE RESPONSIVE TOOLBAR WITH HAMBURGER MENU (=) */
+@media (max-width: 768px) {
+  .mobile-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .toolbar {
+    position: sticky;
+    top: 6px;
+    padding: 8px 10px;
+    border-radius: 14px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .toolbar .left {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+  }
+  #today-label {
+    font-size: 11px;
+    padding: 4px 6px;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .nav-btn {
+    padding: 5px 8px;
+    font-size: 11px;
+  }
+  .toolbar-right {
+    display: none !important; /* 100% hidden by default until = hamburger is clicked */
+  }
+  .toolbar-right.open {
+    display: flex !important;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(203, 213, 225, 0.8);
+    animation: fadeInDown 0.2s ease-out forwards;
+  }
+  .toolbar-right .auth-btn, .toolbar-right .print-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+  table, thead, tbody, tr, td { display: block; width: 100%; }
+  thead { display: none; }
+  tbody tr { margin-bottom: 14px; display: block; background: #fff; border-radius: 12px; padding: 10px; }
+  tbody tr td { border: none; border-radius: 8px !important; width: auto !important; padding: 8px 4px; }
+  tbody tr td:first-child { text-align: left; padding-bottom: 6px; display: flex; align-items: baseline; gap: 8px; background: none; }
+  .academic-banner { flex-direction: column; align-items: stretch; }
+  .academic-progress-container { max-width: 100%; }
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="toolbar">
+    <div class="left">
+      <button class="nav-btn" onclick="changeWeek(-1)"><i class="fa-solid fa-chevron-left"></i> <span id="txt-prev">Prev</span></button>
+      <span id="today-label" style="font-weight:700;"></span>
+      <button class="nav-btn" onclick="changeWeek(1)"><span id="txt-next">Next</span> <i class="fa-solid fa-chevron-right"></i></button>
+      <button class="nav-btn" onclick="jumpToCurrentWeek()"><span id="txt-today">Today</span></button>
+      <button class="mobile-menu-btn" id="mobile-menu-btn" onclick="toggleMobileMenu()"><i class="fa-solid fa-bars"></i></button>
+    </div>
+    <div class="toolbar-right" id="toolbar-right">
+      <button class="auth-btn" id="lang-btn" onclick="toggleLanguage(); closeMobileMenu();"><i class="fa-solid fa-globe"></i> <span id="lang-btn-text">العربية</span></button>
+      <button class="auth-btn" onclick="openRevisionModal(); closeMobileMenu();"><i class="fa-solid fa-rotate-left"></i> <span id="txt-revision">Revision</span></button>
+      <button class="auth-btn" onclick="openCalendarModal(); closeMobileMenu();"><i class="fa-solid fa-calendar-check"></i> <span id="txt-exams">Exams</span></button>
+      <button class="auth-btn" onclick="openCatchUpModal(); closeMobileMenu();"><i class="fa-solid fa-life-ring"></i> <span id="txt-catchup">Catch-Up</span></button>
+      <button class="auth-btn" onclick="openReportsModal(); closeMobileMenu();"><i class="fa-solid fa-chart-line"></i> <span id="txt-history">History</span></button>
+      <button class="auth-btn" onclick="openColumnsManagerModal(); closeMobileMenu();"><i class="fa-solid fa-table-columns"></i> <span id="txt-columns">Columns</span></button>
+      <button class="auth-btn" onclick="openSubjectsModal(); closeMobileMenu();"><i class="fa-solid fa-book-bookmark"></i> <span id="txt-curriculum">Curriculum</span></button>
+      <button class="auth-btn" id="auth-trigger" onclick="handleAuthClick(); closeMobileMenu();"><i class="fa-solid fa-user"></i> <span id="auth-btn-text">Sign In</span></button>
+      <button class="print-btn" onclick="window.print(); closeMobileMenu();"><i class="fa-solid fa-print"></i> <span id="txt-print">Print</span></button>
+    </div>
+  </div>
+
+  <div class="banner">
+    <h1 id="txt-app-title">Baccalaureate Schedules</h1>
+    <div class="rule"></div>
+    <div class="sub" id="txt-app-sub">PLAN &nbsp;/&nbsp; STUDY &nbsp;/&nbsp; ACHIEVE</div>
+  </div>
+
+  <!-- ACADEMIC YEAR PROGRESS BANNER -->
+  <div class="academic-banner" id="academic-banner">
+    <div class="academic-info">
+      <div class="academic-title"><i class="fa-solid fa-graduation-cap" style="color:var(--gold);"></i> <span id="txt-academic-year">2026–2027 Academic Year</span></div>
+      <div class="academic-sub" id="academic-days-text">(0 days elapsed • 0 days remaining)</div>
+    </div>
+    <div class="academic-progress-container">
+      <div class="academic-bar-track"><div class="academic-bar-fill" id="academic-progress-fill" style="width:0%"></div></div>
+      <span class="academic-pct" id="academic-pct-val">0%</span>
+    </div>
+  </div>
+
+  <div id="missed-container"></div>
+
+  <div class="dash">
+    <div class="stat streak">
+      <div class="icon"><i class="fa-solid fa-fire"></i></div>
+      <div>
+        <div class="label" id="txt-lbl-streak">Study Streak</div>
+        <div class="value" id="streak-val">0 days</div>
+      </div>
+    </div>
+    <div class="stat perfect">
+      <div class="icon"><i class="fa-solid fa-star"></i></div>
+      <div>
+        <div class="label" id="txt-lbl-perfect">Perfect Streak</div>
+        <div class="value" id="perfect-val">0 days</div>
+      </div>
+    </div>
+    <div class="stat best">
+      <div class="icon"><i class="fa-solid fa-trophy"></i></div>
+      <div>
+        <div class="label" id="txt-lbl-best">Best Streak</div>
+        <div class="value" id="best-val">0 days</div>
+      </div>
+    </div>
+    <div class="stat progress">
+      <div class="top-row">
+        <div class="icon"><i class="fa-solid fa-chart-simple"></i></div>
+        <div>
+          <div class="label" id="txt-lbl-week">This Week</div>
+          <div class="value" id="progress-val">0%</div>
+        </div>
+      </div>
+      <div class="bar-track"><div class="bar-fill" id="progress-bar" style="width:0%"></div></div>
+      <div class="hint" id="txt-lbl-reset">Resets every Saturday</div>
+    </div>
+  </div>
+
+  <table id="schedule-table">
+    <thead id="table-head"></thead>
+    <tbody id="table-body"></tbody>
+  </table>
+</div>
+
+<script>
+/* ─────────────────────────────────────────────
+   MOBILE MENU TOGGLE SYSTEM (=)
+───────────────────────────────────────────── */
+function toggleMobileMenu() {
+  const menu = document.getElementById('toolbar-right');
+  const btn  = document.getElementById('mobile-menu-btn');
+  if (menu) {
+    const isOpen = menu.classList.toggle('open');
+    if (btn) {
+      btn.innerHTML = isOpen ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
+    }
+  }
+}
+
+function closeMobileMenu() {
+  const menu = document.getElementById('toolbar-right');
+  const btn  = document.getElementById('mobile-menu-btn');
+  if (menu && menu.classList.contains('open')) {
+    menu.classList.remove('open');
+    if (btn) {
+      btn.innerHTML = '<i class="fa-solid fa-bars"></i>';
+    }
+  }
+}
+
+/* ─────────────────────────────────────────────
+   SUPABASE CONFIGURATION & AUTH
+───────────────────────────────────────────── */
+const SUPABASE_URL = "YOUR_SUPABASE_URL";
+const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+
+let supabaseClient = null;
+let currentUser    = null;
+
+/* ─────────────────────────────────────────────
+   COMPLETE I18N LOCALIZATION DICTIONARY
+───────────────────────────────────────────── */
+const I18N = {
+  en: {
+    appTitle: "Baccalaureate Schedules",
+    appSub: "PLAN / STUDY / ACHIEVE",
+    prev: "Prev", next: "Next", today: "Today",
+    revision: "Revision", exams: "Exams", catchUp: "Catch-Up", history: "History",
+    columns: "Columns", curriculum: "Curriculum", signIn: "Sign In", print: "Print",
+    streak: "Study Streak", perfect: "Perfect Streak", best: "Best Streak", thisWeek: "This Week",
+    resetHint: "Resets every Saturday",
+    academicYear: "2026–2027 Academic Year",
+    daysElapsed: "days elapsed",
+    daysRemaining: "days until final exams",
+    dayNames: { Sat:'Saturday', Sun:'Sunday', Mon:'Monday', Tue:'Tuesday', Wed:'Wednesday', Thu:'Thursday', Fri:'Friday' },
+    dayShort: { Sat:'Sat', Sun:'Sun', Mon:'Mon', Tue:'Tue', Wed:'Wed', Thu:'Thu', Fri:'Fri' },
+    goals: "Daily Goals",
+    dayCol: "Day",
+    addGoal: "+ Goal",
+    addSession: "+ Add",
+    off: "OFF",
+    missedMsg: "You missed checking in on",
+    streakResetMsg: "your streak was reset.",
+    weekLabelPrefix: "Week: ",
+    
+    // Calendar Modal
+    calendarTitle: "Exam & Deadline Calendar",
+    calendarSub: "Track Baccalaureate exams, school tests, and mock exams.",
+    addExamLabel: "Add Exam / Deadline",
+    examTitlePlaceholder: "Title (e.g. Physics Midterm)",
+    addBtn: "Add",
+    doneBtn: "Done",
+    noExams: "No scheduled exams or deadlines.",
+    inDays: "In {n} days",
+    todayExam: "TODAY!",
+    agoDays: "{n} days ago",
+    
+    // Revision Modal
+    revisionTitle: "Spaced Revision Tracker",
+    revisionSub: "Memory curve intervals: 1 → 3 → 7 → 14 → 30 days.",
+    addTopicLabel: "Add Revision Topic",
+    topicPlaceholder: "e.g. Organic Chemistry",
+    reviewedBtn: "Reviewed ✓",
+    intervalLabel: "Interval",
+    nextLabel: "Next",
+    noTopics: "No topics added for spaced revision.",
+    
+    // Catch Up Modal
+    catchupTitle: "Smart Catch-Up Mode",
+    catchupSub: "Recover missed study sessions without breaking your routine.",
+    noMissed: "You have no missed sessions! 🎉",
+    moveToToday: "Move to Today",
+    
+    // History Modal
+    reportsTitle: "Performance & History Report",
+    reportsSub: "Detailed breakdown of study sessions and completion rates.",
+    weeklyRate: "Weekly Completion Rate",
+    streaksRecord: "Streaks Record",
+    closeReport: "Close Report",
+    
+    // Subjects Modal
+    subjectsTitle: "Subjects & Curriculum",
+    subjectsSub: "Track academic progress and lesson targets per subject.",
+    addSubjectLabel: "Add New Subject",
+    subNamePlaceholder: "Subject Name (e.g. Physics)",
+    subTotalPlaceholder: "Total Lessons",
+    addSubBtn: "Add Subject",
+    addLessonBtn: "+1 Lesson",
+    aheadBadge: "Ahead",
+    onTrackBadge: "On Track",
+    behindBadge: "Behind",
+    confirmDeleteSub: "Are you sure you want to delete this subject?",
+    lessonsWord: "lessons",
+
+    // Columns Modal
+    colsTitle: "Custom Columns Manager",
+    colsSub: "Add, rename, or reorder schedule columns.",
+    newColPlaceholder: "e.g. Private Tutor",
+    restoreDefaults: "Restore Defaults",
+    confirmDeleteCol: "Are you sure you want to delete this column? Any sessions inside it will be safely moved to your first column.",
+    
+    // Session Editor
+    sessionNameLabel: "Session / Class Name",
+    sessionNamePlaceholder: "e.g. Chemistry (9 - 11)",
+    teacherLabel: "Teacher / Instructor",
+    teacherPlaceholder: "e.g. Mr. Bassem",
+    timeLabel: "Time",
+    timePlaceholder: "9:00 - 11:00",
+    lessonsCoveredLabel: "Lessons Covered",
+    iconLabel: "Icon",
+    colorLabel: "Color Tag",
+    saveBtn: "Save",
+    deleteBtn: "Delete",
+
+    // Goal Editor
+    goalLabel: "Goal",
+    goalPlaceholder: "e.g. Finish 20 math problems",
+
+    // Auth
+    signInTab: "Sign In",
+    registerTab: "Register",
+    emailLabel: "Email or Phone",
+    passLabel: "Password",
+    createAccount: "Create Account",
+    cancelBtn: "Cancel",
+    accountProfile: "Account Profile",
+    signOutBtn: "Sign Out"
+  },
+  ar: {
+    appTitle: "جدول دراسة البكالوريا",
+    appSub: "خطط / ادرس / تفوق",
+    prev: "السابق", next: "التالي", today: "اليوم",
+    revision: "المراجعة", exams: "الامتحانات", catchUp: "التعويض", history: "السجل",
+    columns: "الأعمدة", curriculum: "المنهج", signIn: "تسجيل الدخول", print: "طباعة",
+    streak: "سلسلة الدراسة", perfect: "سلسلة مثالية", best: "أفضل سلسلة", thisWeek: "إنجاز الأسبوع",
+    resetHint: "يتجدد كل سبت",
+    academicYear: "العام الدراسي 2026–2027",
+    daysElapsed: "يوم منقضي",
+    daysRemaining: "يوم حتى الامتحانات النهائية",
+    dayNames: { Sat:'السبت', Sun:'الأحد', Mon:'الاثنين', Tue:'الثلاثاء', Wed:'الأربعاء', Thu:'الخميس', Fri:'الجمعة' },
+    dayShort: { Sat:'السبت', Sun:'الأحد', Mon:'الاثنين', Tue:'الثلاثاء', Wed:'الأربعاء', Thu:'الخميس', Fri:'الجمعة' },
+    goals: "أهداف اليوم",
+    dayCol: "اليوم",
+    addGoal: "+ هدف",
+    addSession: "+ إضافة",
+    off: "عطلة",
+    missedMsg: "لقد فاتك تسجيل الحضور يوم",
+    streakResetMsg: "تم إعادة ضبط السلسلة.",
+    weekLabelPrefix: "الأسبوع: ",
+
+    // Calendar Modal
+    calendarTitle: "تقويم الامتحانات والمواعيد",
+    calendarSub: "متابعة امتحانات البكالوريا والاختبارات المدرسية والامتحانات التجريبية.",
+    addExamLabel: "إضافة امتحان / موعد",
+    examTitlePlaceholder: "اسم الامتحان (مثلاً: اختبار الفيزياء)",
+    addBtn: "إضافة",
+    doneBtn: "تم",
+    noExams: "لا توجد امتحانات أو مواعيد مجدولة.",
+    inDays: "خلال {n} يوم",
+    todayExam: "اليوم!",
+    agoDays: "منذ {n} يوم",
+
+    // Revision Modal
+    revisionTitle: "متابع المراجعة المتباعدة",
+    revisionSub: "فترات منحنى الذاكرة: 1 ← 3 ← 7 ← 14 ← 30 يوم.",
+    addTopicLabel: "إضافة موضوع للمراجعة",
+    topicPlaceholder: "مثلاً: الكيمياء العضوية",
+    reviewedBtn: "تمت المراجعة ✓",
+    intervalLabel: "الفترة",
+    nextLabel: "القادم",
+    noTopics: "لا توجد مواضيع مضافة للمراجعة المتباعدة.",
+
+    // Catch Up Modal
+    catchupTitle: "وضع التعويض الذكي",
+    catchupSub: "استعادة الجلسات الدراسية الفائتة دون الكسر بروتينك.",
+    noMissed: "ليس لديك أي جلسات فائتة! 🎉",
+    moveToToday: "النقل إلى اليوم",
+
+    // History Modal
+    reportsTitle: "تقرير الأداء والسجل",
+    reportsSub: "تفاصيل دقيقة للجلسات الدراسية ونسب الإنجاز.",
+    weeklyRate: "نسبة إنجاز الأسبوع",
+    streaksRecord: "سجل السلاسل الدراسية",
+    closeReport: "إغلاق التقرير",
+
+    // Subjects Modal
+    subjectsTitle: "المواد والمنهج الدراسي",
+    subjectsSub: "متابعة التقدم الأكاديمي واستهداف الدروس لكل مادة.",
+    addSubjectLabel: "إضافة مادة جديدة",
+    subNamePlaceholder: "اسم المادة (مثلاً: الفيزياء)",
+    subTotalPlaceholder: "إجمالي الدروس",
+    addSubBtn: "إضافة مادة",
+    addLessonBtn: "+1 درس",
+    aheadBadge: "متقدم",
+    onTrackBadge: "على المسار",
+    behindBadge: "متأخر",
+    confirmDeleteSub: "هل أنت تأكد من رغبتك في حذف هذه المادة؟",
+    lessonsWord: "دروس",
+
+    // Columns Modal
+    colsTitle: "إدارة الأعمدة المخصصة",
+    colsSub: "إضافة أو إعادة تسمية أو حذف أعمدة الجدول.",
+    newColPlaceholder: "مثلاً: دروس خصوصية",
+    restoreDefaults: "استعادة الافتراضي",
+    confirmDeleteCol: "هل أنت تأكد من حذف هذا العمود؟ سيتم نقل الجلسات بأمان إلى العمود الأول.",
+
+    // Session Editor
+    sessionNameLabel: "اسم الحصة / المادة",
+    sessionNamePlaceholder: "مثلاً: كيمياء (9 - 11)",
+    teacherLabel: "الأستاذ / المعلم",
+    teacherPlaceholder: "مثلاً: أ. باسم",
+    timeLabel: "الوقت",
+    timePlaceholder: "9:00 - 11:00",
+    lessonsCoveredLabel: "الدروس المغطاة",
+    iconLabel: "الأيقونة",
+    colorLabel: "اللون",
+    saveBtn: "حفظ",
+    deleteBtn: "حذف",
+
+    // Goal Editor
+    goalLabel: "الهدف",
+    goalPlaceholder: "مثلاً: حل 20 مسألة رياضيات",
+
+    // Auth
+    signInTab: "تسجيل الدخول",
+    registerTab: "إنشاء حساب",
+    emailLabel: "البريد أو الهاتف",
+    passLabel: "كلمة المرور",
+    createAccount: "إنشاء حساب",
+    cancelBtn: "إلغاء",
+    accountProfile: "الملف الشخصي",
+    signOutBtn: "تسجيل الخروج"
+  }
+};
+
+let currentLang = 'en';
+
+/* ─────────────────────────────────────────────
+   CONSTANTS & DEFAULT CONFIGS
+───────────────────────────────────────────── */
+const ICONS = {
+  book:     'fa-solid fa-book-open',
+  dumbbell: 'fa-solid fa-dumbbell',
+  laptop:   'fa-solid fa-laptop',
+  palm:     'fa-solid fa-tree'
+};
+const DAY_ORDER = ['Sat','Sun','Mon','Tue','Wed','Thu','Fri'];
+
+const DEFAULT_COLUMNS = [
+  { key: 'school', label: 'School', icon: 'fa-school' },
+  { key: 'center', label: 'Center', icon: 'fa-building-columns' },
+  { key: 'online', label: 'Online', icon: 'fa-laptop' },
+  { key: 'homestudy', label: 'Home Study', icon: 'fa-book-open-reader' }
+];
+
+const DEFAULT_TEMPLATE = {
+  Sat: {
+    school: [
+      { id:'seed-sat-s1', text:'PE ( 9:20 - 10:40 )', icon:'dumbbell', color:'pink', pinned:false, teacher:'Coach Tareq', time:'9:20 - 10:40', lessonsCovered:1 },
+      { id:'seed-sat-s2', text:'English ( 10:40 - 1:40 )', icon:'book', color:'green', pinned:false, teacher:'Mr. Ahmed', time:'10:40 - 1:40', lessonsCovered:2 }
+    ],
+    center: [],
+    online: [
+      { id:'seed-sat-o1', text:'Arabic – Salah', icon:'laptop', color:'amber', pinned:false, teacher:'Mr. Salah', time:'4:00 - 6:00', lessonsCovered:1 },
+      { id:'seed-sat-o2', text:'English – Ahmed Tareq', icon:'laptop', color:'amber', pinned:false, teacher:'Mr. Ahmed', time:'7:00 - 9:00', lessonsCovered:1 }
+    ],
+    homestudy: []
+  },
+  Sun: {
+    school: [], center: [], homestudy: [],
+    online: [{ id:'seed-sun-o1', text:'History – Tolba', icon:'laptop', color:'amber', pinned:false, teacher:'Mr. Tolba', time:'5:00 - 7:00', lessonsCovered:1 }]
+  },
+  Mon: {
+    school: [
+      { id:'seed-mon-s1', text:'Arabic ( 8 - 11 )', icon:'book', color:'green', pinned:false, teacher:'Mr. Salah', time:'8:00 - 11:00', lessonsCovered:2 },
+      { id:'seed-mon-s2', text:'Finance ( 11 - 12 )', icon:'dumbbell', color:'pink', pinned:false, teacher:'Mrs. Mona', time:'11:00 - 12:00', lessonsCovered:1 }
+    ],
+    center: [{ id:'seed-mon-c1', text:'History – Bassem ( 12 : 3 )', icon:'book', color:'green', pinned:false, teacher:'Mr. Bassem', time:'12:00 - 3:00', lessonsCovered:2 }],
+    online: [], homestudy: []
+  },
+  Tue: {
+    school: [{ id:'seed-tue-s1', text:'History – Bassem ( 8 - 11 )', icon:'book', color:'green', pinned:false, teacher:'Mr. Bassem', time:'8:00 - 11:00', lessonsCovered:2 }],
+    center: [], homestudy: [],
+    online: [{ id:'seed-tue-o1', text:'English – Ahmed Tareq', icon:'laptop', color:'amber', pinned:false, teacher:'Mr. Ahmed', time:'6:00 - 8:00', lessonsCovered:1 }]
+  },
+  Wed: { school:[], center:[], online:[], homestudy:[] },
+  Thu: {
+    school: [{ id:'seed-thu-s1', text:'Programming ( 11 - 2 )', icon:'laptop', color:'green', pinned:false, teacher:'Eng. Hassan', time:'11:00 - 2:00', lessonsCovered:2 }],
+    center: [{ id:'seed-thu-c1', text:'History – Bassem ( 2 : 5 )', icon:'book', color:'green', pinned:false, teacher:'Mr. Bassem', time:'2:00 - 5:00', lessonsCovered:1 }],
+    online: [], homestudy: []
+  },
+  Fri: { school:[], center:[], online:[], homestudy:[] }
+};
+
+const DEFAULT_SUBJECTS = [
+  { id: 'sub-arabic', name: 'Arabic', color: 'amber', totalLessons: 24, coveredLessons: 8, targetWeeklyHours: 6.0 },
+  { id: 'sub-english', name: 'English', color: 'green', totalLessons: 20, coveredLessons: 6, targetWeeklyHours: 5.0 },
+  { id: 'sub-history', name: 'History', color: 'green', totalLessons: 30, coveredLessons: 9, targetWeeklyHours: 7.0 },
+  { id: 'sub-pe', name: 'PE & Health', color: 'pink', totalLessons: 10, coveredLessons: 4, targetWeeklyHours: 2.0 }
+];
+
+const DEFAULT_EVENTS = [
+  { id: 'ev-1', title: 'Baccalaureate Final Exams', date: '2027-06-01', type: 'exam' },
+  { id: 'ev-2', title: 'Physics Midterm Test', date: '2026-10-15', type: 'test' }
+];
+
+const DEFAULT_REVISION = [
+  { id: 'rev-1', topic: 'Arabic Grammar Basics', status: 'learned', intervalDays: 7, lastReview: '2026-09-01' },
+  { id: 'rev-2', topic: 'Modern History Unit 1', status: 'needs', intervalDays: 3, lastReview: '2026-09-05' }
+];
+
+function defaultWeek() {
+  return { items:{}, goals:{ Sat:[], Sun:[], Mon:[], Tue:[], Wed:[], Thu:[], Fri:[] } };
+}
+function defaultMeta() {
+  return { streak:0, perfectStreak:0, longestStreak:0, lastCheckDate:null };
+}
+
+/* ─────────────────────────────────────────────
+   STORAGE & STATE
+───────────────────────────────────────────── */
+function loadJSON(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw) return JSON.parse(raw);
+  } catch(e) { console.warn('loadJSON parse error', key, e); }
+  return JSON.parse(JSON.stringify(fallback));
+}
+
+let _saveTimers = {};
+function saveJSON(key, obj) {
+  clearTimeout(_saveTimers[key]);
+  _saveTimers[key] = setTimeout(() => {
+    try {
+      localStorage.setItem(key, JSON.stringify(obj));
+      if (supabaseClient) {
+        saveToSupabase(key, obj);
+      }
+    } catch(e) {
+      console.error('saveJSON failed', key, e);
+    }
+  }, 250);
+}
+
+let columnsConfig, template, week, meta, subjectsList, eventsList, revisionList, missedDates = [];
+const today = new Date();
+today.setHours(0,0,0,0);
+const todayStr = dateStr(today);
+
+let currentWeekStartDate = getWeekStart(today);
+let weekKey              = dateStr(currentWeekStartDate);
+
+/* ─────────────────────────────────────────────
+   WEEK NAVIGATION
+───────────────────────────────────────────── */
+function changeWeek(offset) {
+  currentWeekStartDate.setDate(currentWeekStartDate.getDate() + (offset * 7));
+  weekKey = dateStr(currentWeekStartDate);
+  week    = loadJSON('week-' + weekKey, defaultWeek());
+  updateWeekHeaderLabel();
+  renderDashboard();
+  render();
+}
+
+function jumpToCurrentWeek() {
+  currentWeekStartDate = getWeekStart(today);
+  weekKey              = dateStr(currentWeekStartDate);
+  week                 = loadJSON('week-' + weekKey, defaultWeek());
+  updateWeekHeaderLabel();
+  renderDashboard();
+  render();
+}
+
+function updateWeekHeaderLabel() {
+  const endDate = new Date(currentWeekStartDate);
+  endDate.setDate(endDate.getDate() + 6);
+  const startStr = currentWeekStartDate.toLocaleDateString(undefined, { month:'short', day:'numeric' });
+  const endStr   = endDate.toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' });
+  const t = I18N[currentLang] || I18N.en;
+  document.getElementById('today-label').textContent = `${t.weekLabelPrefix || 'Week: '}${startStr} – ${endStr}`;
+}
+
+/* ─────────────────────────────────────────────
+   SUPABASE & AUTH
+───────────────────────────────────────────── */
+function initSupabase() {
+  const url = (typeof window.ENV_SUPABASE_URL !== 'undefined' ? window.ENV_SUPABASE_URL : SUPABASE_URL);
+  const key = (typeof window.ENV_SUPABASE_ANON_KEY !== 'undefined' ? window.ENV_SUPABASE_ANON_KEY : SUPABASE_ANON_KEY);
+
+  if (url && key && url !== "YOUR_SUPABASE_URL" && key !== "YOUR_SUPABASE_ANON_KEY" && window.supabase) {
+    try {
+      supabaseClient = window.supabase.createClient(url, key);
+      supabaseClient.auth.onAuthStateChange((event, session) => {
+        currentUser = session ? session.user : null;
+        updateAuthUI();
+        if (currentUser) syncFromSupabase();
+      });
+      supabaseClient.auth.getSession().then(({ data:{ session } }) => {
+        currentUser = session ? session.user : null;
+        updateAuthUI();
+        if (currentUser) syncFromSupabase();
+      });
+    } catch (e) {
+      console.error('Supabase init error:', e);
+    }
+  }
+}
+
+function updateAuthUI() {
+  const label = document.getElementById('auth-btn-text');
+  if (currentUser) {
+    const name = currentUser.email ? currentUser.email.split('@')[0] : (currentUser.phone || 'User');
+    label.textContent = name;
+  } else {
+    const t = I18N[currentLang] || I18N.en;
+    label.textContent = t.signIn;
+  }
+}
+
+function handleAuthClick() {
+  if (currentUser) openProfileModal(); else openAuthModal();
+}
+
+async function syncFromSupabase() {
+  if (!supabaseClient || !currentUser) return;
+  try {
+    const { data, error } = await supabaseClient.from('schedule_data').select('*').eq('user_id', currentUser.id);
+    if (error) return;
+    if (data && data.length > 0) {
+      let updated = false;
+      data.forEach(row => {
+        if (row.id === 'template' && row.data) { template = row.data; localStorage.setItem('template', JSON.stringify(template)); updated = true; }
+        else if (row.id === 'meta' && row.data) { meta = row.data; localStorage.setItem('meta', JSON.stringify(meta)); updated = true; }
+        else if (row.id === 'columns' && row.data) { columnsConfig = row.data; localStorage.setItem('columns', JSON.stringify(columnsConfig)); updated = true; }
+        else if (row.id === 'subjects' && row.data) { subjectsList = row.data; localStorage.setItem('subjects', JSON.stringify(subjectsList)); updated = true; }
+        else if (row.id === 'events' && row.data) { eventsList = row.data; localStorage.setItem('events', JSON.stringify(eventsList)); updated = true; }
+        else if (row.id === 'revision' && row.data) { revisionList = row.data; localStorage.setItem('revision', JSON.stringify(revisionList)); updated = true; }
+        else if (row.id === 'week-' + weekKey && row.data) { week = row.data; localStorage.setItem('week-' + weekKey, JSON.stringify(week)); updated = true; }
+      });
+      if (updated) { renderDashboard(); render(); }
+    }
+  } catch(e) {}
+}
+
+async function saveToSupabase(key, obj) {
+  if (!supabaseClient) return;
+  try {
+    const payload = { id: key, data: obj, updated_at: new Date().toISOString() };
+    if (currentUser) payload.user_id = currentUser.id;
+    await supabaseClient.from('schedule_data').upsert(payload);
+  } catch(e) {}
+}
+
+/* ─────────────────────────────────────────────
+   DATE HELPERS
+───────────────────────────────────────────── */
+function pad(n) { return n < 10 ? '0'+n : ''+n; }
+function dateStr(d) { return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+function parseDate(s) { return new Date(s+'T00:00:00'); }
+function addDaysStr(s, n) {
+  const d = parseDate(s);
+  d.setDate(d.getDate() + n);
+  return dateStr(d);
+}
+function getWeekStart(date) {
+  const d = new Date(date);
+  d.setHours(0,0,0,0);
+  const diff = (d.getDay() - 6 + 7) % 7;
+  d.setDate(d.getDate() - diff);
+  return d;
+}
+function dayNameOf(date) {
+  const ws = getWeekStart(date);
+  return DAY_ORDER[Math.round((date - ws) / 86400000)];
+}
+function generateId() {
+  return 'id_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+}
+
+function itemsForDay(day) {
+  let list = [];
+  columnsConfig.forEach(col => {
+    if (template[day] && template[day][col.key]) list.push(...template[day][col.key]);
+  });
+  return list;
+}
+function dateForDay(day) {
+  const d = new Date(currentWeekStartDate);
+  d.setDate(d.getDate() + DAY_ORDER.indexOf(day));
+  return d;
+}
+function isPastDay(day) { return dateForDay(day) < today; }
+function isTodayDay(day) { return dateStr(dateForDay(day)) === todayStr; }
+
+/* ─────────────────────────────────────────────
+   STREAK RECONCILIATION
+───────────────────────────────────────────── */
+function reconcile() {
+  const missed = [];
+  if (!meta.lastCheckDate) { meta.lastCheckDate = todayStr; return missed; }
+  if (meta.lastCheckDate >= todayStr) return missed;
+
+  let cursor = addDaysStr(meta.lastCheckDate, 1);
+  let guard  = 0;
+
+  while (cursor < todayStr && guard < 30) {
+    const d     = parseDate(cursor);
+    const dName = dayNameOf(d);
+    const ws    = dateStr(getWeekStart(d));
+    const wk    = loadJSON('week-' + ws, defaultWeek());
+    const items = itemsForDay(dName);
+    const goals = wk.goals[dName] || [];
+
+    if (items.length > 0 || goals.length > 0) {
+      const anyDone = items.some(it => wk.items[it.id]) || goals.some(g => g.done);
+      const allDone = items.every(it => wk.items[it.id]) && goals.every(g => g.done);
+      
+      if (anyDone) meta.streak++; else meta.streak = 0;
+      if (allDone) meta.perfectStreak++; else meta.perfectStreak = 0;
+
+      meta.longestStreak = Math.max(meta.longestStreak, meta.streak);
+      if (!allDone) missed.push(cursor);
+    }
+    cursor = addDaysStr(cursor, 1);
+    guard++;
+  }
+
+  meta.lastCheckDate = todayStr;
+  return missed;
+}
+
+/* ─────────────────────────────────────────────
+   LANGUAGE & LOCALIZATION SWITCHER
+───────────────────────────────────────────── */
+function applyLanguageUI() {
+  const t = I18N[currentLang] || I18N.en;
+  document.documentElement.dir = (currentLang === 'ar') ? 'rtl' : 'ltr';
+  document.documentElement.lang = currentLang;
+
+  document.getElementById('lang-btn-text').textContent = currentLang === 'en' ? 'العربية' : 'English';
+  document.getElementById('txt-app-title').textContent  = t.appTitle;
+  document.getElementById('txt-app-sub').textContent    = t.appSub;
+  document.getElementById('txt-prev').textContent       = t.prev;
+  document.getElementById('txt-next').textContent       = t.next;
+  document.getElementById('txt-today').textContent      = t.today;
+  document.getElementById('txt-revision').textContent   = t.revision;
+  document.getElementById('txt-exams').textContent      = t.exams;
+  document.getElementById('txt-catchup').textContent    = t.catchUp;
+  document.getElementById('txt-history').textContent    = t.history;
+  document.getElementById('txt-columns').textContent    = t.columns;
+  document.getElementById('txt-curriculum').textContent = t.curriculum;
+  document.getElementById('txt-print').textContent      = t.print;
+
+  document.getElementById('txt-lbl-streak').textContent = t.streak;
+  document.getElementById('txt-lbl-perfect').textContent= t.perfect;
+  document.getElementById('txt-lbl-best').textContent   = t.best;
+  document.getElementById('txt-lbl-week').textContent   = t.thisWeek;
+  document.getElementById('txt-lbl-reset').textContent  = t.resetHint;
+  document.getElementById('txt-academic-year').textContent = t.academicYear;
+
+  updateWeekHeaderLabel();
+  updateAuthUI();
+  renderAcademicYearProgress();
+  renderDashboard();
+  renderMissedBanner();
+  render();
+}
+
+function toggleLanguage() {
+  currentLang = currentLang === 'en' ? 'ar' : 'en';
+  saveJSON('lang', currentLang);
+  applyLanguageUI();
+}
+
+/* ─────────────────────────────────────────────
+   ACADEMIC YEAR PROGRESS CALCULATOR
+───────────────────────────────────────────── */
+function renderAcademicYearProgress() {
+  const startDate = new Date('2026-09-01T00:00:00');
+  const endDate   = new Date('2027-06-01T00:00:00');
+  const now       = new Date();
+
+  const totalDuration = endDate - startDate;
+  const elapsed       = Math.max(0, now - startDate);
+  const elapsedDays   = Math.round(elapsed / (1000 * 60 * 60 * 24));
+  const remainingDays = Math.max(0, Math.round((endDate - now) / (1000 * 60 * 60 * 24)));
+  const pct           = Math.min(100, Math.max(0, Math.round((elapsed / totalDuration) * 100)));
+
+  const pctEl  = document.getElementById('academic-pct-val');
+  const fillEl = document.getElementById('academic-progress-fill');
+  const textEl = document.getElementById('academic-days-text');
+
+  if (pctEl)  pctEl.textContent  = pct + '%';
+  if (fillEl) fillEl.style.width = pct + '%';
+  if (textEl) {
+    const t = I18N[currentLang] || I18N.en;
+    textEl.textContent = `(${elapsedDays} ${t.daysElapsed} • ${remainingDays} ${t.daysRemaining})`;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   INIT
+───────────────────────────────────────────── */
+function init() {
+  currentLang   = loadJSON('lang', 'en');
+  columnsConfig = loadJSON('columns', DEFAULT_COLUMNS);
+  template      = loadJSON('template', DEFAULT_TEMPLATE);
+  subjectsList  = loadJSON('subjects', DEFAULT_SUBJECTS);
+  eventsList    = loadJSON('events', DEFAULT_EVENTS);
+  revisionList  = loadJSON('revision', DEFAULT_REVISION);
+  meta          = loadJSON('meta', defaultMeta());
+  missedDates   = reconcile();
+  saveJSON('meta', meta);
+  week          = loadJSON('week-' + weekKey, defaultWeek());
+
+  DAY_ORDER.forEach(day => {
+    if (!template[day]) template[day] = {};
+    columnsConfig.forEach(col => {
+      if (!template[day][col.key]) template[day][col.key] = [];
+    });
+  });
+
+  updateWeekHeaderLabel();
+  renderMissedBanner();
+  applyLanguageUI();
+
+  initSupabase();
+}
+
+/* ─────────────────────────────────────────────
+   DASHBOARD
+───────────────────────────────────────────── */
+function renderMissedBanner() {
+  const c = document.getElementById('missed-container');
+  if (!missedDates.length) { c.innerHTML = ''; return; }
+  const t = I18N[currentLang] || I18N.en;
+  const list = missedDates
+    .map(s => parseDate(s).toLocaleDateString(undefined, { weekday:'short', month:'short', day:'numeric' }))
+    .join(', ');
+  c.innerHTML = `<div class="missed-banner">
+    <div class="msg"><i class="fa-solid fa-triangle-exclamation"></i>
+    <span>${t.missedMsg || 'You missed checking in on'} <strong>${list}</strong> — ${t.streakResetMsg || 'your streak was reset.'}</span></div>
+    <button onclick="openCatchUpModal()"><i class="fa-solid fa-life-ring"></i> ${t.catchUp}</button>
+  </div>`;
+}
+
+function renderDashboard() {
+  const unit = currentLang === 'ar' ? ' أيام' : (meta.streak === 1 ? ' day' : ' days');
+  document.getElementById('streak-val').textContent = meta.streak + unit;
+  document.getElementById('perfect-val').textContent = (meta.perfectStreak || 0) + unit;
+  document.getElementById('best-val').textContent = meta.longestStreak + unit;
+
+  let total = 0, done = 0;
+  DAY_ORDER.forEach(day => {
+    const items = itemsForDay(day);
+    total += items.length;
+    done  += items.filter(it => week.items[it.id]).length;
+    const goals = week.goals[day] || [];
+    total += goals.length;
+    done  += goals.filter(g => g.done).length;
+  });
+  const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+  document.getElementById('progress-val').textContent = pct + '%';
+  document.getElementById('progress-bar').style.width = pct + '%';
+}
+
+/* ─────────────────────────────────────────────
+   DRAG TO REORDER
+───────────────────────────────────────────── */
+function enableDrag(card, handle, cardClass, getArray, saveKey) {
+  handle.addEventListener('pointerdown', (e) => {
+    if (card.classList.contains('pinned')) return;
+    e.preventDefault();
+    const container = card.parentElement;
+    const rect = card.getBoundingClientRect();
+    const offsetX = e.clientX - rect.left;
+    const offsetY = e.clientY - rect.top;
+
+    const ph = document.createElement('div');
+    ph.className = 'drag-placeholder';
+    ph.style.height = rect.height + 'px';
+    container.insertBefore(ph, card);
+
+    document.body.appendChild(card);
+    card.classList.add('dragging-card');
+    card.style.cssText = `position:fixed;width:${rect.width}px;left:${rect.left}px;top:${rect.top}px;z-index:1000`;
+
+    try { handle.setPointerCapture(e.pointerId); } catch(_) {}
+
+    function onMove(ev) {
+      card.style.left = (ev.clientX - offsetX) + 'px';
+      card.style.top  = (ev.clientY - offsetY) + 'px';
+      const sibs = [...container.children].filter(c => c !== ph && c !== card && c.classList.contains(cardClass));
+      let placed = false;
+      for (const sib of sibs) {
+        const sr = sib.getBoundingClientRect();
+        if (ev.clientY < sr.top + sr.height / 2) { container.insertBefore(ph, sib); placed = true; break; }
+      }
+      if (!placed) {
+        const btn = container.querySelector('.add-btn');
+        btn ? container.insertBefore(ph, btn) : container.appendChild(ph);
+      }
+    }
+    function onUp() {
+      document.removeEventListener('pointermove', onMove);
+      card.style.cssText = '';
+      card.classList.remove('dragging-card');
+      container.insertBefore(card, ph);
+      ph.remove();
+      const ids = [...container.children].filter(c => c.classList.contains(cardClass)).map(c => c.dataset.id);
+      const arr = getArray();
+      const reordered = ids.map(id => arr.find(x => x.id === id)).filter(Boolean);
+      arr.length = 0; reordered.forEach(x => arr.push(x));
+      saveJSON(saveKey, saveKey === 'template' ? template : week);
+      render();
+    }
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', onUp, { once:true });
+  });
+}
+
+/* ─────────────────────────────────────────────
+   RENDER TABLE
+───────────────────────────────────────────── */
+function esc(str) { const d = document.createElement('div'); d.textContent = str || ''; return d.innerHTML; }
+
+function render() {
+  const head = document.getElementById('table-head');
+  const body = document.getElementById('table-body');
+  const t    = I18N[currentLang] || I18N.en;
+
+  let headHTML = `<tr><th><i class="fa-solid fa-calendar-days"></i><span>${t.dayCol}</span></th>`;
+  columnsConfig.forEach(col => {
+    headHTML += `<th><i class="${col.icon || 'fa-solid fa-book'}"></i><span>${esc(col.label)}</span></th>`;
+  });
+  headHTML += `<th><i class="fa-solid fa-bullseye"></i><span>${t.goals}</span></th></tr>`;
+  head.innerHTML = headHTML;
+
+  body.innerHTML = '';
+
+  DAY_ORDER.forEach(day => {
+    const tr = document.createElement('tr');
+    if (isTodayDay(day)) tr.classList.add('today');
+
+    const dayTd = document.createElement('td');
+    const dDate = dateForDay(day);
+    const dayLabel = t.dayNames[day] || day;
+    dayTd.innerHTML = `<div class="day-name">${dayLabel}</div>
+      <div class="day-date">${dDate.toLocaleDateString(undefined,{month:'short',day:'numeric'})}</div>`;
+    tr.appendChild(dayTd);
+
+    const past = isPastDay(day);
+
+    columnsConfig.forEach(col => {
+      const colKey = col.key;
+      const td = document.createElement('td');
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      const items = (template[day] && template[day][colKey]) ? template[day][colKey] : [];
+
+      if (!items.length) {
+        const off = document.createElement('div');
+        off.className = 'block gray';
+        off.innerHTML = `<i class="${ICONS.palm}"></i><span>${t.off}</span>`;
+        off.onclick = () => openScheduleEditor({ day, col:colKey, idx:-1, mode:'add' }, off);
+        cell.appendChild(off);
+      } else {
+        items.forEach((item, idx) => {
+          const isDone   = !!week.items[item.id];
+          const isMissed = past && !isDone;
+          const block = document.createElement('div');
+          block.className = `block ${item.color || 'green'}${isDone?' done':''}${isMissed?' missed':''}${item.pinned?' pinned':''}`;
+          block.dataset.id = item.id;
+
+          let subDetails = [];
+          if (item.teacher) subDetails.push(`<span><i class="fa-solid fa-user-tie"></i> ${esc(item.teacher)}</span>`);
+          if (item.time) subDetails.push(`<span><i class="fa-solid fa-clock"></i> ${esc(item.time)}</span>`);
+
+          block.innerHTML = `
+            <span class="handle"><i class="fa-solid fa-grip-vertical"></i></span>
+            <input type="checkbox" class="chk"${isDone?' checked':''}>
+            <i class="type-icon ${ICONS[item.icon] || ICONS.book}"></i>
+            <div class="details">
+              <span class="txt">${esc(item.text)}</span>
+              ${subDetails.length ? `<div class="sub-info">${subDetails.join('')}</div>` : ''}
+            </div>
+            <span class="pin-btn" title="${item.pinned?'Unpin':'Pin'}"><i class="fa-solid fa-thumbtack"></i></span>
+            <span class="del">✕</span>`;
+
+          block.querySelector('.chk').onclick = e => {
+            e.stopPropagation();
+            week.items[item.id] = !week.items[item.id];
+            saveJSON('week-'+weekKey, week);
+            renderDashboard(); render();
+          };
+          block.querySelector('.pin-btn').onclick = e => {
+            e.stopPropagation();
+            item.pinned = !item.pinned;
+            saveJSON('template', template); render();
+          };
+          block.querySelector('.del').onclick = e => {
+            e.stopPropagation();
+            if (item.pinned) return;
+            template[day][colKey].splice(idx, 1);
+            saveJSON('template', template); render();
+          };
+          block.querySelector('.txt').onclick = () => {
+            if (item.pinned) return;
+            openScheduleEditor({ day, col:colKey, idx, mode:'edit' }, block);
+          };
+          cell.appendChild(block);
+          enableDrag(block, block.querySelector('.handle'), 'block', () => template[day][colKey], 'template');
+        });
+
+        const addBtn = document.createElement('div');
+        addBtn.className = 'add-btn';
+        addBtn.innerHTML = t.addSession;
+        addBtn.onclick = () => openScheduleEditor({ day, col:colKey, idx:-1, mode:'add' }, addBtn);
+        cell.appendChild(addBtn);
+      }
+
+      td.appendChild(cell); tr.appendChild(td);
+    });
+
+    const goalTd = document.createElement('td');
+    const goalCell = document.createElement('div');
+    goalCell.className = 'cell';
+
+    const dayGoals = week.goals[day] || [];
+    dayGoals.forEach(g => {
+      const gEl = document.createElement('div');
+      gEl.className = `goal-item${g.done?' done':''}`;
+      gEl.dataset.id = g.id;
+      gEl.innerHTML = `
+        <input type="checkbox"${g.done?' checked':''}>
+        <span>${esc(g.text)}</span>
+        <span class="del">✕</span>`;
+
+      gEl.querySelector('input').onclick = e => {
+        e.stopPropagation();
+        g.done = !g.done;
+        saveJSON('week-'+weekKey, week);
+        renderDashboard(); render();
+      };
+      gEl.querySelector('span').onclick = () => openGoalEditor(day, g, gEl);
+      gEl.querySelector('.del').onclick = e => {
+        e.stopPropagation();
+        if (g.pinned) return;
+        week.goals[day] = week.goals[day].filter(x => x.id !== g.id);
+        saveJSON('week-'+weekKey, week);
+        renderDashboard(); render();
+      };
+      goalCell.appendChild(gEl);
+    });
+
+    const addGoalBtn = document.createElement('div');
+    addGoalBtn.className = 'add-btn';
+    addGoalBtn.innerHTML = t.addGoal;
+    addGoalBtn.onclick = () => openGoalEditor(day, null, addGoalBtn);
+    goalCell.appendChild(addGoalBtn);
+
+    goalTd.appendChild(goalCell); tr.appendChild(goalTd);
+    body.appendChild(tr);
+  });
+}
+
+/* ─────────────────────────────────────────────
+   POPOVERS & MODALS MANAGEMENT
+───────────────────────────────────────────── */
+let activePopover = null;
+
+function closePopover() {
+  if (activePopover) {
+    if (activePopover.overlay) activePopover.overlay.remove();
+    if (activePopover.el) activePopover.el.remove();
+    activePopover = null;
+  }
+}
+
+function positionPopover(pop, anchor) {
+  const rect = anchor ? anchor.getBoundingClientRect() : { top:100, left:100, height:30, width:100 };
+  let top  = rect.top + rect.height + 6;
+  let left = rect.left;
+  const pw = pop.offsetWidth || 320;
+  const ph = pop.offsetHeight || 300;
+
+  if (left + pw > window.innerWidth - 10) left = window.innerWidth - pw - 10;
+  if (left < 10) left = 10;
+  if (top + ph > window.innerHeight - 10) top = rect.top - ph - 6;
+  if (top < 10) top = 10;
+
+  pop.style.top  = top + 'px';
+  pop.style.left = left + 'px';
+}
+
+/* PHASE 4: CALENDAR & EXAM MODAL */
+function openCalendarModal() {
+  closePopover();
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay'; overlay.onclick = closePopover;
+  document.body.appendChild(overlay);
+
+  const pop = document.createElement('div');
+  pop.className = 'popover'; pop.style.width = '370px';
+
+  function renderCalendarUI() {
+    const t = I18N[currentLang] || I18N.en;
+    const sorted = [...eventsList].sort((a,b) => new Date(a.date) - new Date(b.date));
+
+    let itemsHTML = sorted.map(ev => {
+      const target = new Date(ev.date + 'T00:00:00');
+      const diffDays = Math.round((target - today) / (1000 * 60 * 60 * 24));
+      let countdownText = diffDays > 0 ? t.inDays.replace('{n}', diffDays) : (diffDays === 0 ? t.todayExam : t.agoDays.replace('{n}', Math.abs(diffDays)));
+      let badgeColor = diffDays <= 7 && diffDays >= 0 ? '#e74c3c' : (diffDays > 7 ? '#2e6fdb' : '#94a3b8');
+
+      return `
+        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-weight:700;font-size:13px;color:var(--navy);">${esc(ev.title)}</div>
+            <div style="font-size:11px;color:#64748b;margin-top:2px;">
+              <i class="fa-solid fa-calendar"></i> ${ev.date} • <span style="font-weight:700;color:${badgeColor};">${countdownText}</span>
+            </div>
+          </div>
+          <button style="border:none;background:none;color:#c0392b;cursor:pointer;font-size:14px;" onclick="deleteCalendarEvent('${ev.id}')" title="Delete">✕</button>
+        </div>`;
+    }).join('');
+
+    pop.innerHTML = `
+      <div style="font-weight:700;font-size:15px;margin-bottom:6px;"><i class="fa-solid fa-calendar-check"></i> ${t.calendarTitle}</div>
+      <div style="font-size:12px;color:#64748b;margin-bottom:12px;">${t.calendarSub}</div>
+
+      <div style="max-height:220px;overflow-y:auto;margin-bottom:12px;">
+        ${sorted.length ? itemsHTML : `<div style="text-align:center;color:#94a3b8;padding:15px 0;">${t.noExams}</div>`}
+      </div>
+
+      <label>${t.addExamLabel}</label>
+      <input type="text" id="ev-title" placeholder="${t.examTitlePlaceholder}">
+      <div style="display:flex;gap:6px;margin-top:6px;">
+        <input type="date" id="ev-date" value="${todayStr}" style="flex:1;">
+        <button class="btn btn-save" id="btn-add-ev" style="width:90px;">${t.addBtn}</button>
+      </div>
+
+      <div class="popover-actions" style="margin-top:14px;">
+        <button class="btn btn-save" style="width:100%" onclick="closePopover()">${t.doneBtn}</button>
+      </div>`;
+
+    pop.querySelector('#btn-add-ev').onclick = () => {
+      const title = pop.querySelector('#ev-title').value.trim();
+      const date = pop.querySelector('#ev-date').value;
+      if (!title || !date) return;
+      eventsList.push({ id: 'ev_' + Date.now().toString(36), title, date, type: 'exam' });
+      saveJSON('events', eventsList);
+      renderCalendarUI();
+    };
+  }
+
+  document.body.appendChild(pop);
+  renderCalendarUI();
+  positionPopover(pop, document.body);
+  pop.addEventListener('click', e => e.stopPropagation());
+  activePopover = { el:pop, overlay };
+}
+
+window.deleteCalendarEvent = function(id) {
+  eventsList = eventsList.filter(e => e.id !== id);
+  saveJSON('events', eventsList);
+  closePopover(); openCalendarModal();
+};
+
+/* PHASE 4: SPACED REVISION MODAL */
+function openRevisionModal() {
+  closePopover();
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay'; overlay.onclick = closePopover;
+  document.body.appendChild(overlay);
+
+  const pop = document.createElement('div');
+  pop.className = 'popover'; pop.style.width = '370px';
+
+  function renderRevisionUI() {
+    const t = I18N[currentLang] || I18N.en;
+    let itemsHTML = revisionList.map(rev => {
+      const last = parseDate(rev.lastReview || todayStr);
+      const nextDueDate = new Date(last);
+      nextDueDate.setDate(nextDueDate.getDate() + (rev.intervalDays || 1));
+      const nextDueStr = dateStr(nextDueDate);
+
+      const isDueToday = nextDueStr <= todayStr;
+      const badgeColor = isDueToday ? '#e67e22' : '#219653';
+
+      return `
+        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-weight:700;font-size:13px;color:var(--navy);">${esc(rev.topic)}</div>
+            <div style="font-size:11px;color:#64748b;margin-top:2px;">
+              ${t.intervalLabel}: <strong>${rev.intervalDays}d</strong> • ${t.nextLabel}: ${nextDueStr}
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <button class="btn btn-save" style="font-size:11px;padding:4px 8px;background:${badgeColor};" onclick="markTopicReviewed('${rev.id}')">${t.reviewedBtn}</button>
+            <button style="border:none;background:none;color:#c0392b;cursor:pointer;font-size:13px;" onclick="deleteRevisionTopic('${rev.id}')">✕</button>
+          </div>
+        </div>`;
+    }).join('');
+
+    pop.innerHTML = `
+      <div style="font-weight:700;font-size:15px;margin-bottom:6px;"><i class="fa-solid fa-rotate-left"></i> ${t.revisionTitle}</div>
+      <div style="font-size:12px;color:#64748b;margin-bottom:12px;">${t.revisionSub}</div>
+
+      <div style="max-height:220px;overflow-y:auto;margin-bottom:12px;">
+        ${revisionList.length ? itemsHTML : `<div style="text-align:center;color:#94a3b8;padding:15px 0;">${t.noTopics}</div>`}
+      </div>
+
+      <label>${t.addTopicLabel}</label>
+      <div style="display:flex;gap:6px;">
+        <input type="text" id="rev-topic" placeholder="${t.topicPlaceholder}">
+        <button class="btn btn-save" id="btn-add-rev" style="width:90px;">${t.addBtn}</button>
+      </div>
+
+      <div class="popover-actions" style="margin-top:14px;">
+        <button class="btn btn-save" style="width:100%" onclick="closePopover()">${t.doneBtn}</button>
+      </div>`;
+
+    pop.querySelector('#btn-add-rev').onclick = () => {
+      const topic = pop.querySelector('#rev-topic').value.trim();
+      if (!topic) return;
+      revisionList.push({ id: 'rev_' + Date.now().toString(36), topic, status: 'learned', intervalDays: 1, lastReview: todayStr });
+      saveJSON('revision', revisionList);
+      renderRevisionUI();
+    };
+  }
+
+  document.body.appendChild(pop);
+  renderRevisionUI();
+  positionPopover(pop, document.body);
+  pop.addEventListener('click', e => e.stopPropagation());
+  activePopover = { el:pop, overlay };
+}
+
+window.markTopicReviewed = function(id) {
+  const rev = revisionList.find(r => r.id === id);
+  if (rev) {
+    const intervals = [1, 3, 7, 14, 30, 60];
+    const currIdx = intervals.indexOf(rev.intervalDays || 1);
+    rev.intervalDays = intervals[Math.min(intervals.length - 1, currIdx + 1)];
+    rev.lastReview = todayStr;
+    saveJSON('revision', revisionList);
+    closePopover(); openRevisionModal();
+  }
+};
+
+window.deleteRevisionTopic = function(id) {
+  revisionList = revisionList.filter(r => r.id !== id);
+  saveJSON('revision', revisionList);
+  closePopover(); openRevisionModal();
+};
+
+/* CATCH-UP MODAL */
+function openCatchUpModal() {
+  closePopover();
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay'; overlay.onclick = closePopover;
+  document.body.appendChild(overlay);
+
+  const pop = document.createElement('div');
+  pop.className = 'popover'; pop.style.width = '350px';
+  const t = I18N[currentLang] || I18N.en;
+
+  let missedList = [];
+  missedDates.forEach(dStr => {
+    const dName = dayNameOf(parseDate(dStr));
+    const items = itemsForDay(dName);
+    const wk    = loadJSON('week-' + dateStr(getWeekStart(parseDate(dStr))), defaultWeek());
+    items.forEach(it => {
+      if (!wk.items[it.id]) missedList.push({ day: dName, date: dStr, item: it });
+    });
+  });
+
+  let listHTML = missedList.map(m => `
+    <div style="background:#fff;border:1px solid #f3c1bb;border-radius:8px;padding:8px 10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <div style="font-weight:700;font-size:13px;color:#c0392b;">${esc(m.item.text)}</div>
+        <div style="font-size:11px;color:#64748b;">${m.day} • ${m.item.teacher || 'Class'}</div>
+      </div>
+      <button class="btn btn-save" style="font-size:11px;padding:4px 8px;" onclick="moveMissedToToday('${m.day}', '${m.item.id}')">${t.moveToToday}</button>
+    </div>
+  `).join('');
+
+  pop.innerHTML = `
+    <div style="font-weight:700;font-size:15px;margin-bottom:6px;"><i class="fa-solid fa-life-ring"></i> ${t.catchupTitle}</div>
+    <div style="font-size:12px;color:#64748b;margin-bottom:12px;">${t.catchupSub}</div>
+
+    ${missedList.length ? `<div style="max-height:220px;overflow-y:auto;margin-bottom:12px;">${listHTML}</div>` : `<div style="text-align:center;color:#219653;font-weight:700;padding:20px 0;"><i class="fa-solid fa-circle-check" style="font-size:24px;"></i><br>${t.noMissed}</div>`}
+
+    <div class="popover-actions">
+      <button class="btn btn-save" style="width:100%" onclick="closePopover()">${t.doneBtn}</button>
+    </div>`;
+
+  document.body.appendChild(pop);
+  positionPopover(pop, document.body);
+  pop.addEventListener('click', e => e.stopPropagation());
+  activePopover = { el:pop, overlay };
+}
+
+window.moveMissedToToday = function(fromDay, itemId) {
+  const todayName = dayNameOf(today);
+  let foundItem = null;
+  columnsConfig.forEach(col => {
+    if (template[fromDay] && template[fromDay][col.key]) {
+      const idx = template[fromDay][col.key].findIndex(x => x.id === itemId);
+      if (idx !== -1) {
+        foundItem = template[fromDay][col.key].splice(idx, 1)[0];
+        template[todayName][col.key].push(foundItem);
+      }
+    }
+  });
+  if (foundItem) {
+    saveJSON('template', template);
+    closePopover(); openCatchUpModal(); render();
+  }
+};
+
+/* REPORTS MODAL */
+function openReportsModal() {
+  closePopover();
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay'; overlay.onclick = closePopover;
+  document.body.appendChild(overlay);
+
+  const pop = document.createElement('div');
+  pop.className = 'popover'; pop.style.width = '360px';
+  const t = I18N[currentLang] || I18N.en;
+
+  pop.innerHTML = `
+    <div style="font-weight:700;font-size:15px;margin-bottom:6px;"><i class="fa-solid fa-chart-line"></i> ${t.reportsTitle}</div>
+    <div style="font-size:12px;color:#64748b;margin-bottom:12px;">${t.reportsSub}</div>
+
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;margin-bottom:10px;">
+      <div style="font-weight:700;font-size:13px;color:var(--navy);">${t.weeklyRate}</div>
+      <div style="font-size:20px;font-weight:800;color:#219653;margin-top:4px;">${document.getElementById('progress-val').textContent}</div>
+    </div>
+
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px;margin-bottom:10px;">
+      <div style="font-weight:700;font-size:13px;color:var(--navy);">${t.streaksRecord}</div>
+      <div style="font-size:12px;color:#475569;margin-top:4px;">
+        • ${t.streak}: <strong>${meta.streak}</strong><br>
+        • ${t.perfect}: <strong>${meta.perfectStreak || 0}</strong><br>
+        • ${t.best}: <strong>${meta.longestStreak}</strong>
+      </div>
+    </div>
+
+    <div class="popover-actions">
+      <button class="btn btn-save" style="width:100%" onclick="closePopover()">${t.closeReport}</button>
+    </div>`;
+
+  document.body.appendChild(pop);
+  positionPopover(pop, document.body);
+  pop.addEventListener('click', e => e.stopPropagation());
+  activePopover = { el:pop, overlay };
+}
+
+/* SCHEDULE EDITOR MODAL */
+function openScheduleEditor(ref, anchor) {
+  closePopover();
+  const t  = I18N[currentLang] || I18N.en;
+  const ex = (ref.mode === 'edit' && template[ref.day] && template[ref.day][ref.col]) ? template[ref.day][ref.col][ref.idx] : { text:'', icon:'book', color:'green', teacher:'', time:'', lessonsCovered:1 };
+  let chosenIcon = ex.icon || 'book', chosenColor = ex.color || 'green';
+
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay'; overlay.onclick = closePopover;
+  document.body.appendChild(overlay);
+
+  const pop = document.createElement('div');
+  pop.className = 'popover';
+  pop.innerHTML = `
+    <label>${t.sessionNameLabel}</label>
+    <input type="text" id="pop-text" value="${esc(ex.text)}" placeholder="${t.sessionNamePlaceholder}">
+    
+    <label>${t.teacherLabel}</label>
+    <input type="text" id="pop-teacher" value="${esc(ex.teacher || '')}" placeholder="${t.teacherPlaceholder}">
+    
+    <div style="display:flex;gap:8px;">
+      <div style="flex:1;">
+        <label>${t.timeLabel}</label>
+        <input type="text" id="pop-time" value="${esc(ex.time || '')}" placeholder="${t.timePlaceholder}">
+      </div>
+      <div style="flex:1;">
+        <label>${t.lessonsCoveredLabel}</label>
+        <input type="number" id="pop-lessons" value="${ex.lessonsCovered || 1}" min="1">
+      </div>
+    </div>
+
+    <label>${t.iconLabel}</label>
+    <div class="icon-row">${Object.keys(ICONS).map(k=>`<div class="icon-choice" data-icon="${k}"><i class="${ICONS[k]}"></i></div>`).join('')}</div>
+    
+    <label>${t.colorLabel}</label>
+    <div class="swatch-row">
+      <div class="swatch green" data-color="green"></div>
+      <div class="swatch pink"  data-color="pink"></div>
+      <div class="swatch amber" data-color="amber"></div>
+      <div class="swatch gray"  data-color="gray"></div>
+    </div>
+
+    <div class="popover-actions">
+      <button class="btn btn-delete" id="pop-delete" style="visibility:${ref.mode==='edit'?'visible':'hidden'}">${t.deleteBtn}</button>
+      <button class="btn btn-save" id="pop-save">${t.saveBtn}</button>
+    </div>`;
+  document.body.appendChild(pop);
+  positionPopover(pop, anchor);
+  pop.addEventListener('click', e => e.stopPropagation());
+
+  const refresh = () => {
+    pop.querySelectorAll('.icon-choice').forEach(el => el.classList.toggle('selected', el.dataset.icon  === chosenIcon));
+    pop.querySelectorAll('.swatch'     ).forEach(el => el.classList.toggle('selected', el.dataset.color === chosenColor));
+  };
+  refresh();
+  pop.querySelectorAll('.icon-choice').forEach(el => el.onclick = () => { chosenIcon  = el.dataset.icon;  refresh(); });
+  pop.querySelectorAll('.swatch'     ).forEach(el => el.onclick = () => { chosenColor = el.dataset.color; refresh(); });
+
+  pop.querySelector('#pop-save').onclick = () => {
+    const text = pop.querySelector('#pop-text').value.trim();
+    if (!text) { closePopover(); return; }
+    const item = ref.mode === 'edit' ? template[ref.day][ref.col][ref.idx] : { id:generateId(), pinned:false };
+    item.text = text;
+    item.teacher = pop.querySelector('#pop-teacher').value.trim();
+    item.time = pop.querySelector('#pop-time').value.trim();
+    item.lessonsCovered = parseInt(pop.querySelector('#pop-lessons').value) || 1;
+    item.icon = chosenIcon; item.color = chosenColor;
+    
+    if (ref.mode === 'add') template[ref.day][ref.col].push(item);
+    saveJSON('template', template);
+    closePopover(); renderDashboard(); render();
+  };
+  if (ref.mode === 'edit') {
+    pop.querySelector('#pop-delete').onclick = () => {
+      template[ref.day][ref.col].splice(ref.idx, 1);
+      saveJSON('template', template);
+      closePopover(); renderDashboard(); render();
+    };
+  }
+  activePopover = { el:pop, overlay };
+  pop.querySelector('#pop-text').focus();
+}
+
+/* COLUMNS MANAGER MODAL */
+function openColumnsManagerModal() {
+  closePopover();
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay'; overlay.onclick = closePopover;
+  document.body.appendChild(overlay);
+
+  const pop = document.createElement('div');
+  pop.className = 'popover'; pop.style.width = '340px';
+
+  function renderColsUI() {
+    const t = I18N[currentLang] || I18N.en;
+    let listHTML = columnsConfig.map((col, idx) => `
+      <div style="display:flex;align-items:center;justify-content:space-between;background:#f8fafc;padding:6px 10px;border-radius:7px;margin-bottom:6px;border:1px solid #e2e8f0;">
+        <span style="font-weight:700;font-size:13px;"><i class="${col.icon || 'fa-solid fa-book'}"></i> ${esc(col.label)}</span>
+        <div>
+          <button style="border:none;background:none;cursor:pointer;color:#c0392b;" onclick="deleteColumnPrompt('${col.key}')" title="Delete column">✕</button>
+        </div>
+      </div>
+    `).join('');
+
+    pop.innerHTML = `
+      <div style="font-weight:700;font-size:15px;margin-bottom:8px;"><i class="fa-solid fa-table-columns"></i> ${t.colsTitle}</div>
+      <div style="font-size:12px;color:#6b7280;margin-bottom:12px;">${t.colsSub}</div>
+      
+      <div style="max-height:180px;overflow-y:auto;margin-bottom:10px;">${listHTML}</div>
+
+      <label>${t.colsTitle}</label>
+      <div style="display:flex;gap:6px;">
+        <input type="text" id="new-col-name" placeholder="${t.newColPlaceholder}">
+        <button class="btn btn-save" id="btn-add-col">${t.addBtn}</button>
+      </div>
+
+      <div class="popover-actions" style="margin-top:14px;">
+        <button class="btn btn-delete" id="btn-restore-cols">${t.restoreDefaults}</button>
+        <button class="btn btn-save" onclick="closePopover()">${t.doneBtn}</button>
+      </div>`;
+
+    pop.querySelector('#btn-add-col').onclick = () => {
+      const name = pop.querySelector('#new-col-name').value.trim();
+      if (!name) return;
+      const key = 'col_' + Date.now().toString(36);
+      columnsConfig.push({ key, label: name, icon: 'fa-solid fa-bookmark' });
+      DAY_ORDER.forEach(day => { if (!template[day][key]) template[day][key] = []; });
+      saveJSON('columns', columnsConfig);
+      saveJSON('template', template);
+      renderColsUI(); render();
+    };
+
+    pop.querySelector('#btn-restore-cols').onclick = () => {
+      columnsConfig = JSON.parse(JSON.stringify(DEFAULT_COLUMNS));
+      saveJSON('columns', columnsConfig);
+      renderColsUI(); render();
+    };
+  }
+
+  document.body.appendChild(pop);
+  renderColsUI();
+  positionPopover(pop, document.body);
+  pop.addEventListener('click', e => e.stopPropagation());
+
+  activePopover = { el:pop, overlay };
+}
+
+window.deleteColumnPrompt = function(colKey) {
+  const t = I18N[currentLang] || I18N.en;
+  if (columnsConfig.length <= 1) {
+    alert("You must keep at least 1 schedule column.");
+    return;
+  }
+  if (confirm(t.confirmDeleteCol || `Are you sure you want to delete this column? Any sessions inside it will be safely moved to your first column.`)) {
+    const firstColKey = columnsConfig.find(c => c.key !== colKey).key;
+    DAY_ORDER.forEach(day => {
+      if (template[day] && template[day][colKey]) {
+        template[day][firstColKey].push(...template[day][colKey]);
+        delete template[day][colKey];
+      }
+    });
+    columnsConfig = columnsConfig.filter(c => c.key !== colKey);
+    saveJSON('columns', columnsConfig);
+    saveJSON('template', template);
+    closePopover(); render();
+  }
+};
+
+/* SUBJECTS & CURRICULUM MODAL WITH DELETE SUBJECT BUTTON */
+function openSubjectsModal() {
+  closePopover();
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay'; overlay.onclick = closePopover;
+  document.body.appendChild(overlay);
+
+  const pop = document.createElement('div');
+  pop.className = 'popover'; pop.style.width = '350px';
+
+  function renderSubjectsUI() {
+    const t = I18N[currentLang] || I18N.en;
+    let cardsHTML = subjectsList.map(sub => {
+      const pct = sub.totalLessons ? Math.round((sub.coveredLessons / sub.totalLessons) * 100) : 0;
+      let statusClass = pct >= 50 ? 'ahead' : (pct >= 25 ? 'ontrack' : 'behind');
+      let statusLabel = pct >= 50 ? t.aheadBadge : (pct >= 25 ? t.onTrackBadge : t.behindBadge);
+
+      return `
+        <div class="subject-card">
+          <div>
+            <div class="subject-title">${esc(sub.name)}</div>
+            <div style="font-size:11px;color:#64748b;margin-top:2px;">${sub.coveredLessons} / ${sub.totalLessons} ${t.lessonsWord} (${pct}%)</div>
+          </div>
+          <div style="text-align:right;display:flex;align-items:center;gap:8px;">
+            <div>
+              <span class="badge ${statusClass}">${statusLabel}</span>
+              <div style="margin-top:4px;">
+                <button style="border:none;background:none;cursor:pointer;color:#2e6fdb;font-size:12px;font-weight:600;" onclick="adjustLessonCount('${sub.id}', 1)">${t.addLessonBtn}</button>
+              </div>
+            </div>
+            <button style="border:none;background:none;cursor:pointer;color:#c0392b;font-size:14px;padding:4px;" onclick="deleteSubjectPrompt('${sub.id}')" title="Delete subject">✕</button>
+          </div>
+        </div>`;
+    }).join('');
+
+    pop.innerHTML = `
+      <div style="font-weight:700;font-size:15px;margin-bottom:8px;"><i class="fa-solid fa-book-bookmark"></i> ${t.subjectsTitle}</div>
+      <div style="font-size:12px;color:#6b7280;margin-bottom:12px;">${t.subjectsSub}</div>
+
+      <div style="max-height:220px;overflow-y:auto;margin-bottom:10px;">${cardsHTML.length ? cardsHTML : `<div style="text-align:center;color:#94a3b8;padding:15px 0;">No subjects added.</div>`}</div>
+
+      <label>${t.addSubjectLabel}</label>
+      <div style="display:flex;gap:6px;margin-bottom:6px;">
+        <input type="text" id="new-sub-name" placeholder="${t.subNamePlaceholder}">
+        <input type="number" id="new-sub-total" placeholder="${t.subTotalPlaceholder}" style="width:110px;" value="20">
+      </div>
+      <button class="btn btn-save" id="btn-add-sub" style="width:100%;">${t.addSubBtn}</button>
+
+      <div class="popover-actions" style="margin-top:14px;">
+        <button class="btn btn-save" style="width:100%;" onclick="closePopover()">${t.doneBtn}</button>
+      </div>`;
+
+    pop.querySelector('#btn-add-sub').onclick = () => {
+      const name = pop.querySelector('#new-sub-name').value.trim();
+      const total = parseInt(pop.querySelector('#new-sub-total').value) || 20;
+      if (!name) return;
+      subjectsList.push({ id: 'sub_' + Date.now().toString(36), name, color:'green', totalLessons: total, coveredLessons: 0, targetWeeklyHours: 5.0 });
+      saveJSON('subjects', subjectsList);
+      renderSubjectsUI();
+    };
+  }
+
+  document.body.appendChild(pop);
+  renderSubjectsUI();
+  positionPopover(pop, document.body);
+  pop.addEventListener('click', e => e.stopPropagation());
+
+  activePopover = { el:pop, overlay };
+}
+
+window.deleteSubjectPrompt = function(subId) {
+  const sub = subjectsList.find(s => s.id === subId);
+  if (!sub) return;
+  const t = I18N[currentLang] || I18N.en;
+  if (confirm(t.confirmDeleteSub || `Are you sure you want to delete "${sub.name}"?`)) {
+    subjectsList = subjectsList.filter(s => s.id !== subId);
+    saveJSON('subjects', subjectsList);
+    closePopover(); openSubjectsModal();
+  }
+};
+
+window.adjustLessonCount = function(subId, delta) {
+  const sub = subjectsList.find(s => s.id === subId);
+  if (sub) {
+    sub.coveredLessons = Math.max(0, Math.min(sub.totalLessons, sub.coveredLessons + delta));
+    saveJSON('subjects', subjectsList);
+    closePopover(); openSubjectsModal();
+  }
+};
+
+/* GOAL EDITOR MODAL */
+function openGoalEditor(day, goal, anchor) {
+  closePopover();
+  const t = I18N[currentLang] || I18N.en;
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay'; overlay.onclick = closePopover;
+  document.body.appendChild(overlay);
+
+  const pop = document.createElement('div');
+  pop.className = 'popover';
+  pop.innerHTML = `
+    <label>${t.goalLabel}</label>
+    <input type="text" id="pop-text" value="${goal ? esc(goal.text) : ''}" placeholder="${t.goalPlaceholder}">
+    <div class="popover-actions">
+      <button class="btn btn-delete" id="pop-delete" style="visibility:${goal?'visible':'hidden'}">${t.deleteBtn}</button>
+      <button class="btn btn-save" id="pop-save">${t.saveBtn}</button>
+    </div>`;
+  document.body.appendChild(pop);
+  positionPopover(pop, anchor);
+  pop.addEventListener('click', e => e.stopPropagation());
+
+  pop.querySelector('#pop-save').onclick = () => {
+    const text = pop.querySelector('#pop-text').value.trim();
+    if (!text) { closePopover(); return; }
+    if (goal) { goal.text = text; }
+    else { week.goals[day].push({ id:generateId(), text, done:false, pinned:false }); }
+    saveJSON('week-'+weekKey, week);
+    closePopover(); renderDashboard(); render();
+  };
+  if (goal) {
+    pop.querySelector('#pop-delete').onclick = () => {
+      if (goal.pinned) return;
+      week.goals[day] = week.goals[day].filter(g => g.id !== goal.id);
+      saveJSON('week-'+weekKey, week);
+      closePopover(); renderDashboard(); render();
+    };
+  }
+  activePopover = { el:pop, overlay };
+  pop.querySelector('#pop-text').focus();
+}
+
+/* AUTH MODAL */
+function openAuthModal() {
+  closePopover();
+  let mode = 'login';
+  const t  = I18N[currentLang] || I18N.en;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay'; overlay.onclick = closePopover;
+  document.body.appendChild(overlay);
+
+  const pop = document.createElement('div');
+  pop.className = 'popover'; pop.style.width = '310px';
+
+  function renderModalContent() {
+    pop.innerHTML = `
+      <div class="auth-tabs">
+        <div class="auth-tab ${mode==='login'?'active':''}" id="tab-login">${t.signInTab}</div>
+        <div class="auth-tab ${mode==='signup'?'active':''}" id="tab-signup">${t.registerTab}</div>
+      </div>
+      <label>${t.emailLabel}</label>
+      <input type="email" id="auth-email" placeholder="user@example.com">
+      <label>${t.passLabel}</label>
+      <input type="password" id="auth-pass" placeholder="••••••••">
+      <div class="auth-msg" id="auth-msg"></div>
+      <div class="popover-actions" style="margin-top:14px;">
+        <button class="btn btn-delete" onclick="closePopover()">${t.cancelBtn}</button>
+        <button class="btn btn-save" id="auth-submit">${mode==='login'?t.signInTab:t.createAccount}</button>
+      </div>`;
+
+    pop.querySelector('#tab-login').onclick = () => { mode = 'login'; renderModalContent(); };
+    pop.querySelector('#tab-signup').onclick = () => { mode = 'signup'; renderModalContent(); };
+
+    pop.querySelector('#auth-submit').onclick = async () => {
+      const email = pop.querySelector('#auth-email').value.trim();
+      const password = pop.querySelector('#auth-pass').value.trim();
+      const msgBox = pop.querySelector('#auth-msg');
+
+      if (!email || !password) {
+        msgBox.className = 'auth-msg error';
+        msgBox.textContent = 'Please provide both email/phone and password.';
+        msgBox.style.display = 'block'; return;
+      }
+      if (!supabaseClient) {
+        msgBox.className = 'auth-msg error';
+        msgBox.textContent = 'Supabase client is not connected.';
+        msgBox.style.display = 'block'; return;
+      }
+
+      msgBox.className = 'auth-msg'; msgBox.style.display = 'none';
+      pop.querySelector('#auth-submit').disabled = true;
+
+      if (mode === 'signup') {
+        const { error } = await supabaseClient.auth.signUp({ email, password });
+        if (error) {
+          msgBox.className = 'auth-msg error'; msgBox.textContent = error.message; msgBox.style.display = 'block';
+          pop.querySelector('#auth-submit').disabled = false;
+        } else {
+          msgBox.className = 'auth-msg success'; msgBox.textContent = 'Account created successfully! Signed in.'; msgBox.style.display = 'block';
+          setTimeout(() => closePopover(), 1500);
+        }
+      } else {
+        const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) {
+          msgBox.className = 'auth-msg error'; msgBox.textContent = error.message; msgBox.style.display = 'block';
+          pop.querySelector('#auth-submit').disabled = false;
+        } else { closePopover(); }
+      }
+    };
+  }
+
+  document.body.appendChild(pop);
+  renderModalContent();
+  positionPopover(pop, document.getElementById('auth-trigger'));
+  pop.addEventListener('click', e => e.stopPropagation());
+  activePopover = { el:pop, overlay };
+}
+
+/* PROFILE & ROLE MODAL */
+function openProfileModal() {
+  closePopover();
+  const t = I18N[currentLang] || I18N.en;
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay'; overlay.onclick = closePopover;
+  document.body.appendChild(overlay);
+
+  const pop = document.createElement('div');
+  pop.className = 'popover'; pop.style.width = '290px';
+  const role = (currentUser && currentUser.email && currentUser.email.includes('admin')) ? 'ADMIN' : 'STUDENT';
+
+  pop.innerHTML = `
+    <div style="font-weight:700;font-size:15px;margin-bottom:6px;"><i class="fa-solid fa-circle-user"></i> ${t.accountProfile}</div>
+    <div style="font-size:13px;color:#5a6273;word-break:break-all;margin-bottom:8px;">${currentUser ? (currentUser.email || currentUser.phone) : 'Guest'}</div>
+    
+    <div style="display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;background:${role==='ADMIN'?'#e74c3c':'#2e6fdb'};color:#fff;margin-bottom:14px;">
+      Role: ${role}
+    </div>
+
+    <div class="popover-actions">
+      <button class="btn btn-save" style="width:100%" id="auth-logout"><i class="fa-solid fa-right-from-bracket"></i> ${t.signOutBtn}</button>
+    </div>`;
+
+  document.body.appendChild(pop);
+  positionPopover(pop, document.getElementById('auth-trigger'));
+  pop.addEventListener('click', e => e.stopPropagation());
+
+  pop.querySelector('#auth-logout').onclick = async () => {
+    if (supabaseClient) await supabaseClient.auth.signOut();
+    closePopover();
+  };
+
+  activePopover = { el:pop, overlay };
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePopover(); });
+
+/* ─────────────────────────────────────────────
+   START APP
+───────────────────────────────────────────── */
+init();
+</script>
+</body>
+</html>
