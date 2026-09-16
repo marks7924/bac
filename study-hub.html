@@ -6423,7 +6423,20 @@
     /* ════════════════════════════════
        INIT
     ════════════════════════════════ */
+    function cleanLegacyDemoData() {
+      try {
+        const keys = ['template', 'subjects', 'events', 'revision', 'columns', 'lt-teachers', 'lt-lectures'];
+        keys.forEach(k => {
+          const val = localStorage.getItem(k);
+          if (val && (val.includes('s-s1') || val.includes('Arabic – Salah') || val.includes('History – Bassem') || val.includes('English (10:40') || val.includes('dt1'))) {
+            localStorage.removeItem(k);
+          }
+        });
+      } catch(e) {}
+    }
+
     function init() {
+      cleanLegacyDemoData();
       // Schedule
       sCols = loadJ('columns', DEF_COLS);
       sTmpl = loadJ('template', DEF_TEMPLATE);
@@ -6462,9 +6475,16 @@
     const SUPABASE_URL  = 'https://oqeaikrpcbqqrzsorghy.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9xZWFpa3JwY2JxcXJ6c29yZ2h5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4Njg2NTUsImV4cCI6MjEwNDQ0NDY1NX0.d_dBZsg9Y4fRoCwrA4-RN8zmOV0pxutLsk3sbVEJ_No';
 
-    const isSupabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_URL.startsWith('http'));
-    window._supabase = isSupabaseConfigured ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON) : null;
-    const _sb = window._supabase;
+    let _sb = null;
+    try {
+      if (typeof supabase !== 'undefined' && SUPABASE_URL && SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_URL.startsWith('http')) {
+        _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+        window._supabase = _sb;
+      }
+    } catch(e) {
+      console.error('Supabase init error:', e);
+    }
+    const isSupabaseConfigured = Boolean(_sb);
 
     /* ── Auth UI helpers ── */
     function showAuthScreen()  { document.getElementById('auth-screen').style.display = 'flex'; }
@@ -6562,16 +6582,21 @@
 
     /* ── Google OAuth ── */
     async function doGoogleLogin() {
-      if (!_sb) {
-        showAuthErr('تسجيل الدخول بجوجل يتطلب ربط Supabase URL في Vercel أو الكود');
+      const client = _sb || (typeof supabase !== 'undefined' && SUPABASE_URL.startsWith('http') ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON) : null);
+      if (!client) {
+        showAuthErr('تعذر الاتصال بسيرفر Supabase. تحقق من اتصال النت واعد التحميل.');
         return;
       }
+      showLoader('جاري التحويل لصفحة تسجيل الدخول بحساب Google...');
       const redirectTo = window.location.origin + window.location.pathname;
-      const { error } = await _sb.auth.signInWithOAuth({
+      const { error } = await client.auth.signInWithOAuth({
         provider: 'google',
         options: { redirectTo }
       });
-      if (error) showAuthErr(error.message);
+      if (error) {
+        hideLoader();
+        showAuthErr(error.message);
+      }
     }
 
 
@@ -6596,30 +6621,37 @@
 
     async function confirmDeleteAccount() {
       const val = document.getElementById('delete-confirm-input').value.trim();
-      if (val !== 'احذف حسابي') { showAuthErr('اكتب "احذف حسابي" للتأكيد'); return; }
+      if (val !== 'احذف حسابي') { showToast('error', 'اكتب "احذف حسابي" للتأكيد'); return; }
       const btn = document.getElementById('delete-confirm-btn');
       btn.disabled = true;
       btn.textContent = 'جاري الحذف...';
       try {
         const uid = _sbUid;
-        // Delete all user data tables
-        await Promise.all([
-          _sb.from('schedule_data').delete().eq('user_id', uid),
-          _sb.from('schedule_sessions').delete().eq('user_id', uid),
-          _sb.from('weekly_data').delete().eq('user_id', uid),
-          _sb.from('user_meta').delete().eq('user_id', uid),
-          _sb.from('subjects').delete().eq('user_id', uid),
-          _sb.from('profiles').delete().eq('id', uid),
-        ]);
-        // Clear localStorage for this user
-        Object.keys(localStorage).forEach(k => { if(k.startsWith(uid + ':') || k === 'bac_new_user_' + uid) localStorage.removeItem(k); });
-        // Delete auth user (needs service role normally; will trigger cascade on profiles)
-        await _sb.auth.signOut();
+        if (_sb && uid) {
+          try {
+            await Promise.all([
+              _sb.from('schedule_data').delete().eq('user_id', uid),
+              _sb.from('schedule_sessions').delete().eq('user_id', uid),
+              _sb.from('weekly_data').delete().eq('user_id', uid),
+              _sb.from('user_meta').delete().eq('user_id', uid),
+              _sb.from('subjects').delete().eq('user_id', uid),
+              _sb.from('profiles').delete().eq('id', uid),
+            ]);
+            await _sb.auth.signOut();
+          } catch(err) {}
+        }
+        localStorage.clear();
         closeDeleteConfirm();
+        _appInited = false;
+        _sbUid = '';
+        updateUserUI(null);
+        showAuthScreen();
+        showToast('info', 'تم حذف الحساب وتفريغ البيانات بنجاح 🗑️');
+        setTimeout(() => location.reload(), 800);
       } catch (e) {
         btn.disabled = false;
         btn.textContent = 'حذف نهائياً';
-        toast('حدث خطأ أثناء الحذف!', 'error');
+        showToast('error', 'حدث خطأ أثناء الحذف!');
       }
     }
 
