@@ -6623,10 +6623,16 @@
           }
           await loadAllDataAndInit();
 
-          // Show welcome for new users
-          const isNew = localStorage.getItem('bac_new_user_' + user.id);
-          if (isNew || (event === 'SIGNED_IN' && !localStorage.getItem('bac_toured_' + user.id))) {
-            localStorage.removeItem('bac_new_user_' + user.id);
+          // Show welcome for new users ONLY ONCE on first login/signup
+          const uid = user.id || _sbUid;
+          const seenKey = 'bac_welcome_seen_' + uid;
+          const touredKey = 'bac_toured_' + uid;
+          const isNew = localStorage.getItem('bac_new_user_' + uid);
+
+          if (isNew || (!localStorage.getItem(seenKey) && !localStorage.getItem(touredKey))) {
+            localStorage.removeItem('bac_new_user_' + uid);
+            localStorage.setItem(seenKey, '1');
+            localStorage.setItem(touredKey, '1');
             setTimeout(() => showWelcome(), 800);
           }
         }
@@ -7082,10 +7088,20 @@
        WELCOME SCREEN
     ════════════════════════════════════════════════════ */
     function showWelcome() {
+      const uid = _sbUid || (_sbUser ? _sbUser.id : '');
+      if (uid) {
+        localStorage.setItem('bac_welcome_seen_' + uid, '1');
+        localStorage.setItem('bac_toured_' + uid, '1');
+      }
       document.getElementById('welcome-overlay').classList.add('open');
     }
 
     function closeWelcome(startTourAfter) {
+      const uid = _sbUid || (_sbUser ? _sbUser.id : '');
+      if (uid) {
+        localStorage.setItem('bac_welcome_seen_' + uid, '1');
+        localStorage.setItem('bac_toured_' + uid, '1');
+      }
       document.getElementById('welcome-overlay').classList.remove('open');
       if (startTourAfter) setTimeout(startTour, 300);
     }
