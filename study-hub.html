@@ -6460,21 +6460,38 @@
 
     let _sb = null;
     let _appInited = false;
+    let _exchangingOAuth = false;
 
     async function handleAuthStateChange(event, session) {
       const user = session?.user || null;
-      const hasAuthParams = window.location.search.includes('code=') ||
-                            window.location.hash.includes('access_token=') ||
-                            window.location.hash.includes('error=');
+      const searchParams = new URLSearchParams(window.location.search);
+      const hashParams   = new URLSearchParams(window.location.hash.startsWith('#') ? window.location.hash.substring(1) : window.location.hash);
+
+      const authCode  = searchParams.get('code');
+      const errDesc   = searchParams.get('error_description') || hashParams.get('error_description');
+      const errCode   = searchParams.get('error') || hashParams.get('error');
+
+      // Check if URL has error parameters from OAuth
+      if (errDesc || errCode) {
+        _sbUid = '';
+        updateUserUI(null);
+        hideLoader();
+        showAuthScreen();
+        const msg = errDesc ? decodeURIComponent(errDesc.replace(/\+/g, ' ')) : (errCode || 'حدث خطأ أثناء الاتصال بحساب Google');
+        showAuthErr('خطأ في مصادقة جوجل: ' + msg);
+        try { history.replaceState(null, '', window.location.pathname); } catch(e) {}
+        return;
+      }
 
       if (user) {
         _sbUid = user.id;
         hideAuthScreen();
+        hideLoader();
         updateUserUI(user);
 
         if (!_appInited) {
           _appInited = true;
-          if (hasAuthParams) {
+          if (authCode || window.location.hash.includes('access_token=')) {
             try { history.replaceState(null, '', window.location.pathname); } catch(e) {}
           }
           await loadAllDataAndInit();
@@ -6487,26 +6504,48 @@
           }
         }
       } else {
-        // If returning from OAuth redirect with code/token in URL, wait for Supabase exchange before showing auth screen
-        if (hasAuthParams && (event === 'INITIAL_SESSION' || !event)) {
-          console.log('⏳ Exchanging OAuth token/code...');
+        // If authorization code is in URL but user is not logged in yet, try explicit exchange
+        if (authCode && _sb && !_exchangingOAuth) {
+          _exchangingOAuth = true;
           showLoader('جاري تسجيل الدخول بحساب Google...');
-          return;
+
+          try {
+            const { data, error } = await _sb.auth.exchangeCodeForSession(authCode);
+            if (error) {
+              console.error('exchangeCodeForSession error:', error);
+              _exchangingOAuth = false;
+              _sbUid = '';
+              updateUserUI(null);
+              hideLoader();
+              showAuthScreen();
+              showAuthErr('فشل تسجيل الدخول بحساب Google: ' + (error.message || 'رمز الجلسة غير صالح'));
+              try { history.replaceState(null, '', window.location.pathname); } catch(e) {}
+              return;
+            }
+            if (data?.session) {
+              _exchangingOAuth = false;
+              handleAuthStateChange('SIGNED_IN', data.session);
+              return;
+            }
+          } catch(e) {
+            console.error('Exchange catch error:', e);
+            _exchangingOAuth = false;
+            _sbUid = '';
+            updateUserUI(null);
+            hideLoader();
+            showAuthScreen();
+            showAuthErr('حدث خطأ أثناء معالجة تسجيل الدخول بحساب Google');
+            try { history.replaceState(null, '', window.location.pathname); } catch(e) {}
+            return;
+          }
         }
+
+        if (_exchangingOAuth) return;
 
         _sbUid = '';
         updateUserUI(null);
         hideLoader();
         showAuthScreen();
-
-        if (window.location.hash.includes('error_description=') || window.location.search.includes('error_description=')) {
-          try {
-            const raw = window.location.hash.includes('error_description=') ? window.location.hash.substring(1) : window.location.search.substring(1);
-            const params = new URLSearchParams(raw);
-            const errDesc = params.get('error_description');
-            if (errDesc) showAuthErr(decodeURIComponent(errDesc.replace(/\+/g, ' ')));
-          } catch(e) {}
-        }
       }
     }
 
@@ -6527,6 +6566,7 @@
         // Also check session explicitly
         _sb.auth.getSession().then(({ data: { session } }) => {
           if (session) handleAuthStateChange('INITIAL_SESSION', session);
+          else handleAuthStateChange('INITIAL_SESSION', null);
         });
       }
     } catch(e) {
