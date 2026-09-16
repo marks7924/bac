@@ -617,16 +617,16 @@
     /* Schedule table */
     .s-table-wrap {
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius: var(--r);
+      border: 1px solid var(--border);
     }
 
     .s-table {
       width: 100%;
+      min-width: 680px;
       border-collapse: collapse;
       background: var(--card);
-      border-radius: var(--r);
-      overflow: hidden;
-      box-shadow: var(--sh-sm);
-      border: 1px solid var(--border);
     }
 
     .s-table th {
@@ -2510,34 +2510,9 @@
         grid-template-columns: 1fr !important;
       }
 
-      .s-table,
-      .s-table thead,
-      .s-table tbody,
-      .s-table tr,
-      .s-table td {
-        display: block;
-        width: 100%;
-      }
-
-      .s-table thead {
-        display: none;
-      }
-
-      .s-table tbody tr {
-        margin-bottom: 12px;
-        background: var(--card);
-        border-radius: 12px;
-        padding: 10px;
-        border: 1px solid var(--border);
-      }
-
-      .s-table td:first-child {
-        text-align: start;
-        display: flex;
-        gap: 8px;
-        align-items: baseline;
-        background: none;
-        padding-bottom: 6px;
+      .s-table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
       }
 
       .sched-bar {
@@ -6881,21 +6856,55 @@
         requestAnimationFrame(() => {
           const rect = targetEl.getBoundingClientRect();
           const pad = 6;
-          _tourHL.style.top    = (rect.top    - pad) + 'px';
-          _tourHL.style.left   = (rect.left   - pad) + 'px';
-          _tourHL.style.width  = (rect.width  + pad * 2) + 'px';
-          _tourHL.style.height = (rect.height + pad * 2) + 'px';
+          _tourHL.style.display = 'block';
+          _tourHL.style.top    = (Math.max(0, rect.top - pad)) + 'px';
+          _tourHL.style.left   = (Math.max(0, rect.left - pad)) + 'px';
+          _tourHL.style.width  = (Math.min(window.innerWidth, rect.width + pad * 2)) + 'px';
+          _tourHL.style.height = (Math.min(window.innerHeight, rect.height + pad * 2)) + 'px';
 
-          // Position tooltip
-          const ttW = 300, ttH = 180;
-          let top  = rect.bottom + 14;
-          let left = rect.left;
-          if (top + ttH > window.innerHeight - 10) top = rect.top - ttH - 14;
-          if (left + ttW > window.innerWidth  - 10) left = window.innerWidth - ttW - 10;
-          if (left < 10) left = 10;
-          if (top  < 10) top  = 10;
-          _tourTT.style.top  = top  + 'px';
-          _tourTT.style.left = left + 'px';
+          const isMobile = window.innerWidth <= 640;
+          const ttW = Math.min(320, window.innerWidth - 32);
+
+          if (isMobile) {
+            // Mobile: pin cleanly to top or bottom depending on target location
+            _tourTT.style.position = 'fixed';
+            _tourTT.style.left = '50%';
+            _tourTT.style.transform = 'translateX(-50%)';
+            _tourTT.style.width = 'calc(100vw - 32px)';
+            _tourTT.style.maxWidth = '340px';
+
+            if (rect.top > window.innerHeight / 2) {
+              _tourTT.style.top = '16px';
+              _tourTT.style.bottom = 'auto';
+            } else {
+              _tourTT.style.bottom = '16px';
+              _tourTT.style.top = 'auto';
+            }
+          } else {
+            // Laptop / Desktop: smart positioning without overlapping target
+            _tourTT.style.position = 'fixed';
+            _tourTT.style.transform = 'none';
+            _tourTT.style.bottom = 'auto';
+            _tourTT.style.width = '300px';
+
+            const ttH = _tourTT.offsetHeight || 180;
+            let top = rect.bottom + 12;
+            if (top + ttH > window.innerHeight - 15) {
+              top = rect.top - ttH - 12;
+            }
+            if (top < 15 || top + ttH > window.innerHeight - 10) {
+              top = window.innerHeight - ttH - 20;
+            }
+
+            let left = rect.left;
+            if (left + ttW > window.innerWidth - 15) {
+              left = window.innerWidth - ttW - 15;
+            }
+            if (left < 15) left = 15;
+
+            _tourTT.style.top  = top + 'px';
+            _tourTT.style.left = left + 'px';
+          }
         });
       }, 150);
     }
