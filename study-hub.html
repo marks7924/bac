@@ -6281,57 +6281,32 @@
     let ltTeachers = [], ltLectures = [], ltFilter = 'all', ltEditTId = null, ltEditLId = null, ltEditLTId = null;
     let ltSelDays = [], ltSelEmoji = '📚', ltSelColor = '#3b82f6';
 
-    const MARKSAMER_TEACHERS = [
-      {"id": "xmu42m0ld9cr4", "name": "ا. محمد صلاح", "subject": "عربي", "platform": "بسطهالك", "link": "https://bassthalk.com/userprofile/courses/course/1731", "time": "10:00", "days": ["Sat"], "emoji": "📚", "color": "#3b82f6"},
-      {"id": "xmu42p9ddigcu", "name": "ا. محمد طلبه", "subject": "تاريخ", "platform": "Smart accedmy", "link": "https://smartacademy-eg.com/packages-details/141", "time": "00:00", "days": ["Sun"], "emoji": "🧮", "color": "#22c55e"},
-      {"id": "xmu42r5yo9dhu", "name": "ا. محمد عبالحميد", "subject": "برمجه", "platform": "Smart accedmy", "link": "https://smartacademy-eg.com/packages-details/144", "time": "18:00", "days": ["Thu"], "emoji": "📚", "color": "#3b82f6"},
-      {"id": "xmu42u6qlglvj", "name": "ا. احمد طارق", "subject": "انجليزي", "platform": "احمد طارق", "link": "https://ahmed-tarek.net/userprofile/courses/course/12", "time": "00:00", "days": ["Sun"], "emoji": "✏️", "color": "#06b6d4"}
-    ];
-    const MARKSAMER_LECTURES = [
-      {"id": "xmu42mxkd4rm9", "teacherId": "xmu42m0ld9cr4", "title": "محاضرة أسبوع 1", "weekNum": 1, "date": "2026-09-12", "watched": false, "link": "https://bassthalk.com/userprofile/courses/course/1731", "notes": ""},
-      {"id": "xmu42pe2wftua", "teacherId": "xmu42p9ddigcu", "title": "محاضرة أسبوع 2", "weekNum": 2, "date": "2026-09-13", "watched": false, "link": "https://smartacademy-eg.com/packages-details/141", "notes": ""},
-      {"id": "xmu42pbdow4y1", "teacherId": "xmu42p9ddigcu", "title": "محاضرة أسبوع 1", "weekNum": 1, "date": "2026-09-06", "watched": true, "link": "https://smartacademy-eg.com/packages-details/141", "notes": ""},
-      {"id": "xmu42r9rsvtym", "teacherId": "xmu42r5yo9dhu", "title": "محاضرة أسبوع 2", "weekNum": 2, "date": "2026-09-10", "watched": false, "link": "https://smartacademy-eg.com/packages-details/144", "notes": ""},
-      {"id": "xmu42r890k49h", "teacherId": "xmu42r5yo9dhu", "title": "محاضرة أسبوع 1", "weekNum": 1, "date": "2026-09-03", "watched": true, "link": "https://smartacademy-eg.com/packages-details/144", "notes": ""},
-      {"id": "xmu42ud1g0n98", "teacherId": "xmu42u6qlglvj", "title": "محاضرة أسبوع 1", "weekNum": 1, "date": "2026-09-13", "watched": false, "link": "https://ahmed-tarek.net/userprofile/courses/course/12", "notes": ""}
-    ];
+    const MARKSAMER_TEACHERS = [];
+    const MARKSAMER_LECTURES = [];
 
     function ltLoad() {
       const getVal = (k) => {
-        let v = _sbUid ? localStorage.getItem(_lsKey(k)) : null;
+        if (!_sbUid) return null;
+        let v = localStorage.getItem(_lsKey(k));
         if (v) { try { return JSON.parse(v); } catch(e){} }
         return null;
       };
 
       ltTeachers = getVal('lt_t') || getVal('lt-teachers') || getVal('lt_teachers_v2') || [];
       ltLectures = getVal('lt_l') || getVal('lt-lectures') || getVal('lt_lectures_v2') || [];
-
-      // Auto-seed ONLY for marksamer010@gmail.com if empty
-      let activeEmail = '';
-      try {
-        if (window._currentUser && window._currentUser.email) activeEmail = window._currentUser.email;
-        else activeEmail = JSON.parse(localStorage.getItem('bac_local_user') || '{}').email || '';
-      } catch(e){}
-
-      if (activeEmail && activeEmail.toLowerCase().trim() === 'marksamer010@gmail.com' && ltTeachers.length === 0) {
-        ltTeachers = typeof MARKSAMER_TEACHERS !== 'undefined' ? MARKSAMER_TEACHERS : [];
-        ltLectures = typeof MARKSAMER_LECTURES !== 'undefined' ? MARKSAMER_LECTURES : [];
-        ltSave();
-      }
     }
 
     function ltSave() {
+      if (!_sbUid) return;
       const tStr = JSON.stringify(ltTeachers);
       const lStr = JSON.stringify(ltLectures);
       ['lt_t', 'lt-teachers', 'lt_teachers_v2'].forEach(k => {
-        localStorage.setItem(k, tStr);
-        if (_sbUid) localStorage.setItem(_lsKey(k), tStr);
+        localStorage.setItem(_lsKey(k), tStr);
       });
       ['lt_l', 'lt-lectures', 'lt_lectures_v2'].forEach(k => {
-        localStorage.setItem(k, lStr);
-        if (_sbUid) localStorage.setItem(_lsKey(k), lStr);
+        localStorage.setItem(_lsKey(k), lStr);
       });
-      if (_sbUid && window._supabase) {
+      if (window._supabase) {
         const _sb = getSbClient();
         if (_sb) {
           _sb.from('schedule_data').upsert([
