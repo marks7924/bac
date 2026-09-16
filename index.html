@@ -4137,7 +4137,7 @@
     <div class="lt-wrap">
       <!-- Top actions -->
       <div class="lt-top-bar">
-        <button class="lt-btn" onclick="openAddTeacherModal()"><i class="fa-solid fa-user-plus"></i> <span
+        <button class="lt-btn admin-only" onclick="openAddTeacherModal()"><i class="fa-solid fa-user-plus"></i> <span
             id="lt-btn-addteacher">إضافة أستاذ</span></button>
         <button class="lt-btn primary" onclick="ltGenWeek()"><i class="fa-solid fa-rotate"></i> <span
             id="lt-btn-update">تحديث الأسبوع</span></button>
@@ -4245,7 +4245,7 @@
       <!-- Actions & Filter -->
       <div class="ex-top-bar">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <button class="s-btn accent" onclick="exAddPrompt(this)"><i class="fa-solid fa-plus"></i> <span id="ex-btn-add-txt">إضافة امتحان جديد</span></button>
+          <button class="s-btn accent admin-only" onclick="exAddPrompt(this)"><i class="fa-solid fa-plus"></i> <span id="ex-btn-add-txt">إضافة امتحان جديد</span></button>
         </div>
         <div class="lt-tabs">
           <button class="lt-tab active" id="ex-f-all" onclick="exSetFilter('all')"><i class="fa-solid fa-layer-group"></i> <span id="ex-f-all-txt">الكل</span></button>
@@ -4270,7 +4270,7 @@
           <div style="font-size:12px;color:var(--text3);margin-top:2px" id="cur-sub-txt">تابع نسبة إنجاز كل مادة والدروس بالمراحل الأربعة</div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="s-btn accent" onclick="curAddSubjPrompt(this)"><i class="fa-solid fa-plus"></i> <span id="cur-btn-add-txt">إضافة مادة جديدة</span></button>
+          <button class="s-btn accent admin-only" onclick="curAddSubjPrompt(this)"><i class="fa-solid fa-plus"></i> <span id="cur-btn-add-txt">إضافة مادة جديدة</span></button>
         </div>
       </div>
 
@@ -5385,24 +5385,14 @@
     }
 
     async function toggleAdminMode() {
-      if (!isAdminMode) {
-        // Enforce Server / Database Authorization Check
-        await checkUserRole();
-        const isLocalUser = !_sbUid;
-        if (_userRole !== 'ADMIN' && !isLocalUser) {
-          showToast('error', lang === 'ar' ? '🔒 يتطلب صلاحية المسؤول (Admin Role Required)!' : '🔒 Admin permission required!');
-          isAdminMode = false;
-          localStorage.setItem('hub_admin_mode', '0');
-          applyAdminModeUI();
-          return;
-        }
-        isAdminMode = true;
-        localStorage.setItem('hub_admin_mode', '1');
-        showToast('info', lang === 'ar' ? '🛡️ تم تفعيل وضع المسؤول (Admin Mode ON)' : '🛡️ Admin Mode Enabled');
+      isAdminMode = !isAdminMode;
+      localStorage.setItem('hub_admin_mode', isAdminMode ? '1' : '0');
+
+      const isAr = lang === 'ar';
+      if (isAdminMode) {
+        showToast('info', isAr ? '🛡️ تم تفعيل وضع التعديل (Admin / Edit Mode ON)' : '🛡️ Admin / Edit Mode Enabled');
       } else {
-        isAdminMode = false;
-        localStorage.setItem('hub_admin_mode', '0');
-        showToast('info', lang === 'ar' ? '🛡️ تم إيقاف وضع المسؤول (Admin Mode OFF)' : '🛡️ Admin Mode Disabled');
+        showToast('info', isAr ? '👁️ تم تفعيل وضع العرض (Admin / Edit Mode OFF)' : '👁️ View Mode Active');
       }
       applyAdminModeUI();
     }
@@ -5428,7 +5418,7 @@
       if (typeof schedRender === 'function') schedRender();
       if (typeof exRenderAll === 'function') exRenderAll();
       if (typeof curRenderAll === 'function') curRenderAll();
-      if (typeof ltRender === 'function') ltRender();
+      if (typeof ltRenderAll === 'function') ltRenderAll();
     }
 
     function moveMobileDay(dir) {
