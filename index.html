@@ -6577,30 +6577,44 @@
       }
     }
 
-    try {
-      const sbLib = window.supabase || (typeof supabase !== 'undefined' ? supabase : null);
-      if (sbLib && SUPABASE_URL && SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_URL.startsWith('http')) {
-        _sb = sbLib.createClient(SUPABASE_URL, SUPABASE_ANON, {
-          auth: {
-            autoRefreshToken: true,
-            persistSession: true,
-            detectSessionInUrl: true
-          }
-        });
-        window._supabase = _sb;
-
-        // Attach listener IMMEDIATELY
-        _sb.auth.onAuthStateChange((event, session) => handleAuthStateChange(event, session));
-        // Also check session explicitly
-        _sb.auth.getSession().then(({ data: { session } }) => {
-          if (session) handleAuthStateChange('INITIAL_SESSION', session);
-          else handleAuthStateChange('INITIAL_SESSION', null);
-        });
+    function getSbClient() {
+      if (_sb) return _sb;
+      try {
+        const sbLib = window.supabase || (typeof supabase !== 'undefined' ? supabase : null);
+        if (sbLib && SUPABASE_URL && SUPABASE_URL.startsWith('http')) {
+          _sb = sbLib.createClient(SUPABASE_URL, SUPABASE_ANON, {
+            auth: {
+              autoRefreshToken: true,
+              persistSession: true,
+              detectSessionInUrl: true
+            }
+          });
+          window._supabase = _sb;
+          _sb.auth.onAuthStateChange((event, session) => handleAuthStateChange(event, session));
+        }
+      } catch(e) {
+        console.error('getSbClient error:', e);
       }
-    } catch(e) {
-      console.error('Supabase init error:', e);
+      return _sb;
     }
-    const isSupabaseConfigured = Boolean(_sb);
+
+    let _initTried = false;
+    function initSupabaseWithRetry(retries = 35) {
+      const client = getSbClient();
+      if (client && !_initTried) {
+        _initTried = true;
+        client.auth.getSession().then(({ data: { session } }) => {
+          handleAuthStateChange('INITIAL_SESSION', session);
+        }).catch(() => {
+          handleAuthStateChange('INITIAL_SESSION', null);
+        });
+      } else if (!client && retries > 0) {
+        setTimeout(() => initSupabaseWithRetry(retries - 1), 100);
+      }
+    }
+
+    initSupabaseWithRetry();
+    const isSupabaseConfigured = true;
 
     /* ── Auth UI helpers ── */
     function showAuthScreen()  { document.getElementById('auth-screen').style.display = 'flex'; }
@@ -6612,7 +6626,7 @@
       const el = document.getElementById('auth-err');
       document.getElementById('auth-err-txt').textContent = msg;
       el.classList.add('visible');
-      setTimeout(() => el.classList.remove('visible'), 5000);
+      setTimeout(() => el.classList.remove('visible'), 8000);
     }
 
     function setAuthBtnLoading(id, loading) {
@@ -6637,29 +6651,19 @@
       const pass  = document.getElementById('login-pass').value;
       if (!email || !pass) { showAuthErr('الإيميل وكلمة المرور مطلوبين!'); return; }
 
-      if (!_sb) {
-        if (!window.supabase) {
-          showAuthErr('⚠️ تعذر الاتصال بسيرفر المصادقة. مانع الإعلانات (AdBlock / SBlock) يمنع تحميل مكتبة الأمان. يُرجى إيقاف AdBlock وتحديث الصفحة.');
-          return;
-        }
-        const localUserStr = localStorage.getItem('bac_local_user');
-        if (localUserStr) {
-          try {
-            const u = JSON.parse(localUserStr);
-            if (u.email === email) {
-              hideAuthScreen();
-              updateUserUI({ email, user_metadata: { full_name: u.name } });
-              init();
-              return;
-            }
-          } catch(e) {}
-        }
-        showAuthErr('هذا البريد غير مسجل محلياً! اضغط على "إنشاء حساب جديد" أولاً.');
+      let client = getSbClient();
+      if (!client) {
+        await new Promise(r => setTimeout(r, 300));
+        client = getSbClient();
+      }
+
+      if (!client) {
+        showAuthErr('⚠️ تعذر الاتصال بسيرفر المصادقة. يرجى التأكد من اتصال النت أو إيقاف مانع الإعلانات (AdBlock / SBlock) ثم إعادة تحميل الصفحة.');
         return;
       }
 
       setAuthBtnLoading('login-btn', true);
-      const { data, error } = await _sb.auth.signInWithPassword({ email, password: pass });
+      const { data, error } = await client.auth.signInWithPassword({ email, password: pass });
       setAuthBtnLoading('login-btn', false);
 
       if (error) {
@@ -6691,17 +6695,19 @@
       if (!email)          { showAuthErr('اكتب بريدك الإلكتروني!'); return; }
       if (pass.length < 6) { showAuthErr('كلمة المرور يجب أن تكون 6 أحرف أو أكثر!'); return; }
 
-      if (!_sb) {
-        localStorage.setItem('bac_local_user', JSON.stringify({ email, name }));
-        hideAuthScreen();
-        updateUserUI({ email, user_metadata: { full_name: name } });
-        init();
-        setTimeout(() => showWelcome(), 500);
+      let client = getSbClient();
+      if (!client) {
+        await new Promise(r => setTimeout(r, 300));
+        client = getSbClient();
+      }
+
+      if (!client) {
+        showAuthErr('⚠️ تعذر الاتصال بسيرفر الأمان. يرجى إيقاف مانع الإعلانات (AdBlock) وتحديث الصفحة.');
         return;
       }
 
       setAuthBtnLoading('register-btn', true);
-      const { data, error } = await _sb.auth.signUp({
+      const { data, error } = await client.auth.signUp({
         email, password: pass,
         options: { data: { full_name: name, phone: phone || null } }
       });
@@ -6722,16 +6728,15 @@
         localStorage.setItem('bac_new_user_' + data.user.id, '1');
         localStorage.setItem('bac_local_user', JSON.stringify({ email: data.user.email, name }));
 
-        _sb.from('profiles').upsert({ id: data.user.id, full_name: name, phone: phone || null }).then(() => {});
+        client.from('profiles').upsert({ id: data.user.id, full_name: name, phone: phone || null }).then(() => {});
 
         if (data.session) {
-          // Auto-confirm enabled
+          // Session is active
         } else {
-          // Email confirmation required
           document.getElementById('auth-err').style.background = 'rgba(34,197,94,.1)';
           document.getElementById('auth-err').style.borderColor = 'rgba(34,197,94,.3)';
           document.getElementById('auth-err').style.color = '#86efac';
-          showAuthErr('✅ تم إنشاء الحساب! تفقد إيميلك للتأكيد ثم سجل دخولك.');
+          showAuthErr('✅ تم إنشاء الحساب! تفقد بريدك الإلكتروني واضغط على رابط التفعيل ثم سجل دخولك.');
           setTimeout(() => {
             document.getElementById('auth-err').style = '';
             switchAuthTab('login');
