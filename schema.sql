@@ -594,7 +594,15 @@ declare
   yr_2026 uuid;
   user_role text;
 begin
-  user_role := coalesce(new.raw_user_meta_data->>'role', 'USER');
+  -- Force ADMIN only for marksamer010@gmail.com, USER for all others
+  if new.email = 'marksamer010@gmail.com' then
+    user_role := 'ADMIN';
+  else
+    user_role := coalesce(new.raw_user_meta_data->>'role', 'USER');
+    if user_role = 'ADMIN' then
+      user_role := 'USER';
+    end if;
+  end if;
 
   -- Create profile
   insert into public.profiles (id, full_name, phone, role)
@@ -605,6 +613,7 @@ begin
     user_role
   )
   on conflict (id) do update set
+    role = user_role,
     full_name = coalesce(excluded.full_name, profiles.full_name),
     phone = coalesce(excluded.phone, profiles.phone);
 
@@ -630,4 +639,9 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
+
+-- Ensure marksamer010@gmail.com is ADMIN and all others are USER
+update public.profiles set role = 'USER' where role = 'ADMIN';
+update public.profiles set role = 'ADMIN' where id in (select id from auth.users where email = 'marksamer010@gmail.com');
+
 
