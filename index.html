@@ -6823,41 +6823,7 @@
        SYSTEM 2: CURRICULUM TREE LOGIC
     ════════════════════════════════ */
     const DEF_CURRIC = {
-      subjects: [
-        {
-          id: 'sub_chem', name: 'الكيمياء', emoji: '🧪', color: '#3b82f6',
-          units: [
-            {
-              id: 'u_chem_1', title: 'الباب الأول: العناصر الانتقالية',
-              lessons: [
-                { id: 'l_c1', title: 'الدرس الأول: عناصر السلسلة الانتقالية الأولى', stages: { explain: true, practice: true, rev: true, test: true } },
-                { id: 'l_c2', title: 'الدرس الثاني: خواص عناصر السلسلة الأولى', stages: { explain: true, practice: true, rev: false, test: false } },
-                { id: 'l_c3', title: 'الدرس الثالث: الحديد واستخلاصه وأكاسيده', stages: { explain: true, practice: false, rev: false, test: false } }
-              ]
-            },
-            {
-              id: 'u_chem_2', title: 'الباب الثاني: التحليل الكيميائي',
-              lessons: [
-                { id: 'l_c4', title: 'الدرس الأول: التحليل الكيفي - الأنيونات', stages: { explain: false, practice: false, rev: false, test: false } },
-                { id: 'l_c5', title: 'الدرس الثاني: الكاتيونات والتحليل الكمي', stages: { explain: false, practice: false, rev: false, test: false } }
-              ]
-            }
-          ]
-        },
-        {
-          id: 'sub_phy', name: 'الفيزياء', emoji: '⚡', color: '#8b5cf6',
-          units: [
-            {
-              id: 'u_phy_1', title: 'الفصل الأول: التيار الكهربي وقانونا كيرشوف',
-              lessons: [
-                { id: 'l_p1', title: 'الدرس الأول: التيار الكهربي وقانون أوم', stages: { explain: true, practice: true, rev: true, test: false } },
-                { id: 'l_p2', title: 'الدرس الثاني: توصيل المقاومات', stages: { explain: true, practice: true, rev: false, test: false } },
-                { id: 'l_p3', title: 'الدرس الثالث: قانون أوم للدائرة المغلقة', stages: { explain: true, practice: false, rev: false, test: false } }
-              ]
-            }
-          ]
-        }
-      ]
+      subjects: []
     };
 
     let sCurricData = loadJ('curriculum', DEF_CURRIC);
@@ -7292,10 +7258,10 @@
     ════════════════════════════════ */
     function cleanLegacyDemoData() {
       try {
-        const keys = ['template', 'subjects', 'events', 'revision', 'columns', 'lt-teachers', 'lt-lectures'];
+        const keys = ['template', 'subjects', 'events', 'revision', 'columns', 'lt-teachers', 'lt-lectures', 'curriculum', 'lt_t', 'lt_l'];
         keys.forEach(k => {
           const val = localStorage.getItem(k);
-          if (val && (val.includes('s-s1') || val.includes('Arabic – Salah') || val.includes('History – Bassem') || val.includes('English (10:40') || val.includes('dt1'))) {
+          if (val && (val.includes('s-s1') || val.includes('Salah') || val.includes('Bassem') || val.includes('Sameh') || val.includes('sub_chem') || val.includes('u_chem_1') || val.includes('xmu42'))) {
             localStorage.removeItem(k);
           }
         });
