@@ -5241,37 +5241,12 @@
     ];
 
     const DEF_TEMPLATE = {
-      Sat: {
-        school: [{ id: "xmu42yt2s7dbg", text: "English", teacher: "Mr. Sameh", time: "11 - 1", color: "green", pinned: true, icon: "fa-solid fa-book-open" }],
-        center: [],
-        online: [{ id: "xmu434wmdcnar", text: "Arabic", teacher: "Mr. Salah", time: "10 AM", color: "pink", pinned: true, icon: "fa-solid fa-book-open" }]
-      },
-      Sun: {
-        school: [], center: [],
-        online: [
-          { id: "xmu435jh1ma3p", text: "English", teacher: "Mr. Ahmen Tariq", time: "", color: "green", pinned: true, icon: "fa-solid fa-book-open" },
-          { id: "xmu435yns500q", text: "History", teacher: "Mr. Tolba", time: "", color: "amber", pinned: true, icon: "fa-solid fa-book-open" }
-        ]
-      },
-      Mon: {
-        school: [{ id: "xmu42zm81ijdd", text: "Arabic", teacher: "Mr. Saied", time: "8 - 11", color: "pink", pinned: true, icon: "fa-solid fa-book-open" }],
-        center: [{ id: "xmu432lqxdt87", text: "History", teacher: "Mr. Bassem", time: "2 - 4:30", color: "amber", pinned: true, icon: "fa-solid fa-book-open" }],
-        online: []
-      },
-      Tue: {
-        school: [{ id: "xmu430f84lkwz", text: "History", teacher: "Mr. Bassem", time: "8 - 11", color: "amber", pinned: true, icon: "fa-solid fa-book-open" }],
-        center: [],
-        online: [{ id: "xmu436ndo94yk", text: "Arabic ( HW )", teacher: "Mr. Salah", time: "10 AM", color: "pink", pinned: true, icon: "fa-solid fa-book-open" }]
-      },
-      Wed: {
-        school: [], center: [],
-        online: [{ id: "xmu437oow94uz", text: "English ( Skills / HW )", teacher: "Mr. Ahmed Tariq", time: "", color: "green", pinned: true, icon: "fa-solid fa-book-open" }]
-      },
-      Thu: {
-        school: [{ id: "xmu4312d0xunt", text: "Computer", teacher: "Mrs. Mary", time: "11 - 1", color: "amber", pinned: true, icon: "fa-solid fa-laptop" }],
-        center: [{ id: "xmu4349t8thp3", text: "History", teacher: "Mr. Bassem", time: "2 - 4:30", color: "amber", pinned: true, icon: "fa-solid fa-book-open" }],
-        online: [{ id: "xmu438oek3jdu", text: "Computer", teacher: "Mr. Mohamemd", time: "6 PM", color: "amber", pinned: true, icon: "fa-solid fa-laptop" }]
-      },
+      Sat: { school: [], center: [], online: [] },
+      Sun: { school: [], center: [], online: [] },
+      Mon: { school: [], center: [], online: [] },
+      Tue: { school: [], center: [], online: [] },
+      Wed: { school: [], center: [], online: [] },
+      Thu: { school: [], center: [], online: [] },
       Fri: { school: [], center: [], online: [] }
     };
 
@@ -5281,20 +5256,7 @@
 
     function defWeek() {
       return {
-        items: {
-          "xmu42yt2s7dbg": true,
-          "xmu434wmdcnar": false,
-          "xmu435jh1ma3p": false,
-          "xmu435yns500q": false,
-          "xmu42zm81ijdd": true,
-          "xmu432lqxdt87": true,
-          "xmu430f84lkwz": false,
-          "xmu436ndo94yk": false,
-          "xmu437oow94uz": false,
-          "xmu4312d0xunt": false,
-          "xmu4349t8thp3": false,
-          "xmu438oek3jdu": false
-        },
+        items: {},
         goals: { Sat: [], Sun: [], Mon: [], Tue: [], Wed: [], Thu: [], Fri: [] }
       };
     }
@@ -6337,7 +6299,6 @@
     function ltLoad() {
       const getVal = (k) => {
         let v = _sbUid ? localStorage.getItem(_lsKey(k)) : null;
-        if (!v) v = localStorage.getItem(k);
         if (v) { try { return JSON.parse(v); } catch(e){} }
         return null;
       };
@@ -6345,16 +6306,16 @@
       ltTeachers = getVal('lt_t') || getVal('lt-teachers') || getVal('lt_teachers_v2') || [];
       ltLectures = getVal('lt_l') || getVal('lt-lectures') || getVal('lt_lectures_v2') || [];
 
-      // Auto-seed for marksamer010@gmail.com if empty
+      // Auto-seed ONLY for marksamer010@gmail.com if empty
       let activeEmail = '';
       try {
-        if (_sbUser && _sbUser.email) activeEmail = _sbUser.email;
+        if (window._currentUser && window._currentUser.email) activeEmail = window._currentUser.email;
         else activeEmail = JSON.parse(localStorage.getItem('bac_local_user') || '{}').email || '';
       } catch(e){}
 
-      if ((!activeEmail || activeEmail.toLowerCase().includes('marksamer010')) && ltTeachers.length === 0) {
-        ltTeachers = MARKSAMER_TEACHERS;
-        ltLectures = MARKSAMER_LECTURES;
+      if (activeEmail && activeEmail.toLowerCase().trim() === 'marksamer010@gmail.com' && ltTeachers.length === 0) {
+        ltTeachers = typeof MARKSAMER_TEACHERS !== 'undefined' ? MARKSAMER_TEACHERS : [];
+        ltLectures = typeof MARKSAMER_LECTURES !== 'undefined' ? MARKSAMER_LECTURES : [];
         ltSave();
       }
     }
@@ -7775,6 +7736,7 @@
     async function doLogout() {
       showLoader('جاري تسجيل الخروج...');
       _appInited = false;
+      _sbUid = '';
       localStorage.removeItem('bac_local_user');
       if (_sb) await _sb.auth.signOut();
       updateUserUI(null);
@@ -7892,34 +7854,8 @@
               localStorage.setItem(_lsKey(row.id), JSON.stringify(row.data));
             });
           } else {
-            // Account has no data in Supabase yet -> Check if guest/local data exists to migrate
-            const upsertRows = [];
-            allKeys.forEach(k => {
-              const userVal  = localStorage.getItem(_lsKey(k));
-              const guestVal = localStorage.getItem(k);
-              const rawToUse = userVal || guestVal;
-
-              if (rawToUse) {
-                try {
-                  const parsed = JSON.parse(rawToUse);
-                  const isNonEmpty = Array.isArray(parsed) ? parsed.length > 0 : Object.keys(parsed).length > 0;
-                  if (isNonEmpty) {
-                    localStorage.setItem(_lsKey(k), rawToUse);
-                    upsertRows.push({
-                      id: k,
-                      user_id: _sbUid,
-                      data: parsed,
-                      updated_at: new Date().toISOString()
-                    });
-                  }
-                } catch(e) {}
-              }
-            });
-
-            if (upsertRows.length > 0) {
-              console.log(`📤 Migrating ${upsertRows.length} local items to Supabase account ${_sbUid}...`);
-              await _sb.from('schedule_data').upsert(upsertRows, { onConflict: 'id,user_id' });
-            }
+            // New account with no data in Supabase yet -> Start completely empty
+            console.log(`✨ New account detected for user ${_sbUid}. Starting with a fresh, empty workspace.`);
           }
         } catch (e) {
           console.error('loadAllDataAndInit error:', e);
