@@ -6482,8 +6482,8 @@
     ════════════════════════════════════════════════════ */
 
     // ⚠️ ضع بيانات مشروعك هنا (أو أضف SUPABASE_URL و SUPABASE_ANON_KEY في Vercel)
-    const SUPABASE_URL  = 'YOUR_SUPABASE_URL';
-    const SUPABASE_ANON = 'YOUR_SUPABASE_ANON_KEY';
+    const SUPABASE_URL  = 'https://oqeaikrpcbqqrzsorghy.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9xZWFpa3JwY2JxcXJ6c29yZ2h5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4Njg2NTUsImV4cCI6MjEwNDQ0NDY1NX0.d_dBZsg9Y4fRoCwrA4-RN8zmOV0pxutLsk3sbVEJ_No';
 
     const isSupabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_URL.startsWith('http'));
     window._supabase = isSupabaseConfigured ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON) : null;
