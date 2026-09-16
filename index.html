@@ -6523,6 +6523,13 @@
       const email = document.getElementById('login-email').value.trim();
       const pass  = document.getElementById('login-pass').value;
       if (!email || !pass) { showAuthErr('الإيميل وكلمة المرور مطلوبين!'); return; }
+      if (!_sb) {
+        localStorage.setItem('bac_local_user', JSON.stringify({ email, name: email.split('@')[0] }));
+        hideAuthScreen();
+        updateUserUI({ email, user_metadata: { full_name: email.split('@')[0] } });
+        init();
+        return;
+      }
       setAuthBtnLoading('login-btn', true);
       const { error } = await _sb.auth.signInWithPassword({ email, password: pass });
       setAuthBtnLoading('login-btn', false);
@@ -6538,6 +6545,14 @@
       if (!name)            { showAuthErr('اكتب اسمك!'); return; }
       if (!email)           { showAuthErr('اكتب بريدك الإلكتروني!'); return; }
       if (pass.length < 6)  { showAuthErr('كلمة المرور أقل من 6 أحرف!'); return; }
+      if (!_sb) {
+        localStorage.setItem('bac_local_user', JSON.stringify({ email, name }));
+        hideAuthScreen();
+        updateUserUI({ email, user_metadata: { full_name: name } });
+        init();
+        setTimeout(() => showWelcome(), 500);
+        return;
+      }
       setAuthBtnLoading('register-btn', true);
       const { data, error } = await _sb.auth.signUp({
         email, password: pass,
@@ -6570,7 +6585,10 @@
 
     /* ── Google OAuth ── */
     async function doGoogleLogin() {
-      // Use origin + pathname to avoid redirect loops with hash/query params
+      if (!_sb) {
+        showAuthErr('تسجيل الدخول بجوجل يتطلب ربط Supabase URL في Vercel أو الكود');
+        return;
+      }
       const redirectTo = window.location.origin + window.location.pathname;
       const { error } = await _sb.auth.signInWithOAuth({
         provider: 'google',
@@ -6584,7 +6602,11 @@
     async function doLogout() {
       showLoader('جاري تسجيل الخروج...');
       _appInited = false;
-      await _sb.auth.signOut();
+      localStorage.removeItem('bac_local_user');
+      if (_sb) await _sb.auth.signOut();
+      updateUserUI(null);
+      hideLoader();
+      showAuthScreen();
     }
 
 
@@ -6881,10 +6903,20 @@
     ════════════════════════════════════════════════════ */
     // Note: init() is now called by onAuthStateChange after user signs in
     // Fallback: if Supabase isn't configured yet, just init normally
-    if (SUPABASE_URL === 'YOUR_SUPABASE_URL') {
-      console.warn('⚠️ Supabase not configured — running in local mode');
-      hideLoader();
-      init();
+    if (!isSupabaseConfigured) {
+      console.warn('⚠️ Supabase not configured — checking local session');
+      const localUserStr = localStorage.getItem('bac_local_user');
+      if (localUserStr) {
+        try {
+          const localUser = JSON.parse(localUserStr);
+          updateUserUI({ email: localUser.email, user_metadata: { full_name: localUser.name } });
+        } catch(e) {}
+        hideLoader();
+        init();
+      } else {
+        hideLoader();
+        showAuthScreen();
+      }
     }
 
   </script>
