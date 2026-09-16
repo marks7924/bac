@@ -340,7 +340,6 @@
         padding: 0 8px !important;
         min-height: 50px !important;
         gap: 4px !important;
-        overflow: hidden;
       }
       .g-brand {
         gap: 6px !important;
@@ -3055,11 +3054,61 @@
       background: var(--card);
       border: 1px solid var(--border2);
       border-radius: 14px;
-      min-width: 220px;
+      min-width: 230px;
+      max-width: calc(100vw - 32px);
       box-shadow: 0 16px 48px rgba(0,0,0,.55);
       z-index: 9999;
       animation: fadeIn .15s ease;
       overflow: hidden;
+    }
+
+    .g-mobile-drawer {
+      position: fixed;
+      top: 56px;
+      inset-inline-start: 0;
+      inset-inline-end: 0;
+      bottom: 0;
+      background: var(--bg2);
+      z-index: 9998;
+      padding: 16px;
+      overflow-y: auto;
+      border-top: 1px solid var(--border2);
+      box-shadow: 0 16px 40px rgba(0,0,0,.6);
+      animation: fadeIn .15s ease;
+    }
+    .g-mobile-drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .g-mobile-drawer-body {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .g-mobile-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      text-align: inherit;
+      transition: all .15s ease;
+    }
+    .g-mobile-nav-item:hover, .g-mobile-nav-item:active {
+      background: rgba(59,130,246,.15);
+      border-color: var(--blue);
+      color: var(--blue2);
     }
 
     .user-dropdown-header {
@@ -3664,35 +3713,35 @@
       <div class="welcome-top">
         <span class="welcome-emoji">🎉</span>
         <div class="welcome-title" id="welcome-title">أهلاً بيك يا طالب!</div>
-        <div class="welcome-sub">حسابك جاهز — خلينا نشوف إيه اللي ينتظرك في المنصة</div>
+        <div class="welcome-sub" id="welcome-sub">حسابك جاهز — خلينا نشوف إيه اللي ينتظرك في المنصة</div>
       </div>
       <div class="welcome-features">
         <div class="welcome-feat">
           <div class="welcome-feat-icon">📅</div>
-          <div class="welcome-feat-title">الجدول الأسبوعي</div>
-          <div class="welcome-feat-desc">رتّب حصصك ومهامك ليوم وسبوع كامل</div>
+          <div class="welcome-feat-title" id="wf-sched-title">الجدول الأسبوعي</div>
+          <div class="welcome-feat-desc" id="wf-sched-desc">رتّب حصصك ومهامك ليوم وأسبوع كامل</div>
         </div>
         <div class="welcome-feat">
           <div class="welcome-feat-icon">🎬</div>
-          <div class="welcome-feat-title">متابع المحاضرات</div>
-          <div class="welcome-feat-desc">تابع المحاضرات لكل أستاذ وشوف اللي فاتك</div>
+          <div class="welcome-feat-title" id="wf-lt-title">متابع المحاضرات</div>
+          <div class="welcome-feat-desc" id="wf-lt-desc">تابع المحاضرات لكل أستاذ وشوف اللي فاتك</div>
         </div>
         <div class="welcome-feat">
           <div class="welcome-feat-icon">📝</div>
-          <div class="welcome-feat-title">الامتحانات</div>
-          <div class="welcome-feat-desc">عداد تنازلي ومتابعة لكل امتحاناتك</div>
+          <div class="welcome-feat-title" id="wf-exams-title">الامتحانات</div>
+          <div class="welcome-feat-desc" id="wf-exams-desc">عداد تنازلي ومتابعة لكل امتحاناتك</div>
         </div>
         <div class="welcome-feat">
           <div class="welcome-feat-icon">📊</div>
-          <div class="welcome-feat-title">التحليلات</div>
-          <div class="welcome-feat-desc">احصائيات شاملة لأدائك ومستواك</div>
+          <div class="welcome-feat-title" id="wf-an-title">التحليلات</div>
+          <div class="welcome-feat-desc" id="wf-an-desc">احصائيات شاملة لأدائك ومستواك</div>
         </div>
       </div>
       <div class="welcome-actions">
-        <button class="welcome-skip-btn" onclick="closeWelcome(false)">تخطي</button>
+        <button class="welcome-skip-btn" onclick="closeWelcome(false)"><span id="welcome-skip-btn-txt">تخطي</span></button>
         <button class="welcome-tour-btn" onclick="closeWelcome(true)">
           <i class="fa-solid fa-map"></i>
-          ابدأ الجولة التعريفية
+          <span id="welcome-tour-btn-txt">ابدأ الجولة التعريفية</span>
         </button>
       </div>
     </div>
@@ -3778,7 +3827,7 @@
       </button>
       <!-- User Avatar -->
       <div class="user-avatar-wrap" id="user-avatar-wrap" style="display:none">
-        <button class="user-avatar-btn" id="user-avatar-btn" onclick="toggleUserDropdown()" title="حسابك">
+        <button class="user-avatar-btn" id="user-avatar-btn" onclick="toggleUserDropdown(event)" title="حسابك">
           <span id="user-avatar-letter">؟</span>
         </button>
         <div class="user-dropdown" id="user-dropdown" style="display:none">
@@ -3788,28 +3837,58 @@
           </div>
           <button class="user-dropdown-item" onclick="syncAllToSupabase();closeUserDropdown()">
             <i class="fa-solid fa-cloud-arrow-up"></i>
-            مزامنة البيانات سحابياً
+            <span id="ud-sync-txt">مزامنة البيانات سحابياً</span>
           </button>
           <button class="user-dropdown-item" onclick="startTour();closeUserDropdown()">
             <i class="fa-solid fa-map"></i>
-            الجولة التعريفية
+            <span id="ud-tour-txt">الجولة التعريفية</span>
           </button>
           <button class="user-dropdown-item danger" onclick="doLogout();closeUserDropdown()">
             <i class="fa-solid fa-right-from-bracket"></i>
-            تسجيل الخروج
+            <span id="ud-logout-txt">تسجيل الخروج</span>
           </button>
           <button class="user-dropdown-item danger" onclick="openDeleteConfirm();closeUserDropdown()">
             <i class="fa-solid fa-trash-can"></i>
-            حذف الحساب نهائياً
+            <span id="ud-delete-txt">حذف الحساب نهائياً</span>
           </button>
         </div>
       </div>
-      <button class="g-btn g-hamburger" id="g-hamburger" onclick="toggleMobileNav()" title="القائمة">
+      <button class="g-btn g-hamburger" id="g-hamburger" onclick="toggleMobileNav(event)" title="القائمة">
         <i class="fa-solid fa-bars" id="g-hamburger-icon"></i>
       </button>
     </div>
 
   </header>
+
+  <!-- ══════════════════════════════════════════
+     MOBILE NAV DRAWER
+  ══════════════════════════════════════════ -->
+  <div class="g-mobile-drawer" id="g-mobile-drawer" style="display:none">
+    <div class="g-mobile-drawer-header">
+      <div style="font-weight:800;font-size:14px;color:var(--text)" id="md-title-txt">القائمة الرئيسية</div>
+      <button class="g-btn" onclick="toggleMobileNav(event)" style="padding:4px 8px;font-size:16px;">✕</button>
+    </div>
+    <div class="g-mobile-drawer-body">
+      <button class="g-mobile-nav-item" onclick="switchPage('sched');toggleMobileNav(event)">
+        <i class="fa-solid fa-calendar-week"></i> <span id="md-sched-txt">الجدول الأسبوعي</span>
+      </button>
+      <button class="g-mobile-nav-item" onclick="switchPage('lt');toggleMobileNav(event)">
+        <i class="fa-solid fa-video"></i> <span id="md-lt-txt">متابع المحاضرات</span>
+      </button>
+      <button class="g-mobile-nav-item" onclick="switchPage('exams');toggleMobileNav(event)">
+        <i class="fa-solid fa-calendar-check"></i> <span id="md-exams-txt">الامتحانات</span>
+      </button>
+      <button class="g-mobile-nav-item" onclick="switchPage('reports');toggleMobileNav(event)">
+        <i class="fa-solid fa-chart-line"></i> <span id="md-history-txt">سجل وتقرير الأداء</span>
+      </button>
+      <button class="g-mobile-nav-item" onclick="switchPage('curric');toggleMobileNav(event)">
+        <i class="fa-solid fa-book-bookmark"></i> <span id="md-curric-txt">المنهج والمواد</span>
+      </button>
+      <button class="g-mobile-nav-item" onclick="switchPage('analytics');toggleMobileNav(event)">
+        <i class="fa-solid fa-chart-pie"></i> <span id="md-analytics-txt">التحليلات الذكية</span>
+      </button>
+    </div>
+  </div>
 
   <!-- ══════════════════════════════════════════
      PAGE 1: WEEKLY SCHEDULE
@@ -4606,34 +4685,6 @@
     function t(k) { return T()[k] || k; }
 
     /* ════════════════════════════════
-       MOBILE NAVIGATION MENU
-    ════════════════════════════════ */
-    function toggleMobileNav() {
-      const nav = document.querySelector('.g-nav');
-      const icon = document.getElementById('g-hamburger-icon');
-      if (!nav) return;
-      const isOpen = nav.classList.toggle('open');
-      if (icon) {
-        icon.className = isOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
-      }
-    }
-
-    function closeMobileNav() {
-      const nav = document.querySelector('.g-nav');
-      const icon = document.getElementById('g-hamburger-icon');
-      if (nav) nav.classList.remove('open');
-      if (icon) icon.className = 'fa-solid fa-bars';
-    }
-
-    document.addEventListener('click', (e) => {
-      const nav = document.querySelector('.g-nav');
-      const btn = document.getElementById('g-hamburger');
-      if (nav && nav.classList.contains('open') && !nav.contains(e.target) && (!btn || !btn.contains(e.target))) {
-        closeMobileNav();
-      }
-    });
-
-    /* ════════════════════════════════
        PAGE SWITCHING
     ════════════════════════════════ */
     function switchPage(p) {
@@ -4717,6 +4768,42 @@
       si('s-revision', t('revision')); si('s-exams', t('exams')); si('s-catchup', t('catchup'));
       si('s-history', t('history')); si('s-cols', t('cols')); si('s-curric', t('curric')); si('s-print', t('print'));
       si('s-acad-yr', t('academicYear'));
+
+      // Header buttons title i18n
+      const avatarBtn = document.getElementById('user-avatar-btn');
+      if (avatarBtn) avatarBtn.title = isAr ? 'حسابك' : 'Your Account';
+      const hambBtn = document.getElementById('g-hamburger');
+      if (hambBtn) hambBtn.title = isAr ? 'القائمة' : 'Menu';
+
+      // User Profile Dropdown i18n
+      si('ud-sync-txt', isAr ? 'مزامنة البيانات سحابياً' : 'Sync Data to Cloud');
+      si('ud-tour-txt', isAr ? 'الجولة التعريفية' : 'Guided Tour');
+      si('ud-logout-txt', isAr ? 'تسجيل الخروج' : 'Log Out');
+      si('ud-delete-txt', isAr ? 'حذف الحساب نهائياً' : 'Delete Account');
+
+      // Welcome Modal i18n
+      si('welcome-sub', isAr ? 'حسابك جاهز — خلينا نشوف إيه اللي ينتظرك في المنصة' : 'Your account is ready — let us show you around');
+      si('wf-sched-title', isAr ? 'الجدول الأسبوعي' : 'Weekly Schedule');
+      si('wf-sched-desc', isAr ? 'رتّب حصصك ومهامك ليوم وأسبوع كامل' : 'Organize classes and tasks for the whole week');
+      si('wf-lt-title', isAr ? 'متابع المحاضرات' : 'Lecture Tracker');
+      si('wf-lt-desc', isAr ? 'تابع المحاضرات لكل أستاذ وشوف اللي فاتك' : 'Track weekly lectures for all your teachers');
+      si('wf-exams-title', isAr ? 'الامتحانات' : 'Exams');
+      si('wf-exams-desc', isAr ? 'عداد تنازلي ومتابعة لكل امتحاناتك' : 'Countdown and track your upcoming exams');
+      si('wf-an-title', isAr ? 'التحليلات' : 'Analytics');
+      si('wf-an-desc', isAr ? 'إحصائيات شاملة لأدائك ومستواك' : 'Comprehensive stats for your study performance');
+      si('welcome-skip-btn-txt', isAr ? 'تخطي' : 'Skip');
+      si('welcome-tour-btn-txt', isAr ? 'ابدأ الجولة التعريفية' : 'Start Guided Tour');
+
+      if (window._currentUser) updateUserUI(window._currentUser);
+
+      // Mobile Drawer i18n
+      si('md-title-txt', isAr ? 'القائمة الرئيسية' : 'Main Menu');
+      si('md-sched-txt', isAr ? 'الجدول الأسبوعي' : 'Weekly Schedule');
+      si('md-lt-txt', isAr ? 'متابع المحاضرات' : 'Lecture Tracker');
+      si('md-exams-txt', isAr ? 'الامتحانات' : 'Exams');
+      si('md-history-txt', isAr ? 'سجل وتقرير الأداء' : 'History & Reports');
+      si('md-curric-txt', isAr ? 'المنهج والمواد' : 'Curriculum');
+      si('md-analytics-txt', isAr ? 'التحليلات الذكية' : 'Analytics');
       si('s-lbl-streak', t('streak')); si('s-lbl-perfect', t('perfect'));
       si('s-lbl-best', t('best')); si('s-lbl-week', t('thisWeek')); si('s-hint-reset', t('resetHint'));
       // tracker labels
@@ -6643,6 +6730,99 @@
       setTimeout(() => ltGenWeek(true), 600);
     }
 
+    /* ════════════════════════════════════════════════════
+       USER DROPDOWN & MOBILE NAV DRAWER HANDLERS
+    ════════════════════════════════════════════════════ */
+    function toggleUserDropdown(e) {
+      if (e) {
+        if (e.preventDefault) e.preventDefault();
+        if (e.stopPropagation) e.stopPropagation();
+      }
+      const dd = document.getElementById('user-dropdown');
+      if (!dd) return;
+      const isOpen = dd.style.display === 'block' || dd.classList.contains('open');
+      if (isOpen) {
+        dd.style.display = 'none';
+        dd.classList.remove('open');
+      } else {
+        dd.style.display = 'block';
+        dd.classList.add('open');
+      }
+    }
+
+    function closeUserDropdown() {
+      const dd = document.getElementById('user-dropdown');
+      if (dd) {
+        dd.style.display = 'none';
+        dd.classList.remove('open');
+      }
+    }
+
+    function toggleMobileNav(e) {
+      if (e) {
+        if (e.preventDefault) e.preventDefault();
+        if (e.stopPropagation) e.stopPropagation();
+      }
+      const nav = document.querySelector('.g-nav');
+      const drawer = document.getElementById('g-mobile-drawer');
+      const icon = document.getElementById('g-hamburger-icon');
+
+      let isOpen = false;
+      if (drawer) {
+        const isCurrentlyOpen = drawer.classList.contains('open') || drawer.style.display === 'block';
+        isOpen = !isCurrentlyOpen;
+        if (isOpen) {
+          drawer.classList.add('open');
+          drawer.style.display = 'block';
+        } else {
+          drawer.classList.remove('open');
+          drawer.style.display = 'none';
+        }
+      } else if (nav) {
+        isOpen = nav.classList.toggle('open');
+      }
+
+      if (nav) {
+        if (isOpen) nav.classList.add('open');
+        else nav.classList.remove('open');
+      }
+
+      if (icon) {
+        icon.className = isOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
+      }
+    }
+
+    function closeMobileNav() {
+      const nav = document.querySelector('.g-nav');
+      const drawer = document.getElementById('g-mobile-drawer');
+      const icon = document.getElementById('g-hamburger-icon');
+
+      if (nav) nav.classList.remove('open');
+      if (drawer) {
+        drawer.classList.remove('open');
+        drawer.style.display = 'none';
+      }
+      if (icon) icon.className = 'fa-solid fa-bars';
+    }
+
+    document.addEventListener('click', (e) => {
+      const avatarWrap = document.getElementById('user-avatar-wrap');
+      if (avatarWrap && !avatarWrap.contains(e.target)) {
+        closeUserDropdown();
+      }
+      const drawer = document.getElementById('g-mobile-drawer');
+      const hamburger = document.getElementById('g-hamburger');
+      const nav = document.querySelector('.g-nav');
+      const isDrawerOpen = drawer && (drawer.classList.contains('open') || drawer.style.display === 'block');
+      const isNavOpen = nav && nav.classList.contains('open');
+
+      if (isDrawerOpen || isNavOpen) {
+        if ((!drawer || !drawer.contains(e.target)) && (!nav || !nav.contains(e.target)) && hamburger && !hamburger.contains(e.target)) {
+          closeMobileNav();
+        }
+      }
+    });
+
 
     /* ════════════════════════════════════════════════════
        SUPABASE AUTH SYSTEM
@@ -7006,46 +7186,40 @@
 
     /* ── User Avatar UI ── */
     function updateUserUI(user) {
-      if (!user) { document.getElementById('user-avatar-wrap').style.display = 'none'; return; }
+      window._currentUser = user;
+      if (!user) {
+        const wrap = document.getElementById('user-avatar-wrap');
+        if (wrap) wrap.style.display = 'none';
+        return;
+      }
       const wrap = document.getElementById('user-avatar-wrap');
       const letterEl = document.getElementById('user-avatar-letter');
       const nameEl   = document.getElementById('user-dropdown-name');
       const emailEl  = document.getElementById('user-dropdown-email');
-      const avatarBtn = document.getElementById('user-avatar-btn');
 
-      const name  = user.user_metadata?.full_name || user.email?.split('@')[0] || 'طالب';
+      const isAr = lang === 'ar';
+      const name  = user.user_metadata?.full_name || user.email?.split('@')[0] || (isAr ? 'طالب' : 'Student');
       const email = user.email || '';
       const avatar= user.user_metadata?.avatar_url || '';
 
-      nameEl.textContent  = name;
-      emailEl.textContent = email;
+      if (nameEl)  nameEl.textContent  = name;
+      if (emailEl) emailEl.textContent = email;
 
-      if (avatar) {
-        letterEl.innerHTML = `<img src="${avatar}" alt="">`;
-      } else {
-        letterEl.innerHTML = '';
-        letterEl.textContent = (name[0] || '؟').toUpperCase();
+      if (letterEl) {
+        if (avatar) {
+          letterEl.innerHTML = `<img src="${avatar}" alt="">`;
+        } else {
+          letterEl.innerHTML = '';
+          letterEl.textContent = (name[0] || '؟').toUpperCase();
+        }
       }
 
-      // Update welcome title
-      document.getElementById('welcome-title').textContent = `أهلاً بيك يا ${name}! 👋`;
+      // Update welcome title with active language
+      const wt = document.getElementById('welcome-title');
+      if (wt) wt.textContent = isAr ? `أهلاً بيك يا ${name}! 👋` : `Welcome back, ${name}! 👋`;
 
-      wrap.style.display = 'block';
+      if (wrap) wrap.style.display = 'block';
     }
-
-    function toggleUserDropdown() {
-      const dd = document.getElementById('user-dropdown');
-      dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
-    }
-
-    function closeUserDropdown() {
-      document.getElementById('user-dropdown').style.display = 'none';
-    }
-
-    document.addEventListener('click', (e) => {
-      const wrap = document.getElementById('user-avatar-wrap');
-      if (wrap && !wrap.contains(e.target)) closeUserDropdown();
-    });
 
     /* ── Load all data from Supabase then run init ── */
     async function loadAllDataAndInit() {
