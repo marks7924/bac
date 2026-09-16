@@ -3963,11 +3963,11 @@
             <div id="reg-bac-container" style="display:none;background:var(--bg2);padding:14px;border-radius:14px;border:1px solid var(--border);margin-bottom:14px">
               <div class="auth-field">
                 <label class="auth-label" style="color:var(--blue2)">🎯 اختر مسار البكالوريا</label>
-                <select class="auth-input" id="reg-bac-track" onchange="onRegBacTrackChange()">
-                  <option value="eng">🏗️ مسار الهندسة والتكنولوجيا (Engineering Track)</option>
-                  <option value="med">🩺 مسار الطب والعلوم الصحية (Medical Track)</option>
-                  <option value="arts">🎨 مسار الآداب والإنسانيات (Arts & Humanities Track)</option>
-                  <option value="biz">📊 مسار التجارة وإدارة الأعمال (Business & Finance Track)</option>
+                <select class="auth-input" id="reg-bac-track" onchange="onRegBacTrackChange()" oninput="onRegBacTrackChange()">
+                  <option value="eng">💻 مسار هندسة وعلوم حاسب</option>
+                  <option value="med">🩺 مسار طب وعلوم حياة</option>
+                  <option value="arts">🎨 مسار آداب وفنون</option>
+                  <option value="biz">📊 مسار الأعمال</option>
                 </select>
               </div>
 
@@ -7738,20 +7738,20 @@
 
       const electives = {
         eng: [
-          { val: 'adv_calculus', text: '📐 تفاضل وتكامل متقدم (Advanced Calculus)' },
-          { val: 'applied_physics', text: '⚙️ فيزياء تطبيقية وتصميم هندسي (Applied Physics)' }
+          { val: 'programming', text: '💻 برمجة (Programming)' },
+          { val: 'chemistry', text: '🧪 كيمياء (Chemistry)' }
         ],
         med: [
-          { val: 'adv_biology', text: '🧬 أحياء متقدمة وعلم الوراثة (Advanced Biology)' },
-          { val: 'biochem', text: '🧪 كيمياء حيوية وطب صيدلي (Biochemistry)' }
+          { val: 'math', text: '📐 رياضة (Mathematics)' },
+          { val: 'physics', text: '⚡ فيزياء (Physics)' }
         ],
         arts: [
-          { val: 'philosophy', text: '🏛️ فلسفة ومنطق حديث (Modern Philosophy)' },
-          { val: 'contemp_history', text: '📜 تاريخ معاصر وعلاقات دولية (Contemporary History)' }
+          { val: 'psychology', text: '🧠 علم نفس (Psychology)' },
+          { val: 'second_lang', text: '🌐 لغة أجنبية ثانية (Second Foreign Language)' }
         ],
         biz: [
-          { val: 'fin_accounting', text: '📈 محاسبة مالية وتحليل بيانات (Financial Accounting)' },
-          { val: 'intl_economics', text: '🌐 اقتصاد وإدارة أعمال دولية (International Economics)' }
+          { val: 'accounting', text: '📈 محاسبة (Accounting)' },
+          { val: 'bus_admin', text: '🏢 إدارة أعمال (Business Administration)' }
         ]
       };
 
