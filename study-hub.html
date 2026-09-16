@@ -4022,22 +4022,22 @@
       <button class="g-btn" onclick="toggleMobileNav(event)" style="padding:4px 8px;font-size:16px;">✕</button>
     </div>
     <div class="g-mobile-drawer-body">
-      <button class="g-mobile-nav-item" onclick="switchPage('sched');toggleMobileNav(event)">
+      <button class="g-mobile-nav-item" onclick="switchPage('sched')">
         <i class="fa-solid fa-calendar-week"></i> <span id="md-sched-txt">الجدول الأسبوعي</span>
       </button>
-      <button class="g-mobile-nav-item" onclick="switchPage('lt');toggleMobileNav(event)">
+      <button class="g-mobile-nav-item" onclick="switchPage('lt')">
         <i class="fa-solid fa-video"></i> <span id="md-lt-txt">متابع المحاضرات</span>
       </button>
-      <button class="g-mobile-nav-item" onclick="switchPage('exams');toggleMobileNav(event)">
+      <button class="g-mobile-nav-item" onclick="switchPage('exams')">
         <i class="fa-solid fa-calendar-check"></i> <span id="md-exams-txt">الامتحانات</span>
       </button>
-      <button class="g-mobile-nav-item" onclick="switchPage('reports');toggleMobileNav(event)">
+      <button class="g-mobile-nav-item" onclick="switchPage('reports')">
         <i class="fa-solid fa-chart-line"></i> <span id="md-history-txt">سجل وتقرير الأداء</span>
       </button>
-      <button class="g-mobile-nav-item" onclick="switchPage('curric');toggleMobileNav(event)">
+      <button class="g-mobile-nav-item" onclick="switchPage('curric')">
         <i class="fa-solid fa-book-bookmark"></i> <span id="md-curric-txt">المنهج والمواد</span>
       </button>
-      <button class="g-mobile-nav-item" onclick="switchPage('analytics');toggleMobileNav(event)">
+      <button class="g-mobile-nav-item" onclick="switchPage('analytics')">
         <i class="fa-solid fa-chart-pie"></i> <span id="md-analytics-txt">التحليلات الذكية</span>
       </button>
     </div>
@@ -5277,9 +5277,9 @@
     function schedRender() {
       const thead = document.getElementById('s-thead');
       const tbody = document.getElementById('s-tbody');
-      let hh = `<tr><th><div style="display:flex;align-items:center;justify-content:space-between;gap:6px;"><span><i class="fa-solid fa-calendar-days"></i>${t('dayCol')}</span><button class="th-add-btn" onclick="colAddPrompt(this)" title="${lang === 'ar' ? 'إضافة عمود جديد' : 'Add new column'}"><i class="fa-solid fa-plus"></i> ${lang === 'ar' ? 'عمود' : 'Col'}</button></div></th>`;
+      let hh = `<tr><th><div style="display:flex;align-items:center;justify-content:space-between;gap:6px;"><span><i class="fa-solid fa-calendar-days"></i>${t('dayCol')}</span><button class="th-add-btn admin-only" onclick="colAddPrompt(this)" title="${lang === 'ar' ? 'إضافة عمود جديد' : 'Add new column'}"><i class="fa-solid fa-plus"></i> ${lang === 'ar' ? 'عمود' : 'Col'}</button></div></th>`;
       sCols.forEach(c => {
-        hh += `<th><div class="th-col-wrap"><i class="${c.icon || 'fa-solid fa-book'}"></i><span class="th-col-title" title="${lang === 'ar' ? 'انقر لتعديل اسم العمود' : 'Click to edit column name'}" onclick="colEditInline('${c.key}', this)">${esc(colLabel(c))}</span><button class="th-col-del" title="${lang === 'ar' ? 'حذف العمود' : 'Delete column'}" onclick="colDel('${c.key}', this)">✕</button></div></th>`;
+        hh += `<th><div class="th-col-wrap"><i class="${c.icon || 'fa-solid fa-book'}"></i><span class="th-col-title" title="${lang === 'ar' ? 'انقر لتعديل اسم العمود' : 'Click to edit column name'}" onclick="colEditInline('${c.key}', this)">${esc(colLabel(c))}</span><button class="th-col-del admin-only" title="${lang === 'ar' ? 'حذف العمود' : 'Delete column'}" onclick="colDel('${c.key}', this)">✕</button></div></th>`;
       });
       hh += `<th><i class="fa-solid fa-bullseye"></i><span style="margin-inline-start:5px">${t('goals')}</span></th></tr>`;
       thead.innerHTML = hh;
@@ -5314,15 +5314,15 @@
               if (item.teacher) sub.push(`<span><i class="fa-solid fa-user-tie"></i> ${esc(item.teacher)}</span>`);
               if (item.time) sub.push(`<span><i class="fa-solid fa-clock"></i> ${esc(fmt12(item.time))}</span>`);
               block.innerHTML = `
-            <span class="s-handle"><i class="fa-solid fa-grip-vertical"></i></span>
+            <span class="s-handle admin-only"><i class="fa-solid fa-grip-vertical"></i></span>
             <input type="checkbox" class="s-chk"${isDone ? ' checked' : ''}>
             <i class="s-ti ${ICONS_MAP[item.icon] || ICONS_MAP.book}"></i>
             <div class="s-det">
               <span class="s-txt">${esc(item.text)}</span>
               ${sub.length ? `<div class="s-sub">${sub.join('')}</div>` : ''}
             </div>
-            <span class="s-pin" title="Pin"><i class="fa-solid fa-thumbtack"></i></span>
-            <span class="s-del">✕</span>`;
+            <span class="s-pin admin-only" title="Pin"><i class="fa-solid fa-thumbtack"></i></span>
+            <span class="s-del admin-only">✕</span>`;
               block.querySelector('.s-chk').onclick = e => { e.stopPropagation(); sWeek.items[item.id] = !sWeek.items[item.id]; saveJ('week-' + sWeekKey, sWeek); schedRenderDash(); schedRender(); };
               block.querySelector('.s-pin').onclick = e => { e.stopPropagation(); item.pinned = !item.pinned; saveJ('template', sTmpl); schedRender(); };
               block.querySelector('.s-del').onclick = e => { e.stopPropagation(); if (item.pinned) return; sTmpl[day][col.key].splice(idx, 1); saveJ('template', sTmpl); schedRender(); };
@@ -5330,7 +5330,7 @@
               cell.appendChild(block);
               enableDrag(block, block.querySelector('.s-handle'), 's-block', () => sTmpl[day][col.key], () => { saveJ('template', sTmpl); schedRender(); });
             });
-            const addB = document.createElement('div'); addB.className = 's-add-btn'; addB.textContent = t('addSess');
+            const addB = document.createElement('div'); addB.className = 's-add-btn admin-only'; addB.textContent = t('addSess');
             addB.onclick = () => openSchedEditor({ day, col: col.key, idx: -1, mode: 'add' }, addB);
             cell.appendChild(addB);
           }
@@ -5343,13 +5343,13 @@
         (sWeek.goals[day] || []).forEach(g => {
           const gEl = document.createElement('div');
           gEl.className = `s-goal${g.done ? ' done' : ''}`;
-          gEl.innerHTML = `<input type="checkbox"${g.done ? ' checked' : ''}><span>${esc(g.text)}</span><span class="s-del">✕</span>`;
+          gEl.innerHTML = `<input type="checkbox"${g.done ? ' checked' : ''}><span>${esc(g.text)}</span><span class="s-del admin-only">✕</span>`;
           gEl.querySelector('input').onclick = e => { e.stopPropagation(); g.done = !g.done; saveJ('week-' + sWeekKey, sWeek); schedRenderDash(); schedRender(); };
           gEl.querySelector('span').onclick = () => openGoalEditor(day, g, gEl);
           gEl.querySelector('.s-del').onclick = e => { e.stopPropagation(); sWeek.goals[day] = sWeek.goals[day].filter(x => x.id !== g.id); saveJ('week-' + sWeekKey, sWeek); schedRenderDash(); schedRender(); };
           gCell.appendChild(gEl);
         });
-        const addG = document.createElement('div'); addG.className = 's-add-btn'; addG.textContent = t('addGoal');
+        const addG = document.createElement('div'); addG.className = 's-add-btn admin-only'; addG.textContent = t('addGoal');
         addG.onclick = () => openGoalEditor(day, null, addG);
         gCell.appendChild(addG);
         gTd.appendChild(gCell); tr.appendChild(gTd);
@@ -5598,7 +5598,7 @@
 
         if (isAdminMode || items.length > 0) {
           contentHtml += `
-            <div class="s-add-btn" onclick="openSchedEditor({ day: '${day}', col: '${col.key}', idx: -1, mode: 'add' }, this)">${t('addSess')}</div>
+            <div class="s-add-btn admin-only" onclick="openSchedEditor({ day: '${day}', col: '${col.key}', idx: -1, mode: 'add' }, this)">${t('addSess')}</div>
           `;
         }
 
@@ -5632,7 +5632,7 @@
           `;
         });
         contentHtml += `
-              <div class="s-add-btn" onclick="openGoalEditor('${day}', null, this)">${t('addGoal')}</div>
+              <div class="s-add-btn admin-only" onclick="openGoalEditor('${day}', null, this)">${t('addGoal')}</div>
             </div>
           </div>
         `;
@@ -6093,9 +6093,9 @@
         <div style="display:flex;align-items:center;gap:8px">
           <div>
             <span style="font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;background:${colors[sc]};color:var(--text)">${sl}</span>
-            <div style="margin-top:4px"><button style="border:none;background:none;cursor:pointer;color:var(--blue2);font-size:12px;font-weight:700;font-family:inherit" onclick="subjAdd('${s.id}',1)">${t('addLessonBtn')}</button></div>
+            <div style="margin-top:4px"><button class="admin-only" style="border:none;background:none;cursor:pointer;color:var(--blue2);font-size:12px;font-weight:700;font-family:inherit" onclick="subjAdd('${s.id}',1)">${t('addLessonBtn')}</button></div>
           </div>
-          <button style="border:none;background:none;cursor:pointer;color:var(--red);font-size:14px" onclick="subjDel('${s.id}')">✕</button>
+          <button class="admin-only" style="border:none;background:none;cursor:pointer;color:var(--red);font-size:14px" onclick="subjDel('${s.id}')">✕</button>
         </div></div>`;
         }).join('');
         pop.innerHTML = `
@@ -6261,7 +6261,7 @@
       const filtered = ltTeachers.filter(ltTeacherPass);
       if (ltTeachers.length === 0) {
         grid.innerHTML = `<div class="lt-empty-page"><div class="eicon">🎓</div><h2>${t('ltNoTeachers')}</h2><p>${t('ltNoTeachersSub')}</p>
-      <button class="lt-btn primary" onclick="openAddTeacherModal()" style="margin:0 auto;display:inline-flex"><i class="fa-solid fa-user-plus"></i> ${t('ltAddTeacher')}</button></div>`;
+      <button class="lt-btn primary admin-only" onclick="openAddTeacherModal()" style="margin:0 auto;display:inline-flex"><i class="fa-solid fa-user-plus"></i> ${t('ltAddTeacher')}</button></div>`;
         return;
       }
       if (filtered.length === 0) {
@@ -6302,7 +6302,7 @@
       </div>
       <div class="tc-actions">
         ${linkBtn}
-        <button class="ic-btn edit" onclick="event.stopPropagation();openEditTeacherModal('${tc.id}')"><i class="fa-solid fa-pen"></i></button>
+        <button class="ic-btn edit admin-only" onclick="event.stopPropagation();openEditTeacherModal('${tc.id}')"><i class="fa-solid fa-pen"></i></button>
       </div>
     </div>
     ${stats.total > 0 ? `
@@ -6317,7 +6317,7 @@
     <div class="tc-lecs" id="llecs-${tc.id}">
       ${lecs.length === 0 ? `<div style="text-align:center;padding:14px;color:var(--text3);font-size:12px;font-weight:700"><i class="fa-solid fa-video-slash" style="font-size:22px;display:block;margin-bottom:7px;opacity:.25"></i>${t('ltNoLecs')}</div>` : lecs.map(l => ltLecItem(l, tc)).join('')}
     </div>
-    <button class="tc-add-lec" onclick="openAddLecModal('${tc.id}')"><i class="fa-solid fa-plus"></i> ${t('ltAddManual')}</button>
+    <button class="tc-add-lec admin-only" onclick="openAddLecModal('${tc.id}')"><i class="fa-solid fa-plus"></i> ${t('ltAddManual')}</button>
   `;
       return card;
     }
@@ -6340,7 +6340,7 @@
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
       ${badge}
       ${lec.link ? `<a href="${esc(lec.link)}" target="_blank" onclick="event.stopPropagation()" class="lec-open"><i class="fa-solid fa-play"></i> ${t('ltOpenBtn')}</a>` : ''}
-      <button style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;padding:2px" onclick="event.stopPropagation();openEditLecModal('${lec.id}','${lec.teacherId}')"><i class="fa-solid fa-pen"></i></button>
+      <button class="admin-only" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;padding:2px" onclick="event.stopPropagation();openEditLecModal('${lec.id}','${lec.teacherId}')"><i class="fa-solid fa-pen"></i></button>
     </div>
   </div>`;
     }
@@ -6609,7 +6609,7 @@
       </div>
       <div>
         ${scoreHTML}
-        <button style="border:none;background:none;color:var(--red);font-size:11px;cursor:pointer;margin-top:10px;width:100%;text-align:end" onclick="exDel('${ex.id}')">${t('deleteExam')}</button>
+        <button class="admin-only" style="border:none;background:none;color:var(--red);font-size:11px;cursor:pointer;margin-top:10px;width:100%;text-align:end" onclick="exDel('${ex.id}')">${t('deleteExam')}</button>
       </div>
     </div>`;
       }).join('');
@@ -6762,8 +6762,8 @@
         <div class="cur-unit-title">
           <span><i class="fa-solid fa-folder-open"></i> ${esc(u.title)}</span>
           <div style="display:flex;align-items:center;gap:10px">
-            <button style="border:none;background:none;color:var(--blue2);font-size:11px;cursor:pointer;font-family:inherit" onclick="curAddLessonPrompt(this,'${sub.id}','${u.id}')">${t('addLessonBtn')}</button>
-            <button style="border:none;background:none;color:var(--red);font-size:12px;cursor:pointer;opacity:0.7;padding:2px 6px" onclick="curDelUnit('${sub.id}','${u.id}', this)" title="${t('deleteUnitTitle')}">✕</button>
+            <button class="admin-only" style="border:none;background:none;color:var(--blue2);font-size:11px;cursor:pointer;font-family:inherit" onclick="curAddLessonPrompt(this,'${sub.id}','${u.id}')">${t('addLessonBtn')}</button>
+            <button class="admin-only" style="border:none;background:none;color:var(--red);font-size:12px;cursor:pointer;opacity:0.7;padding:2px 6px" onclick="curDelUnit('${sub.id}','${u.id}', this)" title="${t('deleteUnitTitle')}">✕</button>
           </div>
         </div>
         ${lessonsHTML || `<div style="font-size:11px;color:var(--text3);padding:6px">${t('noLessonsInUnit')}</div>`}
@@ -6782,8 +6782,8 @@
             <div style="font-size:15px;font-weight:900;color:var(--gold)">${pct}%</div>
             <div style="font-size:10px;color:var(--text3)">${t('syllabusProgress')}</div>
           </div>
-          <button class="s-btn" onclick="curAddUnitPrompt(this, '${sub.id}')"><i class="fa-solid fa-plus"></i> ${t('addUnitBtn')}</button>
-          <button style="border:none;background:none;color:var(--red);font-size:12px;cursor:pointer" onclick="curDelSubj('${sub.id}', this)">✕</button>
+          <button class="s-btn admin-only" onclick="curAddUnitPrompt(this, '${sub.id}')"><i class="fa-solid fa-plus"></i> ${t('addUnitBtn')}</button>
+          <button class="admin-only" style="border:none;background:none;color:var(--red);font-size:12px;cursor:pointer" onclick="curDelSubj('${sub.id}', this)">✕</button>
         </div>
       </div>
       <div class="tc-prog-track"><div class="tc-prog-fill" style="width:${pct}%;background:${sub.color || 'var(--blue)'}"></div></div>
