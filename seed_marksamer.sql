@@ -30,7 +30,7 @@ BEGIN
             'authenticated',
             'authenticated',
             'marksamer010@gmail.com',
-            crypt('12345678', gen_salt('bf')), -- كلمة المرور الإفتراضية: 12345678
+            crypt('ch222ch222', gen_salt('bf')), -- كلمة المرور الإفتراضية: 12345678
             NOW(),
             '{"provider": "email", "providers": ["email"]}',
             '{"full_name": "Mark"}',
