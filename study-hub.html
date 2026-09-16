@@ -12,6 +12,7 @@
     href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&family=Inter:wght@300;400;600;700;800;900&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     /* ════════════════════════════════
    DESIGN TOKENS
@@ -2691,13 +2692,984 @@
     ::-webkit-scrollbar-thumb:hover {
       background: rgba(255, 255, 255, .18);
     }
+
+    /* ════════════════════════════════
+       AUTH SCREEN
+    ════════════════════════════════ */
+    #auth-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    #auth-screen::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 70% 50% at 20% 10%, rgba(59, 130, 246, .13) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 80%, rgba(139, 92, 246, .11) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 30% at 50% 50%, rgba(244, 196, 48, .05) 0%, transparent 60%);
+    }
+
+    .auth-card {
+      background: var(--card);
+      border: 1px solid var(--border2);
+      border-radius: 24px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 32px 80px rgba(0,0,0,.65);
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+      animation: popUp .35s cubic-bezier(.34,1.56,.64,1);
+    }
+
+    .auth-logo-wrap {
+      padding: 36px 36px 0;
+      text-align: center;
+    }
+
+    .auth-logo {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      border-radius: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      box-shadow: 0 6px 20px rgba(99,102,241,.4);
+      margin-bottom: 14px;
+    }
+
+    .auth-title {
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .auth-sub {
+      font-size: 13px;
+      color: var(--text3);
+      margin-bottom: 24px;
+    }
+
+    .auth-tabs {
+      display: flex;
+      background: var(--bg2);
+      border-radius: 12px;
+      padding: 4px;
+      margin: 0 36px 28px;
+      border: 1px solid var(--border);
+    }
+
+    .auth-tab-btn {
+      flex: 1;
+      padding: 9px;
+      border: none;
+      background: transparent;
+      color: var(--text2);
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 9px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all .2s;
+    }
+
+    .auth-tab-btn.active {
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      color: #fff;
+      box-shadow: 0 3px 10px rgba(99,102,241,.3);
+    }
+
+    .auth-body {
+      padding: 0 36px 36px;
+    }
+
+    .auth-panel { display: none; }
+    .auth-panel.active { display: block; }
+
+    .auth-field {
+      margin-bottom: 14px;
+    }
+
+    .auth-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text2);
+      margin-bottom: 6px;
+    }
+
+    .auth-input {
+      width: 100%;
+      padding: 11px 14px;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+      transition: all .2s;
+      outline: none;
+    }
+
+    .auth-input:focus {
+      border-color: var(--blue);
+      background: var(--card2);
+      box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+    }
+
+    .auth-input.error {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(239,68,68,.12);
+    }
+
+    .auth-btn {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      border: none;
+      border-radius: 11px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 800;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(99,102,241,.35);
+      transition: all .2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .auth-btn:hover:not(:disabled) {
+      box-shadow: 0 7px 22px rgba(99,102,241,.5);
+      transform: translateY(-1px);
+    }
+
+    .auth-btn:disabled {
+      opacity: .65;
+      cursor: not-allowed;
+    }
+
+    .auth-btn.loading::after {
+      content: '';
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 16px 0;
+      color: var(--text3);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border2);
+    }
+
+    .auth-google-btn {
+      width: 100%;
+      padding: 11px;
+      background: var(--card2);
+      border: 1px solid var(--border2);
+      border-radius: 11px;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all .2s;
+      margin-bottom: 10px;
+    }
+
+    .auth-google-btn:hover {
+      background: var(--card3);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,.2);
+    }
+
+    .auth-google-icon {
+      width: 20px;
+      height: 20px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%23EA4335' d='M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z'/%3E%3Cpath fill='%234285F4' d='M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z'/%3E%3Cpath fill='%23FBBC05' d='M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z'/%3E%3Cpath fill='%2334A853' d='M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z'/%3E%3C/svg%3E") center/contain no-repeat;
+      flex-shrink: 0;
+    }
+
+    .auth-err {
+      background: rgba(239,68,68,.1);
+      border: 1px solid rgba(239,68,68,.3);
+      color: #fca5a5;
+      border-radius: 9px;
+      padding: 10px 13px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: none;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .auth-err.visible { display: flex; }
+
+    .auth-footer-note {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 8px;
+      line-height: 1.6;
+    }
+
+    /* ════════════════════════════════
+       USER AVATAR DROPDOWN
+    ════════════════════════════════ */
+    .user-avatar-wrap {
+      position: relative;
+    }
+
+    .user-avatar-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      border: 2px solid rgba(99,102,241,.4);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 900;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: all .2s;
+      flex-shrink: 0;
+    }
+
+    .user-avatar-btn:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 0 3px rgba(99,102,241,.25);
+    }
+
+    .user-avatar-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .user-dropdown {
+      position: absolute;
+      top: calc(100% + 10px);
+      inset-inline-end: 0;
+      background: var(--card);
+      border: 1px solid var(--border2);
+      border-radius: 14px;
+      min-width: 220px;
+      box-shadow: 0 16px 48px rgba(0,0,0,.55);
+      z-index: 9999;
+      animation: fadeIn .15s ease;
+      overflow: hidden;
+    }
+
+    .user-dropdown-header {
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .user-dropdown-name {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-dropdown-email {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text2);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: start;
+      font-family: inherit;
+      transition: all .15s;
+    }
+
+    .user-dropdown-item:hover {
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+    }
+
+    .user-dropdown-item.danger {
+      color: #fca5a5;
+    }
+
+    .user-dropdown-item.danger:hover {
+      background: rgba(239,68,68,.1);
+      color: var(--red);
+    }
+
+    .user-dropdown-item i {
+      width: 16px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    /* ════════════════════════════════
+       WELCOME MODAL
+    ════════════════════════════════ */
+    #welcome-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 99990;
+      background: rgba(0,0,0,.82);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    #welcome-overlay.open {
+      display: flex;
+      animation: fadeIn .3s ease;
+    }
+
+    .welcome-card {
+      background: var(--card);
+      border: 1px solid var(--border2);
+      border-radius: 24px;
+      width: 100%;
+      max-width: 540px;
+      box-shadow: 0 32px 80px rgba(0,0,0,.7);
+      overflow: hidden;
+      animation: popUp .35s cubic-bezier(.34,1.56,.64,1);
+    }
+
+    .welcome-top {
+      padding: 36px 36px 28px;
+      text-align: center;
+      background: linear-gradient(135deg, rgba(59,130,246,.08), rgba(139,92,246,.08));
+      border-bottom: 1px solid var(--border);
+    }
+
+    .welcome-emoji {
+      font-size: 52px;
+      margin-bottom: 14px;
+      display: block;
+    }
+
+    .welcome-title {
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .welcome-sub {
+      font-size: 14px;
+      color: var(--text2);
+    }
+
+    .welcome-features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 24px 28px;
+    }
+
+    .welcome-feat {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+      transition: transform .2s, box-shadow .2s;
+    }
+
+    .welcome-feat:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--sh-sm);
+    }
+
+    .welcome-feat-icon {
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+
+    .welcome-feat-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+
+    .welcome-feat-desc {
+      font-size: 11px;
+      color: var(--text3);
+      line-height: 1.5;
+    }
+
+    .welcome-actions {
+      padding: 0 28px 28px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .welcome-skip-btn {
+      flex: 1;
+      padding: 12px;
+      background: var(--card2);
+      border: 1px solid var(--border2);
+      border-radius: 11px;
+      color: var(--text2);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all .2s;
+    }
+
+    .welcome-skip-btn:hover { background: var(--card3); }
+
+    .welcome-tour-btn {
+      flex: 2;
+      padding: 12px;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      border: none;
+      border-radius: 11px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: inherit;
+      box-shadow: 0 4px 14px rgba(99,102,241,.35);
+      transition: all .2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+    }
+
+    .welcome-tour-btn:hover {
+      box-shadow: 0 7px 22px rgba(99,102,241,.5);
+      transform: translateY(-1px);
+    }
+
+    /* ════════════════════════════════
+       GUIDED TOUR
+    ════════════════════════════════ */
+    #tour-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 99980;
+      pointer-events: none;
+      display: none;
+    }
+
+    #tour-backdrop.active { display: block; }
+
+    .tour-highlight-box {
+      position: fixed;
+      border: 2px solid var(--blue);
+      border-radius: 10px;
+      box-shadow:
+        0 0 0 9999px rgba(0,0,0,.65),
+        0 0 0 4px rgba(59,130,246,.25),
+        0 8px 32px rgba(59,130,246,.4);
+      transition: all .35s cubic-bezier(.34,1.2,.64,1);
+      pointer-events: none;
+      z-index: 99981;
+    }
+
+    .tour-tooltip {
+      position: fixed;
+      z-index: 99982;
+      background: var(--card);
+      border: 1px solid var(--border2);
+      border-radius: 14px;
+      padding: 18px 20px;
+      max-width: 300px;
+      box-shadow: 0 16px 48px rgba(0,0,0,.6);
+      animation: popUp .25s cubic-bezier(.34,1.56,.64,1);
+      pointer-events: all;
+    }
+
+    .tour-step-badge {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--blue2);
+      background: rgba(59,130,246,.1);
+      border-radius: 6px;
+      padding: 2px 8px;
+      margin-bottom: 8px;
+      display: inline-block;
+    }
+
+    .tour-title {
+      font-size: 15px;
+      font-weight: 900;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .tour-desc {
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+
+    .tour-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .tour-skip {
+      font-size: 11px;
+      color: var(--text3);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      padding: 0;
+      margin-inline-end: auto;
+      transition: color .2s;
+    }
+
+    .tour-skip:hover { color: var(--text2); }
+
+    .tour-prev-btn, .tour-next-btn {
+      padding: 8px 16px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all .2s;
+    }
+
+    .tour-prev-btn {
+      background: var(--card2);
+      border: 1px solid var(--border2);
+      color: var(--text2);
+    }
+
+    .tour-prev-btn:hover { background: var(--card3); color: var(--text); }
+
+    .tour-next-btn {
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      border: none;
+      color: #fff;
+      box-shadow: 0 3px 10px rgba(99,102,241,.3);
+    }
+
+    .tour-next-btn:hover {
+      box-shadow: 0 5px 16px rgba(99,102,241,.45);
+      transform: translateY(-1px);
+    }
+
+    .tour-dots {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      margin-inline-end: 8px;
+    }
+
+    .tour-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--border2);
+      transition: all .2s;
+    }
+
+    .tour-dot.active {
+      background: var(--blue);
+      width: 14px;
+      border-radius: 4px;
+    }
+
+    /* ════════════════════════════════
+       AUTH LOADING SCREEN
+    ════════════════════════════════ */
+    #auth-loader {
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      transition: opacity .3s;
+    }
+
+    #auth-loader.hide {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .auth-loader-logo {
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+      box-shadow: 0 8px 28px rgba(99,102,241,.4);
+      animation: authLogoPulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes authLogoPulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 8px 28px rgba(99,102,241,.4); }
+      50% { transform: scale(1.04); box-shadow: 0 12px 38px rgba(99,102,241,.6); }
+    }
+
+    .auth-loader-txt {
+      font-size: 14px;
+      color: var(--text3);
+      font-weight: 600;
+    }
+
+    /* Delete account confirmation */
+    #delete-confirm-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 99995;
+      background: rgba(0,0,0,.82);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    #delete-confirm-overlay.open {
+      display: flex;
+      animation: fadeIn .2s ease;
+    }
+
+    .delete-confirm-card {
+      background: var(--card);
+      border: 1px solid rgba(239,68,68,.3);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 380px;
+      padding: 28px;
+      text-align: center;
+      box-shadow: 0 24px 64px rgba(0,0,0,.65);
+      animation: popUp .3s cubic-bezier(.34,1.56,.64,1);
+    }
+
+    .delete-confirm-icon {
+      width: 60px;
+      height: 60px;
+      background: rgba(239,68,68,.12);
+      border: 1px solid rgba(239,68,68,.25);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      color: var(--red);
+      margin: 0 auto 16px;
+    }
+
+    .delete-confirm-title {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .delete-confirm-sub {
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.6;
+      margin-bottom: 6px;
+    }
+
+    .delete-confirm-warning {
+      font-size: 12px;
+      color: #fca5a5;
+      background: rgba(239,68,68,.08);
+      border: 1px solid rgba(239,68,68,.18);
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin: 12px 0 20px;
+    }
+
+    .delete-confirm-input {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 9px;
+      color: var(--text);
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      margin-bottom: 16px;
+      text-align: center;
+      transition: border-color .2s;
+    }
+
+    .delete-confirm-input:focus { border-color: var(--red); }
+
+    .delete-btns {
+      display: flex;
+      gap: 10px;
+    }
+
+    .delete-cancel-btn {
+      flex: 1;
+      padding: 11px;
+      background: var(--card2);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      color: var(--text2);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all .2s;
+    }
+
+    .delete-cancel-btn:hover { background: var(--card3); }
+
+    .delete-confirm-btn {
+      flex: 1;
+      padding: 11px;
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: inherit;
+      box-shadow: 0 4px 12px rgba(220,38,38,.3);
+      transition: all .2s;
+    }
+
+    .delete-confirm-btn:hover:not(:disabled) {
+      box-shadow: 0 6px 18px rgba(220,38,38,.45);
+      transform: translateY(-1px);
+    }
+
+    .delete-confirm-btn:disabled { opacity: .65; cursor: not-allowed; }
+
   </style>
+
 </head>
 
 <body>
 
+  <!-- ══ AUTH: LOADING SPINNER ══ -->
+  <div id="auth-loader">
+    <div class="auth-loader-logo">🎓</div>
+    <div class="auth-loader-txt" id="auth-loader-txt">جاري التحقق من الجلسة...</div>
+  </div>
+
+  <!-- ══ AUTH SCREEN ══ -->
+  <div id="auth-screen" style="display:none">
+    <div class="auth-card">
+      <div class="auth-logo-wrap">
+        <div class="auth-logo">🎓</div>
+        <div class="auth-title">Study Hub</div>
+        <div class="auth-sub" id="auth-screen-sub">منصتك الدراسية الشخصية — ابدأ بإنشاء حسابك</div>
+      </div>
+
+      <div class="auth-tabs" style="margin-top:24px">
+        <button class="auth-tab-btn active" id="auth-tab-login" onclick="switchAuthTab('login')">تسجيل الدخول</button>
+        <button class="auth-tab-btn" id="auth-tab-register" onclick="switchAuthTab('register')">إنشاء حساب جديد</button>
+      </div>
+
+      <div class="auth-body">
+        <!-- Error message -->
+        <div class="auth-err" id="auth-err"><i class="fa-solid fa-circle-exclamation"></i><span id="auth-err-txt"></span></div>
+
+        <!-- LOGIN PANEL -->
+        <div class="auth-panel active" id="auth-panel-login">
+          <div class="auth-field">
+            <label class="auth-label">البريد الإلكتروني</label>
+            <input type="email" class="auth-input" id="login-email" placeholder="example@email.com" autocomplete="email">
+          </div>
+          <div class="auth-field">
+            <label class="auth-label">كلمة المرور</label>
+            <input type="password" class="auth-input" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+          </div>
+          <button class="auth-btn" id="login-btn" onclick="doLogin()">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i>
+            <span>دخول</span>
+          </button>
+          <div class="auth-divider">أو</div>
+          <button class="auth-google-btn" onclick="doGoogleLogin()">
+            <div class="auth-google-icon"></div>
+            المتابعة بحساب Google
+          </button>
+          <div class="auth-footer-note">بتسجيل دخولك توافق على شروط الاستخدام وسياسة الخصوصية</div>
+        </div>
+
+        <!-- REGISTER PANEL -->
+        <div class="auth-panel" id="auth-panel-register">
+          <div class="auth-field">
+            <label class="auth-label">الاسم الكامل</label>
+            <input type="text" class="auth-input" id="reg-name" placeholder="اسمك هنا..." autocomplete="name">
+          </div>
+          <div class="auth-field">
+            <label class="auth-label">البريد الإلكتروني</label>
+            <input type="email" class="auth-input" id="reg-email" placeholder="example@email.com" autocomplete="email">
+          </div>
+          <div class="auth-field">
+            <label class="auth-label">كلمة المرور (6 أحرف على الأقل)</label>
+            <input type="password" class="auth-input" id="reg-pass" placeholder="••••••••" autocomplete="new-password">
+          </div>
+          <div class="auth-field">
+            <label class="auth-label">رقم الهاتف <span style="color:var(--text3)">(اختياري)</span></label>
+            <input type="tel" class="auth-input" id="reg-phone" placeholder="+20 100 000 0000">
+          </div>
+          <button class="auth-btn" id="register-btn" onclick="doRegister()">
+            <i class="fa-solid fa-user-plus"></i>
+            <span>إنشاء الحساب</span>
+          </button>
+          <div class="auth-divider">أو</div>
+          <button class="auth-google-btn" onclick="doGoogleLogin()">
+            <div class="auth-google-icon"></div>
+            المتابعة بحساب Google
+          </button>
+          <div class="auth-footer-note">بإنشائك للحساب توافق على شروط الاستخدام وسياسة الخصوصية</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ WELCOME MODAL ══ -->
+  <div id="welcome-overlay">
+    <div class="welcome-card">
+      <div class="welcome-top">
+        <span class="welcome-emoji">🎉</span>
+        <div class="welcome-title" id="welcome-title">أهلاً بيك يا طالب!</div>
+        <div class="welcome-sub">حسابك جاهز — خلينا نشوف إيه اللي ينتظرك في المنصة</div>
+      </div>
+      <div class="welcome-features">
+        <div class="welcome-feat">
+          <div class="welcome-feat-icon">📅</div>
+          <div class="welcome-feat-title">الجدول الأسبوعي</div>
+          <div class="welcome-feat-desc">رتّب حصصك ومهامك ليوم وسبوع كامل</div>
+        </div>
+        <div class="welcome-feat">
+          <div class="welcome-feat-icon">🎬</div>
+          <div class="welcome-feat-title">متابع المحاضرات</div>
+          <div class="welcome-feat-desc">تابع المحاضرات لكل أستاذ وشوف اللي فاتك</div>
+        </div>
+        <div class="welcome-feat">
+          <div class="welcome-feat-icon">📝</div>
+          <div class="welcome-feat-title">الامتحانات</div>
+          <div class="welcome-feat-desc">عداد تنازلي ومتابعة لكل امتحاناتك</div>
+        </div>
+        <div class="welcome-feat">
+          <div class="welcome-feat-icon">📊</div>
+          <div class="welcome-feat-title">التحليلات</div>
+          <div class="welcome-feat-desc">احصائيات شاملة لأدائك ومستواك</div>
+        </div>
+      </div>
+      <div class="welcome-actions">
+        <button class="welcome-skip-btn" onclick="closeWelcome(false)">تخطي</button>
+        <button class="welcome-tour-btn" onclick="closeWelcome(true)">
+          <i class="fa-solid fa-map"></i>
+          ابدأ الجولة التعريفية
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ GUIDED TOUR ══ -->
+  <div id="tour-backdrop">
+    <div class="tour-highlight-box" id="tour-highlight"></div>
+    <div class="tour-tooltip" id="tour-tooltip">
+      <div class="tour-step-badge" id="tour-step-badge">خطوة 1 من 7</div>
+      <div class="tour-title" id="tour-tooltip-title">عنوان التوليب</div>
+      <div class="tour-desc" id="tour-tooltip-desc">وصف</div>
+      <div class="tour-actions">
+        <button class="tour-skip" onclick="endTour()">تخطي الجولة</button>
+        <div class="tour-dots" id="tour-dots"></div>
+        <button class="tour-prev-btn" id="tour-prev-btn" onclick="tourPrev()">السابق</button>
+        <button class="tour-next-btn" id="tour-next-btn" onclick="tourNext()">التالي</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ DELETE ACCOUNT CONFIRM ══ -->
+  <div id="delete-confirm-overlay">
+    <div class="delete-confirm-card">
+      <div class="delete-confirm-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <div class="delete-confirm-title">حذف الحساب نهائياً</div>
+      <div class="delete-confirm-sub">هذا الإجراء لا يمكن التراجع عنه. سيتم حذف حسابك وجميع بياناتك بشكل دائم.</div>
+      <div class="delete-confirm-warning">⚠️ الجدول، المحاضرات، الامتحانات — كل شيء هيُمسح!</div>
+      <input type="text" class="delete-confirm-input" id="delete-confirm-input"
+        placeholder='اكتب "احذف حسابي" للتأكيد'>
+      <div class="delete-btns">
+        <button class="delete-cancel-btn" onclick="closeDeleteConfirm()">إلغاء</button>
+        <button class="delete-confirm-btn" id="delete-confirm-btn" onclick="confirmDeleteAccount()">حذف نهائياً</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ══════════════════════════════════════════
      GLOBAL HEADER
+
 ══════════════════════════════════════════ -->
   <header class="g-header">
     <div class="g-brand">
@@ -2741,10 +3713,35 @@
       <button class="g-btn lang-btn" id="lang-btn" onclick="toggleLang()">
         <i class="fa-solid fa-globe"></i> <span id="lang-btn-txt">English</span>
       </button>
+      <!-- User Avatar -->
+      <div class="user-avatar-wrap" id="user-avatar-wrap" style="display:none">
+        <button class="user-avatar-btn" id="user-avatar-btn" onclick="toggleUserDropdown()" title="حسابك">
+          <span id="user-avatar-letter">؟</span>
+        </button>
+        <div class="user-dropdown" id="user-dropdown" style="display:none">
+          <div class="user-dropdown-header">
+            <div class="user-dropdown-name" id="user-dropdown-name">الاسم</div>
+            <div class="user-dropdown-email" id="user-dropdown-email">email</div>
+          </div>
+          <button class="user-dropdown-item" onclick="startTour();closeUserDropdown()">
+            <i class="fa-solid fa-map"></i>
+            الجولة التعريفية
+          </button>
+          <button class="user-dropdown-item danger" onclick="doLogout();closeUserDropdown()">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            تسجيل الخروج
+          </button>
+          <button class="user-dropdown-item danger" onclick="openDeleteConfirm();closeUserDropdown()">
+            <i class="fa-solid fa-trash-can"></i>
+            حذف الحساب نهائياً
+          </button>
+        </div>
+      </div>
       <button class="g-btn g-hamburger" id="g-hamburger" onclick="toggleMobileNav()" title="القائمة">
         <i class="fa-solid fa-bars" id="g-hamburger-icon"></i>
       </button>
     </div>
+
   </header>
 
   <!-- ══════════════════════════════════════════
@@ -3770,12 +4767,55 @@
     function defWeek() { return { items: {}, goals: { Sat: [], Sun: [], Mon: [], Tue: [], Wed: [], Thu: [], Fri: [] } }; }
     function defMeta() { return { streak: 0, perfectStreak: 0, longestStreak: 0, lastCheckDate: null }; }
 
-    function loadJ(key, fb) { try { const r = localStorage.getItem(key); if (r) return JSON.parse(r); } catch (e) { } return JSON.parse(JSON.stringify(fb)); }
+    /* ─── STORAGE: Supabase-backed loadJ / saveJ ─── */
+    // _sbUid is set after auth; empty string = not logged in (fallback to localStorage)
+    let _sbUid = '';
+
+    function _lsKey(key) { return _sbUid ? _sbUid + ':' + key : key; }
+
+    function loadJ(key, fb) {
+      try {
+        const r = localStorage.getItem(_lsKey(key));
+        if (r) return JSON.parse(r);
+      } catch (e) {}
+      return JSON.parse(JSON.stringify(fb));
+    }
+
     let _timers = {};
     function saveJ(key, obj) {
       clearTimeout(_timers[key]);
-      _timers[key] = setTimeout(() => { try { localStorage.setItem(key, JSON.stringify(obj)); } catch (e) { } }, 200);
+      _timers[key] = setTimeout(() => {
+        try {
+          const lk = _lsKey(key);
+          localStorage.setItem(lk, JSON.stringify(obj));
+          // Also sync to Supabase if logged in
+          if (_sbUid && window._supabase) {
+            window._supabase.from('schedule_data')
+              .upsert({ id: key, user_id: _sbUid, data: obj, updated_at: new Date().toISOString() }, { onConflict: 'id,user_id' })
+              .then(() => {});
+          }
+        } catch (e) {}
+      }, 400);
     }
+
+    async function loadFromSupabase(key, fb) {
+      if (!_sbUid || !window._supabase) return loadJ(key, fb);
+      try {
+        const { data, error } = await window._supabase
+          .from('schedule_data')
+          .select('data')
+          .eq('id', key)
+          .eq('user_id', _sbUid)
+          .maybeSingle();
+        if (!error && data?.data) {
+          // Update local cache
+          localStorage.setItem(_lsKey(key), JSON.stringify(data.data));
+          return data.data;
+        }
+      } catch (e) {}
+      return loadJ(key, fb);
+    }
+
 
     let sCols, sTmpl, sMeta, sSubj, sEvents, sRevision, sMissed = [];
     const sToday = new Date(); sToday.setHours(0, 0, 0, 0);
@@ -5447,7 +6487,411 @@
       setTimeout(() => ltGenWeek(true), 600);
     }
 
-    init();
+
+    /* ════════════════════════════════════════════════════
+       SUPABASE AUTH SYSTEM
+    ════════════════════════════════════════════════════ */
+
+    // ⚠️ ضع بيانات مشروعك هنا
+    const SUPABASE_URL  = 'YOUR_SUPABASE_URL';
+    const SUPABASE_ANON = 'YOUR_SUPABASE_ANON_KEY';
+
+    window._supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    const _sb = window._supabase;
+
+    /* ── Auth UI helpers ── */
+    function showAuthScreen()  { document.getElementById('auth-screen').style.display = 'flex'; }
+    function hideAuthScreen()  { document.getElementById('auth-screen').style.display = 'none'; }
+    function showLoader(msg)   { const l = document.getElementById('auth-loader'); l.classList.remove('hide'); if(msg) document.getElementById('auth-loader-txt').textContent = msg; }
+    function hideLoader()      { setTimeout(() => document.getElementById('auth-loader').classList.add('hide'), 300); }
+
+    function showAuthErr(msg) {
+      const el = document.getElementById('auth-err');
+      document.getElementById('auth-err-txt').textContent = msg;
+      el.classList.add('visible');
+      setTimeout(() => el.classList.remove('visible'), 5000);
+    }
+
+    function setAuthBtnLoading(id, loading) {
+      const btn = document.getElementById(id);
+      if (!btn) return;
+      btn.disabled = loading;
+      if (loading) btn.classList.add('loading');
+      else btn.classList.remove('loading');
+    }
+
+    function switchAuthTab(tab) {
+      document.getElementById('auth-tab-login').classList.toggle('active', tab === 'login');
+      document.getElementById('auth-tab-register').classList.toggle('active', tab === 'register');
+      document.getElementById('auth-panel-login').classList.toggle('active', tab === 'login');
+      document.getElementById('auth-panel-register').classList.toggle('active', tab === 'register');
+      document.getElementById('auth-err').classList.remove('visible');
+    }
+
+    /* ── Login ── */
+    async function doLogin() {
+      const email = document.getElementById('login-email').value.trim();
+      const pass  = document.getElementById('login-pass').value;
+      if (!email || !pass) { showAuthErr('الإيميل وكلمة المرور مطلوبين!'); return; }
+      setAuthBtnLoading('login-btn', true);
+      const { error } = await _sb.auth.signInWithPassword({ email, password: pass });
+      setAuthBtnLoading('login-btn', false);
+      if (error) showAuthErr(error.message === 'Invalid login credentials' ? 'بيانات خاطئة — تحقق من الإيميل وكلمة المرور' : error.message);
+    }
+
+    /* ── Register ── */
+    async function doRegister() {
+      const name  = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const pass  = document.getElementById('reg-pass').value;
+      const phone = document.getElementById('reg-phone').value.trim();
+      if (!name)            { showAuthErr('اكتب اسمك!'); return; }
+      if (!email)           { showAuthErr('اكتب بريدك الإلكتروني!'); return; }
+      if (pass.length < 6)  { showAuthErr('كلمة المرور أقل من 6 أحرف!'); return; }
+      setAuthBtnLoading('register-btn', true);
+      const { data, error } = await _sb.auth.signUp({
+        email, password: pass,
+        options: { data: { full_name: name, phone: phone || null } }
+      });
+      setAuthBtnLoading('register-btn', false);
+      if (error) { showAuthErr(error.message); return; }
+      if (data.user) {
+        // Flag as new user for welcome screen
+        localStorage.setItem('bac_new_user_' + data.user.id, '1');
+        // Try to save profile (may fail if email not confirmed yet, that's ok)
+        _sb.from('profiles').upsert({ id: data.user.id, full_name: name, phone: phone || null }).then(() => {});
+
+        if (data.session) {
+          // Auto-confirm enabled — auth state will fire SIGNED_IN automatically
+        } else {
+          // Email confirmation required — show success message
+          document.getElementById('auth-err').style.background = 'rgba(34,197,94,.1)';
+          document.getElementById('auth-err').style.borderColor = 'rgba(34,197,94,.3)';
+          document.getElementById('auth-err').style.color = '#86efac';
+          showAuthErr('✅ تم إنشاء الحساب! تحقق من إيميلك وفعّل الحساب ثم سجل دخول.');
+          setTimeout(() => {
+            document.getElementById('auth-err').style = '';
+            switchAuthTab('login');
+          }, 4000);
+        }
+      }
+    }
+
+
+    /* ── Google OAuth ── */
+    async function doGoogleLogin() {
+      const { error } = await _sb.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.href }
+      });
+      if (error) showAuthErr(error.message);
+    }
+
+    /* ── Logout ── */
+    async function doLogout() {
+      showLoader('جاري تسجيل الخروج...');
+      _appInited = false;
+      await _sb.auth.signOut();
+    }
+
+
+    /* ── Delete Account ── */
+    function openDeleteConfirm()  {
+      document.getElementById('delete-confirm-input').value = '';
+      document.getElementById('delete-confirm-overlay').classList.add('open');
+    }
+    function closeDeleteConfirm() { document.getElementById('delete-confirm-overlay').classList.remove('open'); }
+
+    async function confirmDeleteAccount() {
+      const val = document.getElementById('delete-confirm-input').value.trim();
+      if (val !== 'احذف حسابي') { showAuthErr('اكتب "احذف حسابي" للتأكيد'); return; }
+      const btn = document.getElementById('delete-confirm-btn');
+      btn.disabled = true;
+      btn.textContent = 'جاري الحذف...';
+      try {
+        const uid = _sbUid;
+        // Delete all user data tables
+        await Promise.all([
+          _sb.from('schedule_data').delete().eq('user_id', uid),
+          _sb.from('schedule_sessions').delete().eq('user_id', uid),
+          _sb.from('weekly_data').delete().eq('user_id', uid),
+          _sb.from('user_meta').delete().eq('user_id', uid),
+          _sb.from('subjects').delete().eq('user_id', uid),
+          _sb.from('profiles').delete().eq('id', uid),
+        ]);
+        // Clear localStorage for this user
+        Object.keys(localStorage).forEach(k => { if(k.startsWith(uid + ':') || k === 'bac_new_user_' + uid) localStorage.removeItem(k); });
+        // Delete auth user (needs service role normally; will trigger cascade on profiles)
+        await _sb.auth.signOut();
+        closeDeleteConfirm();
+      } catch (e) {
+        btn.disabled = false;
+        btn.textContent = 'حذف نهائياً';
+        toast('حدث خطأ أثناء الحذف!', 'error');
+      }
+    }
+
+    /* ── User Avatar UI ── */
+    function updateUserUI(user) {
+      if (!user) { document.getElementById('user-avatar-wrap').style.display = 'none'; return; }
+      const wrap = document.getElementById('user-avatar-wrap');
+      const letterEl = document.getElementById('user-avatar-letter');
+      const nameEl   = document.getElementById('user-dropdown-name');
+      const emailEl  = document.getElementById('user-dropdown-email');
+      const avatarBtn = document.getElementById('user-avatar-btn');
+
+      const name  = user.user_metadata?.full_name || user.email?.split('@')[0] || 'طالب';
+      const email = user.email || '';
+      const avatar= user.user_metadata?.avatar_url || '';
+
+      nameEl.textContent  = name;
+      emailEl.textContent = email;
+
+      if (avatar) {
+        letterEl.innerHTML = `<img src="${avatar}" alt="">`;
+      } else {
+        letterEl.innerHTML = '';
+        letterEl.textContent = (name[0] || '؟').toUpperCase();
+      }
+
+      // Update welcome title
+      document.getElementById('welcome-title').textContent = `أهلاً بيك يا ${name}! 👋`;
+
+      wrap.style.display = 'block';
+    }
+
+    function toggleUserDropdown() {
+      const dd = document.getElementById('user-dropdown');
+      dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function closeUserDropdown() {
+      document.getElementById('user-dropdown').style.display = 'none';
+    }
+
+    document.addEventListener('click', (e) => {
+      const wrap = document.getElementById('user-avatar-wrap');
+      if (wrap && !wrap.contains(e.target)) closeUserDropdown();
+    });
+
+    /* ── Load all data from Supabase then run init ── */
+    async function loadAllDataAndInit() {
+      showLoader('جاري تحميل بياناتك...');
+
+      // Pull data from Supabase (runs in parallel) — results cached in localStorage
+      const keys = ['columns','template','subjects','events','revision','meta'];
+      const weekKeys = [];
+      // Load last 4 weeks + current week
+      const wsNow = weekStart(new Date());
+      for (let i = -2; i <= 2; i++) {
+        const d = new Date(wsNow); d.setDate(d.getDate() + i * 7);
+        weekKeys.push('week-' + dStr(d));
+      }
+      const ltKeys = ['lt-teachers','lt-lectures'];
+      const allKeys = [...keys, ...weekKeys, ...ltKeys];
+
+      if (_sbUid && window._supabase) {
+        try {
+          const { data } = await _sb
+            .from('schedule_data')
+            .select('id,data')
+            .eq('user_id', _sbUid)
+            .in('id', allKeys);
+          if (data) {
+            data.forEach(row => {
+              localStorage.setItem(_lsKey(row.id), JSON.stringify(row.data));
+            });
+          }
+        } catch (e) {}
+      }
+
+      hideLoader();
+      init();
+    }
+
+    /* ── Auth State Listener (central entry point) ── */
+    let _appInited = false;
+    _sb.auth.onAuthStateChange(async (event, session) => {
+      const user = session?.user || null;
+
+      if (user) {
+        _sbUid = user.id;
+        hideAuthScreen();
+        updateUserUI(user);
+
+        if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && !_appInited) {
+          _appInited = true;
+          await loadAllDataAndInit();
+
+          // Show welcome for new users
+          const isNew = localStorage.getItem('bac_new_user_' + user.id);
+          if (isNew || event === 'SIGNED_IN' && !localStorage.getItem('bac_toured_' + user.id)) {
+            localStorage.removeItem('bac_new_user_' + user.id);
+            setTimeout(() => showWelcome(), 800);
+          }
+        }
+      } else {
+        _sbUid = '';
+        updateUserUI(null);
+        hideLoader();
+        showAuthScreen();
+      }
+    });
+
+    /* ── Enter key submit ── */
+    document.getElementById('login-pass').addEventListener('keydown', e => { if(e.key === 'Enter') doLogin(); });
+    document.getElementById('login-email').addEventListener('keydown', e => { if(e.key === 'Enter') document.getElementById('login-pass').focus(); });
+    document.getElementById('reg-pass').addEventListener('keydown', e => { if(e.key === 'Enter') doRegister(); });
+
+    /* ════════════════════════════════════════════════════
+       WELCOME SCREEN
+    ════════════════════════════════════════════════════ */
+    function showWelcome() {
+      document.getElementById('welcome-overlay').classList.add('open');
+    }
+
+    function closeWelcome(startTourAfter) {
+      document.getElementById('welcome-overlay').classList.remove('open');
+      if (startTourAfter) setTimeout(startTour, 300);
+    }
+
+    /* ════════════════════════════════════════════════════
+       GUIDED TOUR
+    ════════════════════════════════════════════════════ */
+    const TOUR_STEPS = [
+      {
+        el: '#tab-sched',
+        title: '📅 الجدول الأسبوعي',
+        desc: 'من هنا بتدخل على جدولك الأسبوعي — تقدر تضيف حصصك وتعلّم عليها كمان يتعمل.',
+      },
+      {
+        el: '#page-sched .sched-bar',
+        title: '🗓️ التنقل بين الأسابيع',
+        desc: 'السابق والتالي للتنقل بين الأسابيع — واليوم للرجوع لأسبوعك الحالي فوراً.',
+      },
+      {
+        el: '#page-sched .s-table',
+        title: '✏️ تعديل الجدول',
+        desc: 'اضغط على أي خلية فاضية أو زر + إضافة عشان تضيف حصة. اضغط على اسم الحصة لتعديلها.',
+      },
+      {
+        el: '#tab-lt',
+        title: '🎬 متابع المحاضرات',
+        desc: 'أضف أساتذتك ومحاضراتهم وتابع اللي شفته واللي لسه. هيفكّرك بالمتأخر!',
+      },
+      {
+        el: '#tab-exams',
+        title: '📝 الامتحانات',
+        desc: 'أضف امتحاناتك القادمة وشوف عداد تنازلي لكل واحد. تقدر تسجّل درجاتك بعدين.',
+      },
+      {
+        el: '#tab-curric',
+        title: '📚 شجرة المنهج',
+        desc: 'أضف موادك وأبوابها ودروسها وتابع نسبة إنجازك في كل مادة.',
+      },
+      {
+        el: '#user-avatar-wrap',
+        title: '👤 حسابك الشخصي',
+        desc: 'من هنا تقدر تسجل خروج أو تشوف الجولة تاني في أي وقت. بياناتك بتتحفظ على حسابك تلقائياً!',
+      },
+    ];
+
+    let _tourIdx = 0;
+    let _tourHL = null, _tourTT = null;
+
+    function startTour() {
+      if (_sbUid) localStorage.setItem('bac_toured_' + _sbUid, '1');
+      _tourIdx = 0;
+      document.getElementById('tour-backdrop').classList.add('active');
+      _tourHL = document.getElementById('tour-highlight');
+      _tourTT = document.getElementById('tour-tooltip');
+
+      // Build dots
+      const dotsEl = document.getElementById('tour-dots');
+      dotsEl.innerHTML = TOUR_STEPS.map((_, i) => `<div class="tour-dot${i === 0 ? ' active' : ''}" id="tour-dot-${i}"></div>`).join('');
+
+      renderTourStep();
+    }
+
+    function renderTourStep() {
+      const step = TOUR_STEPS[_tourIdx];
+      const isFirst = _tourIdx === 0;
+      const isLast  = _tourIdx === TOUR_STEPS.length - 1;
+
+      // Update text
+      document.getElementById('tour-step-badge').textContent = `خطوة ${_tourIdx + 1} من ${TOUR_STEPS.length}`;
+      document.getElementById('tour-tooltip-title').textContent = step.title;
+      document.getElementById('tour-tooltip-desc').textContent  = step.desc;
+      document.getElementById('tour-next-btn').textContent = isLast ? '🎉 انتهى!' : 'التالي';
+      document.getElementById('tour-prev-btn').style.visibility = isFirst ? 'hidden' : 'visible';
+
+      // Navigate to the right page if needed
+      const targetEl = document.querySelector(step.el);
+
+      // Update dots
+      document.querySelectorAll('.tour-dot').forEach((d, i) => d.classList.toggle('active', i === _tourIdx));
+
+      if (!targetEl) { positionTourTooltipCenter(); return; }
+
+      // Scroll element into view
+      targetEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      requestAnimationFrame(() => {
+        const rect = targetEl.getBoundingClientRect();
+        const pad = 6;
+        _tourHL.style.top    = (rect.top    - pad) + 'px';
+        _tourHL.style.left   = (rect.left   - pad) + 'px';
+        _tourHL.style.width  = (rect.width  + pad * 2) + 'px';
+        _tourHL.style.height = (rect.height + pad * 2) + 'px';
+
+        // Position tooltip
+        const ttW = 300, ttH = 180;
+        let top  = rect.bottom + 14;
+        let left = rect.left;
+        if (top + ttH > window.innerHeight - 10) top = rect.top - ttH - 14;
+        if (left + ttW > window.innerWidth  - 10) left = window.innerWidth - ttW - 10;
+        if (left < 10) left = 10;
+        if (top  < 10) top  = 10;
+        _tourTT.style.top  = top  + 'px';
+        _tourTT.style.left = left + 'px';
+      });
+    }
+
+    function positionTourTooltipCenter() {
+      _tourHL.style.width = '0'; _tourHL.style.height = '0';
+      _tourTT.style.top  = '50%';
+      _tourTT.style.left = '50%';
+      _tourTT.style.transform = 'translate(-50%,-50%)';
+    }
+
+    function tourNext() {
+      if (_tourIdx < TOUR_STEPS.length - 1) {
+        _tourIdx++;
+        renderTourStep();
+      } else {
+        endTour();
+      }
+    }
+
+    function tourPrev() {
+      if (_tourIdx > 0) { _tourIdx--; renderTourStep(); }
+    }
+
+    function endTour() {
+      document.getElementById('tour-backdrop').classList.remove('active');
+    }
+
+    /* ════════════════════════════════════════════════════
+       START
+    ════════════════════════════════════════════════════ */
+    // Note: init() is now called by onAuthStateChange after user signs in
+    // Fallback: if Supabase isn't configured yet, just init normally
+    if (SUPABASE_URL === 'YOUR_SUPABASE_URL') {
+      console.warn('⚠️ Supabase not configured — running in local mode');
+      hideLoader();
+      init();
+    }
+
   </script>
 </body>
 
