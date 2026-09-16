@@ -3982,7 +3982,7 @@
       <button class="g-btn lang-btn" id="lang-btn" onclick="toggleLang()">
         <i class="fa-solid fa-globe"></i> <span id="lang-btn-txt">English</span>
       </button>
-      <button class="g-btn admin-mode-btn" id="admin-mode-btn" onclick="toggleAdminMode()" title="وضع المسؤول (Admin Mode)">
+      <button class="g-btn admin-mode-btn admin-only" id="admin-mode-btn" onclick="toggleAdminMode()" title="وضع المسؤول (Admin Mode)">
         <i class="fa-solid fa-user-shield" id="admin-mode-icon"></i>
         <span id="admin-mode-txt">الأدمن: إيقاف</span>
       </button>
@@ -5030,7 +5030,14 @@
       if (p === 'reports') repRenderAll();
       if (p === 'analytics') anRenderAll();
       if (p === 'parent') renderParentDashboard();
-      if (p === 'admin') renderAdminPanel();
+      if (p === 'admin') {
+        if (!isMainAdmin()) {
+          showToast('لوحة الأدمن مخصصة فقط للحساب الرئيسي!');
+          switchPage('sched');
+          return;
+        }
+        renderAdminPanel();
+      }
     }
 
     /* ════════════════════════════════
@@ -5559,6 +5566,12 @@
     }
 
     async function toggleAdminMode() {
+      if (!isMainAdmin()) {
+        showToast('وضع الأدمن مخصص فقط للحساب الرئيسي!');
+        isAdminMode = false;
+        document.body.classList.remove('admin-mode-active');
+        return;
+      }
       isAdminMode = !isAdminMode;
       localStorage.setItem('hub_admin_mode', isAdminMode ? '1' : '0');
 
@@ -7819,6 +7832,7 @@
     /* ── User Avatar UI ── */
     function updateUserUI(user) {
       window._currentUser = user;
+      updateRoleUI();
       if (!user) {
         const wrap = document.getElementById('user-avatar-wrap');
         if (wrap) wrap.style.display = 'none';
@@ -8257,16 +8271,30 @@
       updateRoleUI();
     }
 
+    function isMainAdmin() {
+      const userEmail = window._currentUser?.email || '';
+      let localEmail = '';
+      const localUserStr = localStorage.getItem('bac_local_user');
+      if (localUserStr) {
+        try { localEmail = JSON.parse(localUserStr).email || ''; } catch(e) {}
+      }
+      const email = (userEmail || localEmail || '').toLowerCase();
+      return email === 'marksamer010@gmail.com';
+    }
+
     function updateRoleUI() {
-      if (currentUserRole === 'ADMIN') {
+      const mainAdmin = isMainAdmin();
+      if (mainAdmin) {
+        currentUserRole = 'ADMIN';
         document.body.classList.add('role-admin', 'admin-mode-active');
         document.body.classList.remove('role-parent', 'role-student');
       } else if (currentUserRole === 'PARENT') {
-        document.body.classList.add('role-parent');
         document.body.classList.remove('role-admin', 'admin-mode-active', 'role-student');
+        document.body.classList.add('role-parent');
       } else {
+        currentUserRole = 'USER';
+        document.body.classList.remove('role-admin', 'admin-mode-active', 'role-parent');
         document.body.classList.add('role-student');
-        document.body.classList.remove('role-admin', 'role-parent');
       }
     }
 
@@ -8625,9 +8653,6 @@
       showToast('تم إنشاء ونشر المنهج المرجعي الإجباري! 🔒');
     }
 
-    /* ════════════════════════════════════════════════════
-       START
-    ════════════════════════════════════════════════════ */
     // Note: init() is now called by onAuthStateChange after user signs in
     // Fallback: if Supabase isn't configured yet, just init normally
     if (!isSupabaseConfigured) {
