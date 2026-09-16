@@ -3885,26 +3885,89 @@
           <div class="auth-footer-note">بتسجيل دخولك توافق على شروط الاستخدام وسياسة الخصوصية</div>
         </div>
 
-        <!-- REGISTER PANEL -->
+        <!-- REGISTER PANEL (3-SLIDE FLOW) -->
         <div class="auth-panel" id="auth-panel-register">
           <div class="reg-step-bar">
             <div class="reg-step-item active" id="reg-step-dot-1">
               <span class="reg-step-num">1</span>
-              <span>البيانات الأساسية</span>
+              <span>النوع والربط</span>
             </div>
             <div class="reg-step-line"></div>
             <div class="reg-step-item" id="reg-step-dot-2">
               <span class="reg-step-num">2</span>
+              <span>بيانات الحساب</span>
+            </div>
+            <div class="reg-step-line"></div>
+            <div class="reg-step-item" id="reg-step-dot-3">
+              <span class="reg-step-num">3</span>
               <span>المسار والتخصص</span>
             </div>
           </div>
 
-          <!-- SLIDE 1: BASIC INFO -->
+          <!-- SLIDE 1: ROLE & LINKING QUESTION -->
           <div class="reg-slide" id="reg-slide-1">
             <div class="auth-field">
               <label class="auth-label">الاسم الكامل</label>
               <input type="text" class="auth-input" id="reg-name" placeholder="اسمك الثلاثي أو الرباعي..." autocomplete="name">
             </div>
+
+            <div class="auth-field">
+              <label class="auth-label">نوع الحساب</label>
+              <select class="auth-input" id="reg-role" onchange="onRegRoleChange()" oninput="onRegRoleChange()">
+                <option value="USER">🎓 طالب (Student)</option>
+                <option value="PARENT">👨‍👩‍👧 ولي أمر (Parent)</option>
+              </select>
+            </div>
+
+            <!-- STUDENT LINKING OPTIONS -->
+            <div id="reg-student-options" style="background:var(--bg2);padding:14px;border-radius:14px;border:1px solid var(--border);margin-bottom:14px">
+              <div class="auth-field" style="margin-bottom:8px">
+                <label class="auth-label" style="color:var(--blue2)">👨‍👩‍👧 هل ولي الأمر عنده حساب بالفعل على المنصة؟</label>
+                <select class="auth-input" id="reg-has-parent-account" onchange="toggleParentCodeInput()" oninput="toggleParentCodeInput()">
+                  <option value="no" selected>❌ لا (ليس لديه حساب بعد)</option>
+                  <option value="yes">✅ نعم (لديه حساب ولي أمر)</option>
+                </select>
+              </div>
+
+              <div class="auth-field" id="reg-parent-code-box" style="display:none;margin-bottom:0">
+                <label class="auth-label" style="color:var(--amber)">🔑 أدخل كود ولي الأمر الخاص به</label>
+                <input type="text" class="auth-input" id="reg-parent-code-input" placeholder="PAR-XXXX-XXXX" style="text-transform:uppercase;letter-spacing:1px;font-family:monospace">
+                <div style="font-size:11px;color:var(--text3);margin-top:4px">سيتم ربط حسابك مباشرة بحساب ولي أمرك عند اكتمال التسجيل.</div>
+              </div>
+            </div>
+
+            <!-- PARENT LINKING OPTIONS -->
+            <div id="reg-parent-options" style="display:none;background:var(--bg2);padding:14px;border-radius:14px;border:1px solid var(--border);margin-bottom:14px">
+              <div class="auth-field" style="margin-bottom:8px">
+                <label class="auth-label" style="color:var(--blue2)">🎓 هل الطالب عنده حساب بالفعل على المنصة؟</label>
+                <select class="auth-input" id="reg-has-student-account" onchange="toggleStudentCodeInput()" oninput="toggleStudentCodeInput()">
+                  <option value="no" selected>❌ لا (ليس لديه حساب بعد)</option>
+                  <option value="yes">✅ نعم (لديه حساب طالب)</option>
+                </select>
+              </div>
+
+              <div class="auth-field" id="reg-student-code-box" style="display:none;margin-bottom:0">
+                <label class="auth-label" style="color:var(--amber)">🔑 أدخل كود ربط الطالب (موجود في بروفايل الطالب)</label>
+                <input type="text" class="auth-input" id="reg-student-code-input" placeholder="STU-XXXX-XXXX" style="text-transform:uppercase;letter-spacing:1px;font-family:monospace">
+                <div style="font-size:11px;color:var(--text3);margin-top:4px">يمكنك الحصول على الكود من صفحة بروفايل الطالب.</div>
+              </div>
+            </div>
+
+            <button class="auth-btn" type="button" onclick="gotoRegStep(2)">
+              <span>التالي: بيانات الحساب</span>
+              <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <div class="auth-divider">أو</div>
+            <button class="auth-google-btn" disabled type="button" title="قريباً - Soon">
+              <div class="auth-google-icon"></div>
+              <span>المتابعة بحساب Google</span>
+              <span class="auth-google-badge">Soon</span>
+            </button>
+            <div class="auth-footer-note">بإنشائك للحساب توافق على شروط الاستخدام وسياسة الخصوصية</div>
+          </div>
+
+          <!-- SLIDE 2: CREDENTIALS (EMAIL, PASSWORD, PHONE) -->
+          <div class="reg-slide" id="reg-slide-2" style="display:none">
             <div class="auth-field">
               <label class="auth-label">البريد الإلكتروني</label>
               <input type="email" class="auth-input" id="reg-email" placeholder="example@email.com" autocomplete="email">
@@ -3917,28 +3980,22 @@
               <label class="auth-label">رقم الهاتف <span style="color:var(--text3)">(اختياري)</span></label>
               <input type="tel" class="auth-input" id="reg-phone" placeholder="+20 100 000 0000">
             </div>
-            <div class="auth-field">
-              <label class="auth-label">نوع الحساب</label>
-              <select class="auth-input" id="reg-role" onchange="onRegRoleChange()">
-                <option value="USER">🎓 طالب (Student)</option>
-                <option value="PARENT">👨‍👩‍👧 ولي أمر (Parent)</option>
-              </select>
+
+            <div style="display:flex;gap:10px;margin-top:16px">
+              <button class="auth-btn secondary" type="button" onclick="gotoRegStep(1)" style="flex:1;background:var(--bg2);color:var(--text);border:1px solid var(--border)">
+                <i class="fa-solid fa-arrow-right"></i>
+                <span>السابق</span>
+              </button>
+              <button class="auth-btn" type="button" onclick="gotoRegStep(3)" style="flex:2">
+                <span>التالي: المسار والتخصص</span>
+                <i class="fa-solid fa-arrow-left"></i>
+              </button>
             </div>
-            <button class="auth-btn" type="button" onclick="gotoRegStep(2)">
-              <span>التالي: اختيار المسار والتخصص</span>
-              <i class="fa-solid fa-arrow-left"></i>
-            </button>
-            <div class="auth-divider">أو</div>
-            <button class="auth-google-btn" disabled type="button" title="قريباً - Soon">
-              <div class="auth-google-icon"></div>
-              <span>المتابعة بحساب Google</span>
-              <span class="auth-google-badge">Soon</span>
-            </button>
-            <div class="auth-footer-note">بإنشائك للحساب توافق على شروط الاستخدام وسياسة الخصوصية</div>
+            <div class="auth-footer-note" style="margin-top:14px">بإنشائك للحساب توافق على شروط الاستخدام وسياسة الخصوصية</div>
           </div>
 
-          <!-- SLIDE 2: ACADEMIC TRACK & ELECTIVES -->
-          <div class="reg-slide" id="reg-slide-2" style="display:none">
+          <!-- SLIDE 3: ACADEMIC TRACK & ELECTIVES -->
+          <div class="reg-slide" id="reg-slide-3" style="display:none">
             <div style="margin-bottom:14px;font-size:12px;color:var(--text2);font-weight:700">
               🎯 حدد مرحلتك وتخصصك الأكاديمي لتخصيص جدولك ومحتواك الدراسي:
             </div>
@@ -3979,13 +4036,13 @@
             </div>
 
             <div style="display:flex;gap:10px;margin-top:16px">
-              <button class="auth-btn secondary" type="button" onclick="gotoRegStep(1)" style="flex:1;background:var(--bg2);color:var(--text);border:1px solid var(--border)">
+              <button class="auth-btn secondary" type="button" onclick="gotoRegStep(2)" style="flex:1;background:var(--bg2);color:var(--text);border:1px solid var(--border)">
                 <i class="fa-solid fa-arrow-right"></i>
                 <span>السابق</span>
               </button>
               <button class="auth-btn" id="register-btn" type="button" onclick="doRegister()" style="flex:2">
                 <i class="fa-solid fa-user-plus"></i>
-                <span>إنشاء الحساب</span>
+                <span>إنشاء الحساب 🚀</span>
               </button>
             </div>
             <div class="auth-footer-note" style="margin-top:14px">بإنشائك للحساب توافق على شروط الاستخدام وسياسة الخصوصية</div>
@@ -7677,13 +7734,64 @@
       else btn.classList.remove('loading');
     }
 
+    function toggleParentCodeInput() {
+      const val = document.getElementById('reg-has-parent-account')?.value;
+      const box = document.getElementById('reg-parent-code-box');
+      if (box) box.style.display = (val === 'yes' ? 'block' : 'none');
+    }
+
+    function toggleStudentCodeInput() {
+      const val = document.getElementById('reg-has-student-account')?.value;
+      const box = document.getElementById('reg-student-code-box');
+      if (box) box.style.display = (val === 'yes' ? 'block' : 'none');
+    }
+
+    function onRegRoleChange() {
+      const role = document.getElementById('reg-role')?.value || 'USER';
+      const stdOpts = document.getElementById('reg-student-options');
+      const prtOpts = document.getElementById('reg-parent-options');
+      const levelSel = document.getElementById('reg-level');
+
+      if (role === 'PARENT') {
+        if (stdOpts) stdOpts.style.display = 'none';
+        if (prtOpts) prtOpts.style.display = 'block';
+        if (levelSel) levelSel.disabled = true;
+      } else {
+        if (stdOpts) stdOpts.style.display = 'block';
+        if (prtOpts) prtOpts.style.display = 'none';
+        if (levelSel) levelSel.disabled = false;
+      }
+      toggleParentCodeInput();
+      toggleStudentCodeInput();
+    }
+
     function gotoRegStep(step) {
       if (step === 2) {
-        const name  = document.getElementById('reg-name').value.trim();
+        const name = document.getElementById('reg-name').value.trim();
+        if (!name) { showAuthErr('اكتب اسمك الكامل أولاً!'); return; }
+
+        const role = document.getElementById('reg-role')?.value || 'USER';
+        if (role === 'USER') {
+          const hasParent = document.getElementById('reg-has-parent-account')?.value;
+          const pCode = document.getElementById('reg-parent-code-input')?.value?.trim();
+          if (hasParent === 'yes' && !pCode) {
+            showAuthErr('أدخل كود ولي الأمر لربط حسابك معه!');
+            return;
+          }
+        } else {
+          const hasStudent = document.getElementById('reg-has-student-account')?.value;
+          const sCode = document.getElementById('reg-student-code-input')?.value?.trim();
+          if (hasStudent === 'yes' && !sCode) {
+            showAuthErr('أدخل كود ربط الطالب أولاً!');
+            return;
+          }
+        }
+        showAuthErr('');
+      }
+
+      if (step === 3) {
         const email = document.getElementById('reg-email').value.trim();
         const pass  = document.getElementById('reg-pass').value;
-
-        if (!name)           { showAuthErr('اكتب اسمك الكامل!'); return; }
         if (!email)          { showAuthErr('اكتب بريدك الإلكتروني!'); return; }
         if (pass.length < 6) { showAuthErr('كلمة المرور يجب أن تكون 6 أحرف أو أكثر!'); return; }
         showAuthErr('');
@@ -7696,25 +7804,20 @@
 
       const s1 = document.getElementById('reg-slide-1');
       const s2 = document.getElementById('reg-slide-2');
+      const s3 = document.getElementById('reg-slide-3');
       if (s1) s1.style.display = (step === 1 ? 'block' : 'none');
       if (s2) s2.style.display = (step === 2 ? 'block' : 'none');
+      if (s3) s3.style.display = (step === 3 ? 'block' : 'none');
 
       const dot1 = document.getElementById('reg-step-dot-1');
       const dot2 = document.getElementById('reg-step-dot-2');
-      if (dot1 && dot2) {
+      const dot3 = document.getElementById('reg-step-dot-3');
+      if (dot1 && dot2 && dot3) {
         dot1.classList.toggle('active', step === 1);
-        dot1.classList.toggle('completed', step === 2);
+        dot1.classList.toggle('completed', step > 1);
         dot2.classList.toggle('active', step === 2);
-      }
-    }
-
-    function onRegRoleChange() {
-      const role = document.getElementById('reg-role')?.value;
-      const levelSel = document.getElementById('reg-level');
-      if (role === 'PARENT') {
-        if (levelSel) levelSel.disabled = true;
-      } else {
-        if (levelSel) levelSel.disabled = false;
+        dot2.classList.toggle('completed', step > 2);
+        dot3.classList.toggle('active', step === 3);
       }
     }
 
@@ -7826,8 +7929,8 @@
       }
 
       if (!name)           { showAuthErr('اكتب اسمك الكامل!'); gotoRegStep(1); return; }
-      if (!email)          { showAuthErr('اكتب بريدك الإلكتروني!'); gotoRegStep(1); return; }
-      if (pass.length < 6) { showAuthErr('كلمة المرور يجب أن تكون 6 أحرف أو أكثر!'); gotoRegStep(1); return; }
+      if (!email)          { showAuthErr('اكتب بريدك الإلكتروني!'); gotoRegStep(2); return; }
+      if (pass.length < 6) { showAuthErr('كلمة المرور يجب أن تكون 6 أحرف أو أكثر!'); gotoRegStep(2); return; }
 
       let client = getSbClient();
       if (!client) {
@@ -7871,7 +7974,57 @@
         localStorage.setItem('bac_new_user_' + data.user.id, '1');
         localStorage.setItem('bac_local_user', JSON.stringify({ email: data.user.email, name }));
 
-        client.from('profiles').upsert({ id: data.user.id, full_name: name, phone: phone || null }).then(() => {});
+        client.from('profiles').upsert({ id: data.user.id, full_name: name, phone: phone || null, role: role }).then(() => {});
+
+        // Auto-link processing upon account registration
+        if (role === 'USER') {
+          const hasParent = document.getElementById('reg-has-parent-account')?.value;
+          const pCode = document.getElementById('reg-parent-code-input')?.value?.trim()?.toUpperCase();
+          if (hasParent === 'yes' && pCode && client) {
+            client.from('connection_codes').select('*').eq('raw_code', pCode).maybeSingle().then(({ data: cc }) => {
+              if (cc && cc.parent_id) {
+                client.from('parent_student_relationships').upsert({
+                  parent_id: cc.parent_id,
+                  student_id: data.user.id,
+                  status: 'ACTIVE',
+                  approved_at: new Date().toISOString()
+                });
+              }
+            });
+          }
+          // Generate student connection code
+          const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+          let stuCode = 'STU-';
+          for (let i = 0; i < 4; i++) stuCode += chars.charAt(Math.floor(Math.random() * chars.length));
+          stuCode += '-';
+          for (let i = 0; i < 4; i++) stuCode += chars.charAt(Math.floor(Math.random() * chars.length));
+          const exp = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
+          client.from('connection_codes').insert({ student_id: data.user.id, raw_code: stuCode, expires_at: exp }).then(() => {});
+        } else if (role === 'PARENT') {
+          // Generate parent connection code
+          const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+          let parCode = 'PAR-';
+          for (let i = 0; i < 4; i++) parCode += chars.charAt(Math.floor(Math.random() * chars.length));
+          parCode += '-';
+          for (let i = 0; i < 4; i++) parCode += chars.charAt(Math.floor(Math.random() * chars.length));
+          const exp = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
+          client.from('connection_codes').insert({ parent_id: data.user.id, raw_code: parCode, expires_at: exp }).then(() => {});
+
+          const hasStudent = document.getElementById('reg-has-student-account')?.value;
+          const sCode = document.getElementById('reg-student-code-input')?.value?.trim()?.toUpperCase();
+          if (hasStudent === 'yes' && sCode && client) {
+            client.from('connection_codes').select('*').eq('raw_code', sCode).maybeSingle().then(({ data: cc }) => {
+              if (cc && cc.student_id) {
+                client.from('parent_student_relationships').upsert({
+                  parent_id: data.user.id,
+                  student_id: cc.student_id,
+                  status: 'ACTIVE',
+                  approved_at: new Date().toISOString()
+                });
+              }
+            });
+          }
+        }
 
         if (data.session) {
           // Session is active
