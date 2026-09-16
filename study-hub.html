@@ -13,6 +13,7 @@
     rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>if(!window.supabase){document.write('<script src="https://unpkg.com/@supabase/supabase-js@2"><\/script>');}</script>
   <style>
     /* ════════════════════════════════
    DESIGN TOKENS
@@ -6637,6 +6638,10 @@
       if (!email || !pass) { showAuthErr('الإيميل وكلمة المرور مطلوبين!'); return; }
 
       if (!_sb) {
+        if (!window.supabase) {
+          showAuthErr('⚠️ تعذر الاتصال بسيرفر المصادقة. مانع الإعلانات (AdBlock / SBlock) يمنع تحميل مكتبة الأمان. يُرجى إيقاف AdBlock وتحديث الصفحة.');
+          return;
+        }
         const localUserStr = localStorage.getItem('bac_local_user');
         if (localUserStr) {
           try {
@@ -6649,7 +6654,7 @@
             }
           } catch(e) {}
         }
-        showAuthErr('هذا الحساب غير مسجل! انتقل لـ "إنشاء حساب جديد" أولاً.');
+        showAuthErr('هذا البريد غير مسجل محلياً! اضغط على "إنشاء حساب جديد" أولاً.');
         return;
       }
 
@@ -6661,7 +6666,7 @@
         console.error('Login error:', error);
         const msg = (error.message || '').toLowerCase();
         if (msg.includes('invalid login credentials') || msg.includes('user not found') || msg.includes('invalid credentials')) {
-          showAuthErr('❌ هذا البريد غير مسجل أو كلمة المرور خاطئة! إذا لم تكن تملك حساباً، اضغط على "إنشاء حساب" أولاً.');
+          showAuthErr('❌ البريد الإلكتروني أو كلمة المرور غير صحيحة! إذا لم تكن قد أنشأت حساباً بعد، انتقل لتبويب "إنشاء حساب جديد".');
         } else {
           showAuthErr(error.message);
         }
