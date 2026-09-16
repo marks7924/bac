@@ -2920,6 +2920,12 @@
       outline: none;
     }
 
+    select.auth-input option {
+      background-color: #1e2436 !important;
+      color: #ffffff !important;
+      padding: 10px;
+    }
+
     .auth-input:focus {
       border-color: var(--blue);
       background: var(--card2);
@@ -3939,23 +3945,17 @@
 
             <div class="auth-field">
               <label class="auth-label">الصف / المرحلة الدراسية</label>
-              <select class="auth-input" id="reg-level" onchange="onRegLevelChange()">
-                <optgroup label="🌱 المرحلة الإعدادية">
-                  <option value="prep_1">الصف الأول الإعدادي</option>
-                  <option value="prep_2">الصف الثاني الإعدادي</option>
-                  <option value="prep_3">الصف الثالث الإعدادي</option>
-                </optgroup>
-                <optgroup label="🎓 المرحلة الثانوية العامة">
-                  <option value="sec_1">الصف الأول الثانوي</option>
-                  <option value="sec_2_sci">الصف الثاني الثانوي — شعبة علمي</option>
-                  <option value="sec_2_lit">الصف الثاني الثانوي — شعبة أدبي</option>
-                  <option value="sec_3_sci_bio" selected>الصف الثالث الثانوي — علمي علوم</option>
-                  <option value="sec_3_sci_math">الصف الثالث الثانوي — علمي رياضة</option>
-                  <option value="sec_3_lit">الصف الثالث الثانوي — شعبة أدبي</option>
-                </optgroup>
-                <optgroup label="🏛️ نظام البكالوريا (Baccalaureate System)">
-                  <option value="baccalaureate">نظام البكالوريا (Baccalaureate System)</option>
-                </optgroup>
+              <select class="auth-input" id="reg-level" onchange="onRegLevelChange()" oninput="onRegLevelChange()">
+                <option value="prep_1">🌱 الصف الأول الإعدادي</option>
+                <option value="prep_2">🌱 الصف الثاني الإعدادي</option>
+                <option value="prep_3">🌱 الصف الثالث الإعدادي</option>
+                <option value="sec_1">🎓 الصف الأول الثانوي</option>
+                <option value="sec_2_sci">🎓 الصف الثاني الثانوي — شعبة علمي</option>
+                <option value="sec_2_lit">🎓 الصف الثاني الثانوي — شعبة أدبي</option>
+                <option value="sec_3_sci_bio" selected>🎓 الصف الثالث الثانوي — علمي علوم</option>
+                <option value="sec_3_sci_math">🎓 الصف الثالث الثانوي — علمي رياضة</option>
+                <option value="sec_3_lit">🎓 الصف الثالث الثانوي — شعبة أدبي</option>
+                <option value="baccalaureate">🏛️ نظام البكالوريا (Baccalaureate System)</option>
               </select>
             </div>
 
@@ -7687,6 +7687,11 @@
         if (!email)          { showAuthErr('اكتب بريدك الإلكتروني!'); return; }
         if (pass.length < 6) { showAuthErr('كلمة المرور يجب أن تكون 6 أحرف أو أكثر!'); return; }
         showAuthErr('');
+
+        setTimeout(() => {
+          onRegRoleChange();
+          onRegLevelChange();
+        }, 50);
       }
 
       const s1 = document.getElementById('reg-slide-1');
