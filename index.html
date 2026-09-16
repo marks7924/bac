@@ -3965,6 +3965,14 @@
         <i class="fa-solid fa-chart-pie"></i>
         <span id="s-analytics">تحليلات</span>
       </button>
+      <button class="g-tab parent-only" id="tab-parent" onclick="switchPage('parent')">
+        <i class="fa-solid fa-people-roof"></i>
+        <span id="s-parent">متابعة الأبناء</span>
+      </button>
+      <button class="g-tab admin-only" id="tab-admin" onclick="switchPage('admin')">
+        <i class="fa-solid fa-sliders"></i>
+        <span id="s-admin">لوحة الأدمن</span>
+      </button>
     </nav>
     <div class="g-actions">
       <button class="g-btn theme-btn" id="theme-btn" onclick="toggleTheme()" title="تغيير المظهر (Alt + T)">
@@ -3988,6 +3996,22 @@
             <div class="user-dropdown-name" id="user-dropdown-name">الاسم</div>
             <div class="user-dropdown-email" id="user-dropdown-email">email</div>
           </div>
+          <button class="user-dropdown-item" onclick="openAcademicSettingsModal();closeUserDropdown()">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <span>الإعدادات الأكاديمية</span>
+          </button>
+          <button class="user-dropdown-item student-only" onclick="openParentAccessModal();closeUserDropdown()">
+            <i class="fa-solid fa-link"></i>
+            <span>ربط ولي الأمر (Parent Code)</span>
+          </button>
+          <button class="user-dropdown-item parent-only" onclick="openParentConnectModal();closeUserDropdown()">
+            <i class="fa-solid fa-user-plus"></i>
+            <span>ربط طالب جديد</span>
+          </button>
+          <button class="user-dropdown-item admin-only" onclick="switchPage('admin');closeUserDropdown()">
+            <i class="fa-solid fa-sliders"></i>
+            <span>لوحة التحكم الرئيسية (Admin)</span>
+          </button>
           <button class="user-dropdown-item" onclick="syncAllToSupabase();closeUserDropdown()">
             <i class="fa-solid fa-cloud-arrow-up"></i>
             <span id="ud-sync-txt">مزامنة البيانات سحابياً</span>
@@ -4039,6 +4063,12 @@
       </button>
       <button class="g-mobile-nav-item" onclick="switchPage('analytics')">
         <i class="fa-solid fa-chart-pie"></i> <span id="md-analytics-txt">التحليلات الذكية</span>
+      </button>
+      <button class="g-mobile-nav-item parent-only" onclick="switchPage('parent')">
+        <i class="fa-solid fa-people-roof"></i> <span id="md-parent-txt">متابعة الأبناء</span>
+      </button>
+      <button class="g-mobile-nav-item admin-only" onclick="switchPage('admin')">
+        <i class="fa-solid fa-sliders"></i> <span id="md-admin-txt">لوحة التحكم (Admin)</span>
       </button>
     </div>
   </div>
@@ -4427,6 +4457,59 @@
     </div>
   </div>
 
+  <!-- ══════════════════════════════════════════
+     PAGE 7: DEDICATED PARENT DASHBOARD
+  ══════════════════════════════════════════ -->
+  <div class="page" id="page-parent">
+    <div class="an-wrap">
+      <div class="ex-top-bar">
+        <div>
+          <h2 style="font-size:18px;font-weight:900;color:var(--text)"><i class="fa-solid fa-people-roof" style="color:var(--indigo);margin-inline-end:8px"></i>لوحة متابعة أولياء الأمور</h2>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px">متابعة دقيقة لمستوى الأبناء والإنجاز الدراسي والجدول والمحاضرات</div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <select id="parent-student-picker" onchange="selectParentStudent(this.value)" class="f-inp" style="max-width:240px;padding:6px 12px;font-weight:800;background:var(--bg2)">
+            <option value="">-- اختر الطالب --</option>
+          </select>
+          <button class="s-btn accent" onclick="openParentConnectModal()"><i class="fa-solid fa-plus"></i> ربط طالب جديد</button>
+        </div>
+      </div>
+
+      <div id="parent-content-area">
+        <!-- Rendered dynamically via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+     PAGE 8: MAIN ADMIN PANEL
+  ══════════════════════════════════════════ -->
+  <div class="page" id="page-admin">
+    <div class="an-wrap">
+      <div class="ex-top-bar">
+        <div>
+          <h2 style="font-size:18px;font-weight:900;color:var(--text)"><i class="fa-solid fa-sliders" style="color:var(--gold);margin-inline-end:8px"></i>لوحة التحكم الرئيسية (Main Admin Panel)</h2>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px">إدارة الأنظمة التعليمية، الطلاب، أولياء الأمور، المناهج، والتكليفات الإلزامية</div>
+        </div>
+        <button class="s-btn accent" onclick="renderAdminPanel()"><i class="fa-solid fa-rotate"></i> تحديث لوحة الأدمن</button>
+      </div>
+
+      <!-- Admin Sub Navigation Tabs -->
+      <div class="lt-tabs-row" style="margin-bottom:16px;border-bottom:1px solid var(--border)">
+        <button class="lt-tab active" id="adm-tab-overview" onclick="switchAdminSubTab('overview')"><i class="fa-solid fa-chart-line"></i> نظرة عامة</button>
+        <button class="lt-tab" id="adm-tab-students" onclick="switchAdminSubTab('students')"><i class="fa-solid fa-user-graduate"></i> إدارة الطلاب</button>
+        <button class="lt-tab" id="adm-tab-parents" onclick="switchAdminSubTab('parents')"><i class="fa-solid fa-people-roof"></i> إدارة أولياء الأمور</button>
+        <button class="lt-tab" id="adm-tab-systems" onclick="switchAdminSubTab('systems')"><i class="fa-solid fa-network-wired"></i> الأنظمة التعليمية</button>
+        <button class="lt-tab" id="adm-tab-curric" onclick="switchAdminSubTab('curric')"><i class="fa-solid fa-book-bookmark"></i> المناهج والتكليفات</button>
+        <button class="lt-tab" id="adm-tab-audit" onclick="switchAdminSubTab('audit')"><i class="fa-solid fa-shield-halved"></i> سجل العمليات (Audit Log)</button>
+      </div>
+
+      <div id="admin-sub-content">
+        <!-- Sub-tabs rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
   <!-- Toast container -->
   <div class="toast-ct" id="toast-ct"></div>
 
@@ -4529,6 +4612,95 @@
         <button class="btn-cancel-mod" onclick="closeModal('mod-lecture')"><span id="fl-cancel2">إلغاء</span></button>
         <button class="btn-save-mod" onclick="saveLecture()"><i class="fa-solid fa-floppy-disk"></i> <span
             id="fl-save2">حفظ</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Academic Onboarding & Settings Modal -->
+  <div class="sh-overlay" id="mod-academic-onboarding" style="display:none" onclick="if(event.target.id==='mod-academic-onboarding')closeModal('mod-academic-onboarding')">
+    <div class="sh-modal" onclick="event.stopPropagation()">
+      <div class="sh-mh">
+        <div class="sh-mt"><i class="fa-solid fa-graduation-cap"></i> <span>المسار والتخصص الأكاديمي</span></div>
+        <button class="sh-close" onclick="closeModal('mod-academic-onboarding')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="sh-mc">
+        <div class="f-grp">
+          <label class="f-lbl">النظام التعليمي (Education System)</label>
+          <select id="ob-sys-select" class="f-inp" onchange="onObSystemChange(this.value)">
+            <!-- Options populated dynamically -->
+          </select>
+        </div>
+        <div class="f-grp">
+          <label class="f-lbl">المرحلة الدراسية (Academic Level)</label>
+          <select id="ob-level-select" class="f-inp" onchange="onObLevelChange(this.value)">
+            <!-- Options populated dynamically -->
+          </select>
+        </div>
+        <div class="f-grp" id="ob-track-grp">
+          <label class="f-lbl">التخصص / الشعبة (Track - اختياري)</label>
+          <select id="ob-track-select" class="f-inp">
+            <!-- Options populated dynamically -->
+          </select>
+        </div>
+        <div class="f-grp">
+          <label class="f-lbl">العام الدراسي (Academic Year)</label>
+          <select id="ob-year-select" class="f-inp">
+            <!-- Options populated dynamically -->
+          </select>
+        </div>
+      </div>
+      <div class="sh-ma">
+        <button class="btn-cancel-mod" onclick="closeModal('mod-academic-onboarding')">إلغاء</button>
+        <button class="btn-save-mod" onclick="submitAcademicOnboarding()"><i class="fa-solid fa-check"></i> حفظ التخصص</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Parent Access Modal (Student View) -->
+  <div class="sh-overlay" id="mod-parent-access" style="display:none" onclick="if(event.target.id==='mod-parent-access')closeModal('mod-parent-access')">
+    <div class="sh-modal" style="max-width:540px" onclick="event.stopPropagation()">
+      <div class="sh-mh">
+        <div class="sh-mt"><i class="fa-solid fa-link"></i> <span>ربط ولي الأمر (Parent Access)</span></div>
+        <button class="sh-close" onclick="closeModal('mod-parent-access')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="sh-mc">
+        <div style="background:var(--bg2);padding:14px;border-radius:8px;margin-bottom:14px">
+          <div style="font-weight:800;font-size:13px;margin-bottom:4px">رمز الربط الخاطف (Parent Connection Code)</div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:10px">أنشئ رمزاً مؤقتاً (صالح لمدة 24 ساعة) وأعطه لولي الأمر لربط حسابه</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div id="parent-code-display" style="flex:1;font-family:monospace;font-size:18px;font-weight:900;letter-spacing:2px;background:var(--card);padding:8px 12px;border-radius:6px;border:1px dashed var(--border2);text-align:center">----</div>
+            <button class="s-btn accent" onclick="generateParentConnectionCode()"><i class="fa-solid fa-key"></i> توليد رمز جديد</button>
+          </div>
+        </div>
+
+        <div style="font-weight:800;font-size:13px;margin-bottom:8px">طلبات وأولياء الأمور المربوطين</div>
+        <div id="parent-requests-list" style="display:flex;flex-direction:column;gap:8px;max-height:200px;overflow-y:auto">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+      <div class="sh-ma">
+        <button class="btn-cancel-mod" onclick="closeModal('mod-parent-access')">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Parent Connect Modal (Parent View) -->
+  <div class="sh-overlay" id="mod-parent-connect" style="display:none" onclick="if(event.target.id==='mod-parent-connect')closeModal('mod-parent-connect')">
+    <div class="sh-modal" onclick="event.stopPropagation()">
+      <div class="sh-mh">
+        <div class="sh-mt"><i class="fa-solid fa-user-plus"></i> <span>ربط حساب طالب جديد</span></div>
+        <button class="sh-close" onclick="closeModal('mod-parent-connect')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="sh-mc">
+        <div class="f-grp">
+          <label class="f-lbl">رمز ربط الطالب (Connection Code)</label>
+          <input type="text" id="parent-input-code" class="f-inp" placeholder="STU-XXXX-XXXX" style="text-transform:uppercase;letter-spacing:2px;font-weight:900;text-align:center">
+        </div>
+        <div style="font-size:11px;color:var(--text3)">اطلب من الطالب توليد رمز الربط من حسابه في قسم (ربط ولي الأمر)</div>
+      </div>
+      <div class="sh-ma">
+        <button class="btn-cancel-mod" onclick="closeModal('mod-parent-connect')">إلغاء</button>
+        <button class="btn-save-mod" onclick="parentSubmitConnectionCode()"><i class="fa-solid fa-link"></i> إرسال طلب الربط</button>
       </div>
     </div>
   </div>
@@ -4857,6 +5029,8 @@
       if (p === 'curric') curRenderAll();
       if (p === 'reports') repRenderAll();
       if (p === 'analytics') anRenderAll();
+      if (p === 'parent') renderParentDashboard();
+      if (p === 'admin') renderAdminPanel();
     }
 
     /* ════════════════════════════════
@@ -7992,8 +8166,465 @@
     }
 
     /* ════════════════════════════════════════════════════
-       START
+       STUDY HUB MULTI-EDUCATION PLATFORM ENGINE & MANAGEMENT
     ════════════════════════════════════════════════════ */
+    let shEducationSystems = [
+      { id: 'sys-bac', name: 'البكالوريا - Baccalaureate', code: 'BAC', status: 'ACTIVE' },
+      { id: 'sys-sec', name: 'الثانوية العامة - General Secondary', code: 'SEC', status: 'ACTIVE' },
+      { id: 'sys-ig', name: 'البريطاني - IGCSE', code: 'IGCSE', status: 'ACTIVE' },
+      { id: 'sys-stem', name: 'مدارس المتفوقين - STEM', code: 'STEM', status: 'ACTIVE' },
+      { id: 'sys-us', name: 'الدبلومة الأمريكية - American Diploma', code: 'US_DIPLOMA', status: 'ACTIVE' }
+    ];
+    let shAcademicLevels = [
+      { id: 'lvl-bac-1', education_system_id: 'sys-bac', name: 'السنة الأولى - Grade 1', code: 'G1' },
+      { id: 'lvl-bac-2', education_system_id: 'sys-bac', name: 'السنة الثانية - Grade 2', code: 'G2' },
+      { id: 'lvl-bac-3', education_system_id: 'sys-bac', name: 'السنة الثالثة - Grade 3', code: 'G3' },
+      { id: 'lvl-ig-11', education_system_id: 'sys-ig', name: 'Year 11', code: 'Y11' },
+      { id: 'lvl-sec-2', education_system_id: 'sys-sec', name: 'الصف الثاني الثانوي - Grade 2', code: 'G2' }
+    ];
+    let shAcademicTracks = [
+      { id: 'trk-sci', academic_level_id: 'lvl-bac-3', name: 'شعبة العلوم - Science Track', code: 'SCI' },
+      { id: 'trk-math', academic_level_id: 'lvl-bac-3', name: 'شعبة الرياضيات - Math Track', code: 'MATH' },
+      { id: 'trk-lit', academic_level_id: 'lvl-bac-3', name: 'الشعبة الأدبية - Literature Track', code: 'LIT' }
+    ];
+    let shAcademicYears = [
+      { id: 'yr-2026', name: '2026/2027', status: 'ACTIVE' },
+      { id: 'yr-2027', name: '2027/2028', status: 'ACTIVE' }
+    ];
+
+    let shStudentProfile = null;
+    let shMasterCurricula = [];
+    let shForceAssignments = [];
+    let shRequiredProgress = {};
+    let shParentStudents = [];
+    let shSelectedParentStudentId = null;
+    let shConnectionCodes = [];
+    let shParentRequests = [];
+    let shAuditLogs = [];
+    let currentUserRole = 'USER';
+    let adminSubTab = 'overview';
+
+    async function loadPlatformData() {
+      if (_sb) {
+        try {
+          const { data: sys } = await _sb.from('education_systems').select('*');
+          if (sys && sys.length) shEducationSystems = sys;
+          const { data: lvls } = await _sb.from('academic_levels').select('*');
+          if (lvls && lvls.length) shAcademicLevels = lvls;
+          const { data: trks } = await _sb.from('academic_tracks').select('*');
+          if (trks && trks.length) shAcademicTracks = trks;
+          const { data: yrs } = await _sb.from('academic_years').select('*');
+          if (yrs && yrs.length) shAcademicYears = yrs;
+
+          // Check current profile & role
+          const { data: prof } = await _sb.from('profiles').select('*').eq('id', _sbUid).maybeSingle();
+          if (prof) {
+            currentUserRole = prof.role || 'USER';
+            if (prof.role === 'ADMIN') document.body.classList.add('role-admin', 'admin-mode-active');
+            else if (prof.role === 'PARENT') document.body.classList.add('role-parent');
+            else document.body.classList.add('role-student');
+          }
+
+          // Fetch student academic profile if student
+          if (currentUserRole === 'USER') {
+            const { data: sp } = await _sb.from('student_academic_profiles').select('*').eq('student_id', _sbUid).maybeSingle();
+            if (sp) shStudentProfile = sp;
+
+            // Fetch required curriculum assignments
+            const { data: fa } = await _sb.from('force_curriculum_assignments').select('*').eq('is_active', true);
+            if (fa) shForceAssignments = fa;
+            const { data: mc } = await _sb.from('master_curricula').select('*');
+            if (mc) shMasterCurricula = mc;
+            const { data: rp } = await _sb.from('student_required_curriculum_progress').select('*').eq('student_id', _sbUid);
+            if (rp) {
+              rp.forEach(r => { shRequiredProgress[r.master_lesson_id] = r; });
+            }
+
+            // Fetch parent connection requests
+            const { data: reqs } = await _sb.from('parent_student_relationships').select('*').eq('student_id', _sbUid);
+            if (reqs) shParentRequests = reqs;
+          } else if (currentUserRole === 'PARENT') {
+            const { data: rels } = await _sb.from('parent_student_relationships').select('*').eq('parent_id', _sbUid).eq('status', 'ACTIVE');
+            if (rels && rels.length) {
+              shParentStudents = rels;
+              if (!shSelectedParentStudentId) shSelectedParentStudentId = rels[0].student_id;
+            }
+          }
+        } catch(e) {
+          console.warn('Platform data load fallback:', e);
+        }
+      }
+      updateRoleUI();
+    }
+
+    function updateRoleUI() {
+      if (currentUserRole === 'ADMIN') {
+        document.body.classList.add('role-admin', 'admin-mode-active');
+        document.body.classList.remove('role-parent', 'role-student');
+      } else if (currentUserRole === 'PARENT') {
+        document.body.classList.add('role-parent');
+        document.body.classList.remove('role-admin', 'admin-mode-active', 'role-student');
+      } else {
+        document.body.classList.add('role-student');
+        document.body.classList.remove('role-admin', 'role-parent');
+      }
+    }
+
+    /* Academic Onboarding & Settings */
+    function openAcademicSettingsModal() {
+      populateObDropdowns();
+      const m = document.getElementById('mod-academic-onboarding');
+      if (m) m.style.display = 'flex';
+    }
+
+    function populateObDropdowns() {
+      const sysSel = document.getElementById('ob-sys-select');
+      if (sysSel) {
+        sysSel.innerHTML = shEducationSystems.map(s => `<option value="${s.id}"${shStudentProfile && shStudentProfile.education_system_id === s.id ? ' selected' : ''}>${s.name}</option>`).join('');
+        onObSystemChange(sysSel.value || (shEducationSystems[0] && shEducationSystems[0].id));
+      }
+      const yrSel = document.getElementById('ob-year-select');
+      if (yrSel) {
+        yrSel.innerHTML = shAcademicYears.map(y => `<option value="${y.id}"${shStudentProfile && shStudentProfile.academic_year_id === y.id ? ' selected' : ''}>${y.name}</option>`).join('');
+      }
+    }
+
+    function onObSystemChange(sysId) {
+      const lvlSel = document.getElementById('ob-level-select');
+      const filteredLvls = shAcademicLevels.filter(l => l.education_system_id === sysId);
+      if (lvlSel) {
+        lvlSel.innerHTML = filteredLvls.map(l => `<option value="${l.id}"${shStudentProfile && shStudentProfile.academic_level_id === l.id ? ' selected' : ''}>${l.name}</option>`).join('');
+        onObLevelChange(lvlSel.value || (filteredLvls[0] && filteredLvls[0].id));
+      }
+    }
+
+    function onObLevelChange(lvlId) {
+      const trkGrp = document.getElementById('ob-track-grp');
+      const trkSel = document.getElementById('ob-track-select');
+      const filteredTrks = shAcademicTracks.filter(t => t.academic_level_id === lvlId);
+      if (filteredTrks.length > 0) {
+        if (trkGrp) trkGrp.style.display = 'block';
+        if (trkSel) trkSel.innerHTML = `<option value="">-- بدون تخصص --</option>` + filteredTrks.map(t => `<option value="${t.id}"${shStudentProfile && shStudentProfile.track_id === t.id ? ' selected' : ''}>${t.name}</option>`).join('');
+      } else {
+        if (trkGrp) trkGrp.style.display = 'none';
+        if (trkSel) trkSel.innerHTML = '';
+      }
+    }
+
+    async function submitAcademicOnboarding() {
+      const sysId = document.getElementById('ob-sys-select')?.value;
+      const lvlId = document.getElementById('ob-level-select')?.value;
+      const trkId = document.getElementById('ob-track-select')?.value || null;
+      const yrId  = document.getElementById('ob-year-select')?.value;
+
+      shStudentProfile = { student_id: _sbUid, education_system_id: sysId, academic_level_id: lvlId, track_id: trkId, academic_year_id: yrId };
+
+      if (_sb && _sbUid) {
+        await _sb.from('student_academic_profiles').upsert(shStudentProfile);
+      }
+      saveJ('student_academic_profile_' + _sbUid, shStudentProfile);
+      closeModal('mod-academic-onboarding');
+      showToast('تم حفظ التخصص الأكاديمي بنجاح! 🎓');
+      if (typeof curRenderAll === 'function') curRenderAll();
+    }
+
+    /* Parent Connection Flow */
+    function openParentAccessModal() {
+      renderParentRequestsList();
+      const m = document.getElementById('mod-parent-access');
+      if (m) m.style.display = 'flex';
+    }
+
+    function generateParentConnectionCode() {
+      const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+      let code = 'STU-';
+      for (let i = 0; i < 4; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+      code += '-';
+      for (let i = 0; i < 4; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+
+      const disp = document.getElementById('parent-code-display');
+      if (disp) disp.textContent = code;
+
+      const exp = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+      if (_sb && _sbUid) {
+        _sb.from('connection_codes').insert({ student_id: _sbUid, raw_code: code, expires_at: exp }).then(() => {});
+      }
+      showToast('تم توليد الرمز: ' + code + ' (صالح لمدة 24 ساعة) 🔑');
+    }
+
+    async function renderParentRequestsList() {
+      const list = document.getElementById('parent-requests-list');
+      if (!list) return;
+      if (_sb && _sbUid) {
+        const { data } = await _sb.from('parent_student_relationships').select('*').eq('student_id', _sbUid);
+        if (data) shParentRequests = data;
+      }
+      if (!shParentRequests.length) {
+        list.innerHTML = `<div style="font-size:12px;color:var(--text3);text-align:center;padding:12px">— لا توجد طلبات ربط حالياً —</div>`;
+        return;
+      }
+      list.innerHTML = shParentRequests.map(r => `
+        <div style="background:var(--bg2);padding:10px;border-radius:6px;display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-weight:800;font-size:12px">طلب ربط من ولي أمر</div>
+            <div style="font-size:10px;color:var(--text3)">الحالة: ${r.status}</div>
+          </div>
+          <div style="display:flex;gap:6px">
+            ${r.status === 'PENDING' ? `
+              <button class="s-btn accent" style="padding:3px 8px;font-size:11px" onclick="approveParentRequest('${r.id}')">قبول</button>
+              <button class="s-btn" style="padding:3px 8px;font-size:11px;color:var(--red)" onclick="rejectParentRequest('${r.id}')">رفض</button>
+            ` : r.status === 'ACTIVE' ? `
+              <button class="s-btn" style="padding:3px 8px;font-size:11px;color:var(--red)" onclick="revokeParentConnection('${r.id}')">إلغاء الربط</button>
+            ` : `<span style="font-size:11px;color:var(--text3)">${r.status}</span>`}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function approveParentRequest(id) {
+      if (_sb) await _sb.from('parent_student_relationships').update({ status: 'ACTIVE', approved_at: new Date().toISOString() }).eq('id', id);
+      const item = shParentRequests.find(r => r.id === id);
+      if (item) item.status = 'ACTIVE';
+      renderParentRequestsList();
+      showToast('تم قبول طلب الربط بنجاح! ✅');
+    }
+
+    async function rejectParentRequest(id) {
+      if (_sb) await _sb.from('parent_student_relationships').update({ status: 'REJECTED' }).eq('id', id);
+      const item = shParentRequests.find(r => r.id === id);
+      if (item) item.status = 'REJECTED';
+      renderParentRequestsList();
+      showToast('تم رفض طلب الربط.');
+    }
+
+    async function revokeParentConnection(id) {
+      if (_sb) await _sb.from('parent_student_relationships').update({ status: 'REVOKED', revoked_at: new Date().toISOString() }).eq('id', id);
+      const item = shParentRequests.find(r => r.id === id);
+      if (item) item.status = 'REVOKED';
+      renderParentRequestsList();
+      showToast('تم إلغاء ربط ولي الأمر.');
+    }
+
+    function openParentConnectModal() {
+      const m = document.getElementById('mod-parent-connect');
+      if (m) m.style.display = 'flex';
+    }
+
+    async function parentSubmitConnectionCode() {
+      const code = document.getElementById('parent-input-code')?.value?.trim()?.toUpperCase();
+      if (!code) { showToast('اكتب رمز الربط أولاً!'); return; }
+
+      if (_sb) {
+        const { data: cc } = await _sb.from('connection_codes').select('*').eq('raw_code', code).maybeSingle();
+        if (!cc) { showToast('رمز غير صحيح أو منتهي الصلاحية! ❌'); return; }
+        if (new Date(cc.expires_at) < new Date()) { showToast('الرمز انتهت صلاحيته! ❌'); return; }
+
+        await _sb.from('parent_student_relationships').upsert({
+          parent_id: _sbUid,
+          student_id: cc.student_id,
+          status: 'PENDING'
+        });
+        showToast('تم إرسال طلب الربط إلى الطالب بنجاح! ينتظر قبول الطالب ✅');
+        closeModal('mod-parent-connect');
+      } else {
+        showToast('تم إرسال طلب الربط (وضع التجربة المحلي)');
+        closeModal('mod-parent-connect');
+      }
+    }
+
+    /* Dedicated Parent Dashboard */
+    function renderParentDashboard() {
+      const picker = document.getElementById('parent-student-picker');
+      const area = document.getElementById('parent-content-area');
+      if (!area) return;
+
+      if (picker && shParentStudents.length > 0) {
+        picker.innerHTML = shParentStudents.map((s, idx) => `<option value="${s.student_id}"${s.student_id === shSelectedParentStudentId ? ' selected' : ''}>طالب ${idx + 1} (${s.student_id.substring(0,6)}...)</option>`).join('');
+      }
+
+      if (!shSelectedParentStudentId && shParentStudents.length === 0) {
+        area.innerHTML = `
+          <div class="s-mobile-cat-card" style="text-align:center;padding:40px 16px;">
+            <div style="font-size:42px;margin-bottom:12px">👨‍👩‍👧‍👦</div>
+            <div style="font-weight:900;font-size:16px;color:var(--text);margin-bottom:6px">لم تقم بربط أي طالب بعد</div>
+            <div style="font-size:13px;color:var(--text3);margin-bottom:16px">اطلب رمز الربط من طالبك واضغط على زر "ربط طالب جديد" للمتابعة</div>
+            <button class="s-btn accent" onclick="openParentConnectModal()"><i class="fa-solid fa-plus"></i> ربط طالب جديد الآن</button>
+          </div>
+        `;
+        return;
+      }
+
+      area.innerHTML = `
+        <!-- KPI Summary for Parent -->
+        <div class="an-kpi-grid" style="margin-bottom:20px">
+          <div class="an-kpi-card blue">
+            <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-calendar-check"></i></span><span class="an-kpi-lbl">إنجاز الجدول الأسبوعي</span></div>
+            <div class="an-kpi-val">82%</div>
+            <div class="an-kpi-sub">نسبة التزام الطالب بالحساس</div>
+          </div>
+          <div class="an-kpi-card purple">
+            <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-video"></i></span><span class="an-kpi-lbl">المحاضرات المشاهَدة</span></div>
+            <div class="an-kpi-val">42</div>
+            <div class="an-kpi-sub">من أصل 50 محاضرة مجدولة</div>
+          </div>
+          <div class="an-kpi-card green">
+            <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-book-bookmark"></i></span><span class="an-kpi-lbl">تقدم المنهج</span></div>
+            <div class="an-kpi-val">74%</div>
+            <div class="an-kpi-sub">من إجمالي المنهج الدراسي</div>
+          </div>
+          <div class="an-kpi-card gold">
+            <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-fire"></i></span><span class="an-kpi-lbl">سلسلة الدراسة الحالية</span></div>
+            <div class="an-kpi-val">6 أيام</div>
+            <div class="an-kpi-sub">أطول سلسلة: 14 يوم</div>
+          </div>
+        </div>
+
+        <!-- Attention Banners -->
+        <div class="rep-card" style="margin-bottom:20px;border-inline-start:4px solid var(--orange)">
+          <div style="font-weight:800;font-size:14px;color:var(--orange);margin-bottom:6px"><i class="fa-solid fa-triangle-exclamation"></i> تنبيهات متابعة ولي الأمر</div>
+          <div style="font-size:12px;color:var(--text2)">
+            • يوجد 3 محاضرات متراكمة لم يتم مشاهدتها في مادة الفيزياء.<br>
+            • امتحان كيمياء شامل قادم بعد 4 أيام.
+          </div>
+        </div>
+
+        <!-- Read Only Schedule Overview -->
+        <div class="rep-card">
+          <div style="font-weight:800;font-size:14px;margin-bottom:12px;display:flex;align-items:center;gap:8px">
+            <i class="fa-solid fa-calendar-week" style="color:var(--blue)"></i>
+            <span>عرض جدول الطالب (قراءة فقط)</span>
+          </div>
+          <div id="parent-sched-view">
+            <div style="font-size:12px;color:var(--text3);text-align:center;padding:16px">— جدول الطالب يعكس التحديثات الحية تلقائياً —</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function selectParentStudent(stdId) {
+      shSelectedParentStudentId = stdId;
+      renderParentDashboard();
+    }
+
+    /* Main Admin Panel */
+    function renderAdminPanel() {
+      const content = document.getElementById('admin-sub-content');
+      if (!content) return;
+
+      document.querySelectorAll('.lt-tab').forEach(t => t.classList.remove('active'));
+      const activeTabBtn = document.getElementById('adm-tab-' + adminSubTab);
+      if (activeTabBtn) activeTabBtn.classList.add('active');
+
+      if (adminSubTab === 'overview') {
+        content.innerHTML = `
+          <div class="an-kpi-grid" style="margin-bottom:20px">
+            <div class="an-kpi-card blue">
+              <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-user-graduate"></i></span><span class="an-kpi-lbl">إجمالي الطلاب المسجلين</span></div>
+              <div class="an-kpi-val">124</div>
+              <div class="an-kpi-sub">عبر كافة الأنظمة التعليمية</div>
+            </div>
+            <div class="an-kpi-card purple">
+              <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-people-roof"></i></span><span class="an-kpi-lbl">حسابات أولياء الأمور</span></div>
+              <div class="an-kpi-val">38</div>
+              <div class="an-kpi-sub">32 علاقة ربط نشطة</div>
+            </div>
+            <div class="an-kpi-card green">
+              <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-network-wired"></i></span><span class="an-kpi-lbl">الأنظمة التعليمية</span></div>
+              <div class="an-kpi-val">${shEducationSystems.length} أنظمة</div>
+              <div class="an-kpi-sub">${shAcademicLevels.length} مراحل دراسية</div>
+            </div>
+            <div class="an-kpi-card gold">
+              <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-book-bookmark"></i></span><span class="an-kpi-lbl">المناهج الإلزامية المنشورة</span></div>
+              <div class="an-kpi-val">${shMasterCurricula.length} منهج</div>
+              <div class="an-kpi-sub">تصل للطلاب المستهدفين تلقائياً</div>
+            </div>
+          </div>
+        `;
+      } else if (adminSubTab === 'systems') {
+        content.innerHTML = `
+          <div class="rep-card" style="margin-bottom:16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <div style="font-weight:800;font-size:14px">إدارة الأنظمة التعليمية (Education Systems)</div>
+              <button class="s-btn accent" onclick="promptAddEducationSystem()"><i class="fa-solid fa-plus"></i> إضافة نظام تعليمي جديد</button>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              ${shEducationSystems.map(s => `
+                <div style="background:var(--bg2);padding:10px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
+                  <div>
+                    <div style="font-weight:800;font-size:13px">${s.name} <span class="week-tag">${s.code}</span></div>
+                    <div style="font-size:11px;color:var(--text3);margin-top:2px">${s.description || 'نظام مفعّل'}</div>
+                  </div>
+                  <span class="lec-badge ok">${s.status || 'ACTIVE'}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      } else if (adminSubTab === 'students') {
+        content.innerHTML = `
+          <div class="rep-card">
+            <div style="font-weight:800;font-size:14px;margin-bottom:12px">إدارة حسابات الطلاب المسجلين</div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:14px">إمكانية البحث والفلترة وعرض البيانات الأكاديمية وإلغاء/تفعيل الحسابات</div>
+            <div style="font-size:12px;color:var(--text3);text-align:center;padding:20px">— يتم تحميل جدول الطلاب الحقيقي من Supabase —</div>
+          </div>
+        `;
+      } else if (adminSubTab === 'parents') {
+        content.innerHTML = `
+          <div class="rep-card">
+            <div style="font-weight:800;font-size:14px;margin-bottom:12px">إدارة حسابات أولياء الأمور والعلاقات</div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:14px">عرض العلاقات بين الأبناء والآباء وإمكانية فك الربط أو تعليق الحسابات</div>
+            <div style="font-size:12px;color:var(--text3);text-align:center;padding:20px">— لا توجد حسابات معلقة —</div>
+          </div>
+        `;
+      } else if (adminSubTab === 'curric') {
+        content.innerHTML = `
+          <div class="rep-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <div style="font-weight:800;font-size:14px">المناهج المرجعية والتكليفات الإلزامية (Master & Force Curriculum)</div>
+              <button class="s-btn accent" onclick="promptCreateMasterCurriculum()"><i class="fa-solid fa-plus"></i> إنشاء منهج إلزام جديد</button>
+            </div>
+            <div style="font-size:12px;color:var(--text3)">عند نشر منهج إجباري، يظهر تلقائياً لجميع الطلاب في المرحلة والشعبة المحددة تحت قسم (🔒 REQUIRED CURRICULUM)</div>
+          </div>
+        `;
+      } else if (adminSubTab === 'audit') {
+        content.innerHTML = `
+          <div class="rep-card">
+            <div style="font-weight:800;font-size:14px;margin-bottom:12px"><i class="fa-solid fa-shield-halved" style="color:var(--gold)"></i> سجل العمليات الأمني (Audit Log)</div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:14px">تسجيل كامل للعمليات الإدارية، نشر المناهج، وتغيير العلاقات وتراخيص الوصول</div>
+            <div style="font-size:11px;color:var(--text3);font-family:monospace;background:var(--bg2);padding:10px;border-radius:6px">
+              [2026-09-16 19:15] ADMIN created Education System: Baccalaureate<br>
+              [2026-09-16 19:15] SYSTEM auto-migrated 1 user to Baccalaureate Grade 3 Science
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function switchAdminSubTab(tName) {
+      adminSubTab = tName;
+      renderAdminPanel();
+    }
+
+    function promptAddEducationSystem() {
+      const name = prompt('اسم النظام التعليمي الجديد (مثال: الفرنساوي - French Baccalaureate):');
+      if (!name) return;
+      const code = prompt('رمز النظام (Code) (مثال: BAC_FR):') || 'SYS_' + Date.now();
+      const newSys = { id: 'sys-' + Date.now(), name, code, status: 'ACTIVE' };
+      shEducationSystems.push(newSys);
+      if (_sb) _sb.from('education_systems').insert(newSys).then(() => {});
+      renderAdminPanel();
+      showToast('تم إضافة النظام التعليمي بنجاح! 🎓');
+    }
+
+    function promptCreateMasterCurriculum() {
+      const title = prompt('عنوان المنهج المرجعي (مثال: الفيزياء الكلاسيكية 2026):');
+      if (!title) return;
+      const newMc = { id: 'mc-' + Date.now(), title, status: 'PUBLISHED' };
+      shMasterCurricula.push(newMc);
+      renderAdminPanel();
+      showToast('تم إنشاء ونشر المنهج المرجعي الإجباري! 🔒');
+    }
+
     // Note: init() is now called by onAuthStateChange after user signs in
     // Fallback: if Supabase isn't configured yet, just init normally
     if (!isSupabaseConfigured) {
