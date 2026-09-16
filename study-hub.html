@@ -3133,6 +3133,9 @@
     body:not(.admin-mode-active) .admin-only {
       display: none !important;
     }
+    body:not(.is-main-admin) .main-admin-only {
+      display: none !important;
+    }
 
     /* ════════════════════════════════
        MOBILE SCHEDULE (ONE DAY AT A TIME)
@@ -3969,7 +3972,7 @@
         <i class="fa-solid fa-people-roof"></i>
         <span id="s-parent">متابعة الأبناء</span>
       </button>
-      <button class="g-tab admin-only" id="tab-admin" onclick="switchPage('admin')">
+      <button class="g-tab main-admin-only" id="tab-admin" onclick="switchPage('admin')">
         <i class="fa-solid fa-sliders"></i>
         <span id="s-admin">لوحة الأدمن</span>
       </button>
@@ -3982,7 +3985,7 @@
       <button class="g-btn lang-btn" id="lang-btn" onclick="toggleLang()">
         <i class="fa-solid fa-globe"></i> <span id="lang-btn-txt">English</span>
       </button>
-      <button class="g-btn admin-mode-btn admin-only" id="admin-mode-btn" onclick="toggleAdminMode()" title="وضع المسؤول (Admin Mode)">
+      <button class="g-btn admin-mode-btn" id="admin-mode-btn" onclick="toggleAdminMode()" title="وضع المسؤول (Admin Mode)">
         <i class="fa-solid fa-user-shield" id="admin-mode-icon"></i>
         <span id="admin-mode-txt">الأدمن: إيقاف</span>
       </button>
@@ -4008,7 +4011,7 @@
             <i class="fa-solid fa-user-plus"></i>
             <span>ربط طالب جديد</span>
           </button>
-          <button class="user-dropdown-item admin-only" onclick="switchPage('admin');closeUserDropdown()">
+          <button class="user-dropdown-item main-admin-only" onclick="switchPage('admin');closeUserDropdown()">
             <i class="fa-solid fa-sliders"></i>
             <span>لوحة التحكم الرئيسية (Admin)</span>
           </button>
@@ -4067,7 +4070,7 @@
       <button class="g-mobile-nav-item parent-only" onclick="switchPage('parent')">
         <i class="fa-solid fa-people-roof"></i> <span id="md-parent-txt">متابعة الأبناء</span>
       </button>
-      <button class="g-mobile-nav-item admin-only" onclick="switchPage('admin')">
+      <button class="g-mobile-nav-item main-admin-only" onclick="switchPage('admin')">
         <i class="fa-solid fa-sliders"></i> <span id="md-admin-txt">لوحة التحكم (Admin)</span>
       </button>
     </div>
@@ -5566,12 +5569,6 @@
     }
 
     async function toggleAdminMode() {
-      if (!isMainAdmin()) {
-        showToast('وضع الأدمن مخصص فقط للحساب الرئيسي!');
-        isAdminMode = false;
-        document.body.classList.remove('admin-mode-active');
-        return;
-      }
       isAdminMode = !isAdminMode;
       localStorage.setItem('hub_admin_mode', isAdminMode ? '1' : '0');
 
@@ -8286,14 +8283,14 @@
       const mainAdmin = isMainAdmin();
       if (mainAdmin) {
         currentUserRole = 'ADMIN';
-        document.body.classList.add('role-admin', 'admin-mode-active');
+        document.body.classList.add('is-main-admin', 'role-admin');
         document.body.classList.remove('role-parent', 'role-student');
       } else if (currentUserRole === 'PARENT') {
-        document.body.classList.remove('role-admin', 'admin-mode-active', 'role-student');
+        document.body.classList.remove('is-main-admin', 'role-admin', 'role-student');
         document.body.classList.add('role-parent');
       } else {
         currentUserRole = 'USER';
-        document.body.classList.remove('role-admin', 'admin-mode-active', 'role-parent');
+        document.body.classList.remove('is-main-admin', 'role-admin', 'role-parent');
         document.body.classList.add('role-student');
       }
     }
