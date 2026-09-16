@@ -6450,10 +6450,19 @@
     const SUPABASE_URL  = 'https://oqeaikrpcbqqrzsorghy.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9xZWFpa3JwY2JxcXJ6c29yZ2h5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4Njg2NTUsImV4cCI6MjEwNDQ0NDY1NX0.d_dBZsg9Y4fRoCwrA4-RN8zmOV0pxutLsk3sbVEJ_No';
 
+    // Auto-fix double hash in URL from OAuth redirects (##access_token -> #access_token)
+    if (window.location.hash.startsWith('##')) {
+      try {
+        const cleanHash = window.location.hash.replace(/^##/, '#');
+        history.replaceState(null, '', window.location.pathname + cleanHash + window.location.search);
+      } catch(e) {}
+    }
+
     let _sb = null;
     try {
-      if (typeof supabase !== 'undefined' && SUPABASE_URL && SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_URL.startsWith('http')) {
-        _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+      const sbLib = window.supabase || (typeof supabase !== 'undefined' ? supabase : null);
+      if (sbLib && SUPABASE_URL && SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_URL.startsWith('http')) {
+        _sb = sbLib.createClient(SUPABASE_URL, SUPABASE_ANON);
         window._supabase = _sb;
       }
     } catch(e) {
@@ -6557,16 +6566,16 @@
 
     /* ── Google OAuth ── */
     async function doGoogleLogin() {
-      const client = _sb || (typeof supabase !== 'undefined' && SUPABASE_URL.startsWith('http') ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON) : null);
+      const client = _sb || (window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON) : null);
       if (!client) {
         showAuthErr('تعذر الاتصال بسيرفر Supabase. تحقق من اتصال النت واعد التحميل.');
         return;
       }
       showLoader('جاري التحويل لصفحة تسجيل الدخول بحساب Google...');
-      const redirectTo = window.location.origin + window.location.pathname;
+      const cleanOrigin = window.location.origin + window.location.pathname.replace(/\/+$/, '');
       const { error } = await client.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo }
+        options: { redirectTo: cleanOrigin }
       });
       if (error) {
         hideLoader();
