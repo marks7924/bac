@@ -4734,24 +4734,18 @@
     ];
 
     const DEF_TEMPLATE = {
-      Sat: { school: [{ id: 's-s1', text: 'PE (9:20-10:40)', icon: 'dumbbell', color: 'pink', pinned: false, teacher: 'Coach Tariq', time: '9:20-10:40', lessonsCovered: 1 }, { id: 's-s2', text: 'English (10:40-1:40)', icon: 'book', color: 'green', pinned: false, teacher: 'Mr. Ahmed', time: '10:40-1:40', lessonsCovered: 2 }], center: [], online: [{ id: 's-o1', text: 'Arabic – Salah', icon: 'laptop', color: 'amber', pinned: false, teacher: 'Mr. Salah', time: '4:00-6:00', lessonsCovered: 1 }], homestudy: [] },
-      Sun: { school: [], center: [], online: [{ id: 'su-o1', text: 'History – Tolba', icon: 'laptop', color: 'amber', pinned: false, teacher: 'Mr. Tolba', time: '5:00-7:00', lessonsCovered: 1 }], homestudy: [] },
-      Mon: { school: [{ id: 'm-s1', text: 'Arabic (8-11)', icon: 'book', color: 'green', pinned: false, teacher: 'Mr. Salah', time: '8:00-11:00', lessonsCovered: 2 }, { id: 'm-s2', text: 'Finance (11-12)', icon: 'dumbbell', color: 'pink', pinned: false, teacher: 'Mrs. Mona', time: '11:00-12:00', lessonsCovered: 1 }], center: [{ id: 'm-c1', text: 'History – Bassem (12-3)', icon: 'book', color: 'green', pinned: false, teacher: 'Mr. Bassem', time: '12:00-3:00', lessonsCovered: 2 }], online: [], homestudy: [] },
-      Tue: { school: [{ id: 't-s1', text: 'History – Bassem (8-11)', icon: 'book', color: 'green', pinned: false, teacher: 'Mr. Bassem', time: '8:00-11:00', lessonsCovered: 2 }], center: [], online: [{ id: 't-o1', text: 'English – Ahmed', icon: 'laptop', color: 'amber', pinned: false, teacher: 'Mr. Ahmed', time: '6:00-8:00', lessonsCovered: 1 }], homestudy: [] },
+      Sat: { school: [], center: [], online: [], homestudy: [] },
+      Sun: { school: [], center: [], online: [], homestudy: [] },
+      Mon: { school: [], center: [], online: [], homestudy: [] },
+      Tue: { school: [], center: [], online: [], homestudy: [] },
       Wed: { school: [], center: [], online: [], homestudy: [] },
-      Thu: { school: [{ id: 'th-s1', text: 'Programming (11-2)', icon: 'laptop', color: 'green', pinned: false, teacher: 'Eng. Hassan', time: '11:00-2:00', lessonsCovered: 2 }], center: [{ id: 'th-c1', text: 'History – Bassem (2-5)', icon: 'book', color: 'green', pinned: false, teacher: 'Mr. Bassem', time: '2:00-5:00', lessonsCovered: 1 }], online: [], homestudy: [] },
+      Thu: { school: [], center: [], online: [], homestudy: [] },
       Fri: { school: [], center: [], online: [], homestudy: [] }
     };
 
-    const DEF_SUBJECTS = [
-      { id: 'sub-ar', name: 'Arabic', totalLessons: 24, coveredLessons: 8 },
-      { id: 'sub-en', name: 'English', totalLessons: 20, coveredLessons: 6 },
-      { id: 'sub-hi', name: 'History', totalLessons: 30, coveredLessons: 9 },
-      { id: 'sub-pe', name: 'PE', totalLessons: 10, coveredLessons: 4 }
-    ];
-
-    const DEF_EVENTS = [{ id: 'ev-1', title: 'Baccalaureate Finals', date: '2027-05-15' }, { id: 'ev-2', title: 'Physics Midterm', date: '2026-10-15' }];
-    const DEF_REVISION = [{ id: 'rev-1', topic: 'Arabic Grammar', intervalDays: 7, lastReview: '2026-09-01' }, { id: 'rev-2', topic: 'History Unit 1', intervalDays: 3, lastReview: '2026-09-05' }];
+    const DEF_SUBJECTS = [];
+    const DEF_EVENTS   = [];
+    const DEF_REVISION = [];
 
     function defWeek() { return { items: {}, goals: { Sat: [], Sun: [], Mon: [], Tue: [], Wed: [], Thu: [], Fri: [] } }; }
     function defMeta() { return { streak: 0, perfectStreak: 0, longestStreak: 0, lastCheckDate: null }; }
@@ -5811,24 +5805,7 @@
        SEED DEMO DATA
     ════════════════════════════════ */
     function seedLt() {
-      if (ltTeachers.length > 0) return;
-      const today = ltTodayStr(), twa = addD(today, -14), owa = addD(today, -7), tda = addD(today, -3), yest = addD(today, -1);
-      ltTeachers = [
-        { id: 'dt1', name: 'أ. أحمد فوزي', subject: 'الرياضيات', platform: 'يوتيوب', link: 'https://youtube.com', time: '18:00', freq: 7, days: ['Mon', 'Thu'], emoji: '🧮', color: '#3b82f6', createdAt: today },
-        { id: 'dt2', name: 'أ. سالي عبدالله', subject: 'الكيمياء', platform: 'يوتيوب', link: 'https://youtube.com', time: '20:00', freq: 7, days: ['Tue', 'Fri'], emoji: '🔬', color: '#22c55e', createdAt: today },
-        { id: 'dt3', name: 'أ. خالد منير', subject: 'الفيزياء', platform: 'تيليجرام', link: 'https://t.me', time: '19:00', freq: 7, days: ['Sun', 'Wed'], emoji: '⚡', color: '#f97316', createdAt: today }
-      ];
-      ltLectures = [
-        { id: 'l1', teacherId: 'dt1', title: 'معادلات تربيعية', date: twa, weekNum: 1, link: 'https://youtube.com', notes: '', watched: true, watchedAt: addD(twa, 2), createdAt: twa },
-        { id: 'l2', teacherId: 'dt1', title: 'التفاضل والتكامل', date: owa, weekNum: 2, link: 'https://youtube.com', notes: 'مهمة', watched: false, watchedAt: null, createdAt: owa },
-        { id: 'l3', teacherId: 'dt1', title: 'المثلثات', date: yest, weekNum: 3, link: 'https://youtube.com', notes: '', watched: false, watchedAt: null, createdAt: yest },
-        { id: 'l4', teacherId: 'dt2', title: 'الروابط الكيميائية', date: twa, weekNum: 1, link: 'https://youtube.com', notes: '', watched: true, watchedAt: addD(twa, 1), createdAt: twa },
-        { id: 'l5', teacherId: 'dt2', title: 'الجدول الدوري', date: owa, weekNum: 2, link: 'https://youtube.com', notes: '', watched: true, watchedAt: addD(owa, 3), createdAt: owa },
-        { id: 'l6', teacherId: 'dt2', title: 'الكيمياء العضوية', date: tda, weekNum: 3, link: 'https://youtube.com', notes: '', watched: false, watchedAt: null, createdAt: tda },
-        { id: 'l7', teacherId: 'dt3', title: 'قوانين نيوتن', date: twa, weekNum: 1, link: 'https://t.me', notes: '', watched: true, watchedAt: addD(twa, 4), createdAt: twa },
-        { id: 'l8', teacherId: 'dt3', title: 'الكهرباء الساكنة', date: owa, weekNum: 2, link: 'https://t.me', notes: 'مراجعة قبلها', watched: false, watchedAt: null, createdAt: owa }
-      ];
-      ltSave();
+      return;
     }
 
     /* ════════════════════════════════
@@ -6777,39 +6754,52 @@
     ════════════════════════════════════════════════════ */
     const TOUR_STEPS = [
       {
+        page: 'sched',
         el: '#tab-sched',
         title: '📅 الجدول الأسبوعي',
-        desc: 'من هنا بتدخل على جدولك الأسبوعي — تقدر تضيف حصصك وتعلّم عليها كمان يتعمل.',
+        desc: 'من هنا بتدخل على جدولك الأسبوعي — رتّب حصصك اليومية والأسبوعية وتفقد إنجازك.',
       },
       {
+        page: 'sched',
         el: '#page-sched .sched-bar',
         title: '🗓️ التنقل بين الأسابيع',
-        desc: 'السابق والتالي للتنقل بين الأسابيع — واليوم للرجوع لأسبوعك الحالي فوراً.',
+        desc: 'استخدم السابق والتالي للتنقل بين الأسابيع — وزر اليوم للرجوع لأسبوعك الحالي فوراً.',
       },
       {
-        el: '#page-sched .s-table',
-        title: '✏️ تعديل الجدول',
-        desc: 'اضغط على أي خلية فاضية أو زر + إضافة عشان تضيف حصة. اضغط على اسم الحصة لتعديلها.',
-      },
-      {
-        el: '#tab-lt',
+        page: 'lt',
+        el: '#page-lt',
         title: '🎬 متابع المحاضرات',
-        desc: 'أضف أساتذتك ومحاضراتهم وتابع اللي شفته واللي لسه. هيفكّرك بالمتأخر!',
+        desc: 'أضف أساتذتك ومحاضراتهم الأسبوعية، وتابع اللي شفته والمتأخر عليك أولاً بأول!',
       },
       {
-        el: '#tab-exams',
-        title: '📝 الامتحانات',
-        desc: 'أضف امتحاناتك القادمة وشوف عداد تنازلي لكل واحد. تقدر تسجّل درجاتك بعدين.',
+        page: 'exams',
+        el: '#page-exams',
+        title: '📝 مركز الامتحانات',
+        desc: 'جدول امتحاناتك القادمة مع عداد تنازلي حقيقي لكل امتحان، وسجل درجاتك وتقييم مستواك.',
       },
       {
-        el: '#tab-curric',
-        title: '📚 شجرة المنهج',
-        desc: 'أضف موادك وأبوابها ودروسها وتابع نسبة إنجازك في كل مادة.',
+        page: 'curric',
+        el: '#page-curric',
+        title: '📚 شجرة المنهج والمواد',
+        desc: 'أضف المواد والأبواب والدروس، وتابع نسبة إنجازك للمنهج عبر 4 مراحل (شرح، تمارين، مراجعة، امتحان).',
       },
       {
+        page: 'reports',
+        el: '#page-reports',
+        title: '📊 سجل وتقارير الأداء',
+        desc: 'تقرير شامل عن سلاسل التزامك (Streak)، والمحاضرات المشاهدة، والمهام المنجزة يوم بيوم.',
+      },
+      {
+        page: 'analytics',
+        el: '#page-analytics',
+        title: '🧠 مركز التحليلات الذكية',
+        desc: 'إحصائيات متقدمة تربط كل بياناتك ببعض وتديك توصيات ذكية لتحسين مستواك وتفادي التأخير.',
+      },
+      {
+        page: 'sched',
         el: '#user-avatar-wrap',
-        title: '👤 حسابك الشخصي',
-        desc: 'من هنا تقدر تسجل خروج أو تشوف الجولة تاني في أي وقت. بياناتك بتتحفظ على حسابك تلقائياً!',
+        title: '👤 حسابك الشخصي والإعدادات',
+        desc: 'بياناتك محفوظة على حسابك تلقائياً! تقدر من هنا تسجل خروج أو تعيد الجولة التعريفية في أي وقت.',
       },
     ];
 
@@ -6835,6 +6825,11 @@
       const isFirst = _tourIdx === 0;
       const isLast  = _tourIdx === TOUR_STEPS.length - 1;
 
+      // Switch to the target page if specified
+      if (step.page && typeof switchPage === 'function') {
+        switchPage(step.page);
+      }
+
       // Update text
       document.getElementById('tour-step-badge').textContent = `خطوة ${_tourIdx + 1} من ${TOUR_STEPS.length}`;
       document.getElementById('tour-tooltip-title').textContent = step.title;
@@ -6842,36 +6837,35 @@
       document.getElementById('tour-next-btn').textContent = isLast ? '🎉 انتهى!' : 'التالي';
       document.getElementById('tour-prev-btn').style.visibility = isFirst ? 'hidden' : 'visible';
 
-      // Navigate to the right page if needed
-      const targetEl = document.querySelector(step.el);
-
       // Update dots
       document.querySelectorAll('.tour-dot').forEach((d, i) => d.classList.toggle('active', i === _tourIdx));
 
-      if (!targetEl) { positionTourTooltipCenter(); return; }
+      setTimeout(() => {
+        const targetEl = document.querySelector(step.el);
+        if (!targetEl) { positionTourTooltipCenter(); return; }
 
-      // Scroll element into view
-      targetEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
-      requestAnimationFrame(() => {
-        const rect = targetEl.getBoundingClientRect();
-        const pad = 6;
-        _tourHL.style.top    = (rect.top    - pad) + 'px';
-        _tourHL.style.left   = (rect.left   - pad) + 'px';
-        _tourHL.style.width  = (rect.width  + pad * 2) + 'px';
-        _tourHL.style.height = (rect.height + pad * 2) + 'px';
+        requestAnimationFrame(() => {
+          const rect = targetEl.getBoundingClientRect();
+          const pad = 6;
+          _tourHL.style.top    = (rect.top    - pad) + 'px';
+          _tourHL.style.left   = (rect.left   - pad) + 'px';
+          _tourHL.style.width  = (rect.width  + pad * 2) + 'px';
+          _tourHL.style.height = (rect.height + pad * 2) + 'px';
 
-        // Position tooltip
-        const ttW = 300, ttH = 180;
-        let top  = rect.bottom + 14;
-        let left = rect.left;
-        if (top + ttH > window.innerHeight - 10) top = rect.top - ttH - 14;
-        if (left + ttW > window.innerWidth  - 10) left = window.innerWidth - ttW - 10;
-        if (left < 10) left = 10;
-        if (top  < 10) top  = 10;
-        _tourTT.style.top  = top  + 'px';
-        _tourTT.style.left = left + 'px';
-      });
+          // Position tooltip
+          const ttW = 300, ttH = 180;
+          let top  = rect.bottom + 14;
+          let left = rect.left;
+          if (top + ttH > window.innerHeight - 10) top = rect.top - ttH - 14;
+          if (left + ttW > window.innerWidth  - 10) left = window.innerWidth - ttW - 10;
+          if (left < 10) left = 10;
+          if (top  < 10) top  = 10;
+          _tourTT.style.top  = top  + 'px';
+          _tourTT.style.left = left + 'px';
+        });
+      }, 150);
     }
 
     function positionTourTooltipCenter() {
@@ -6896,6 +6890,7 @@
 
     function endTour() {
       document.getElementById('tour-backdrop').classList.remove('active');
+      if (typeof switchPage === 'function') switchPage('sched');
     }
 
     /* ════════════════════════════════════════════════════
