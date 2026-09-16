@@ -6721,31 +6721,51 @@
     let _appInited = false;
     if (_sb) {
       _sb.auth.onAuthStateChange(async (event, session) => {
-      const user = session?.user || null;
+        const user = session?.user || null;
+        const hasAuthParams = window.location.search.includes('code=') ||
+                              window.location.hash.includes('access_token=') ||
+                              window.location.hash.includes('error=');
 
-      if (user) {
-        _sbUid = user.id;
-        hideAuthScreen();
-        updateUserUI(user);
+        if (user) {
+          _sbUid = user.id;
+          hideAuthScreen();
+          updateUserUI(user);
 
-        if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && !_appInited) {
-          _appInited = true;
-          await loadAllDataAndInit();
+          if (!_appInited) {
+            _appInited = true;
+            if (hasAuthParams) {
+              try { history.replaceState(null, '', window.location.pathname); } catch(e) {}
+            }
+            await loadAllDataAndInit();
 
-          // Show welcome for new users
-          const isNew = localStorage.getItem('bac_new_user_' + user.id);
-          if (isNew || event === 'SIGNED_IN' && !localStorage.getItem('bac_toured_' + user.id)) {
-            localStorage.removeItem('bac_new_user_' + user.id);
-            setTimeout(() => showWelcome(), 800);
+            // Show welcome for new users
+            const isNew = localStorage.getItem('bac_new_user_' + user.id);
+            if (isNew || (event === 'SIGNED_IN' && !localStorage.getItem('bac_toured_' + user.id))) {
+              localStorage.removeItem('bac_new_user_' + user.id);
+              setTimeout(() => showWelcome(), 800);
+            }
+          }
+        } else {
+          // If returning from OAuth redirect with code/token in URL, wait for Supabase exchange before showing auth screen
+          if (hasAuthParams && event === 'INITIAL_SESSION') {
+            console.log('⏳ Exchanging OAuth token/code...');
+            return;
+          }
+
+          _sbUid = '';
+          updateUserUI(null);
+          hideLoader();
+          showAuthScreen();
+
+          if (window.location.hash.includes('error_description=')) {
+            try {
+              const params = new URLSearchParams(window.location.hash.substring(1));
+              const errDesc = params.get('error_description');
+              if (errDesc) showAuthErr(decodeURIComponent(errDesc));
+            } catch(e) {}
           }
         }
-      } else {
-        _sbUid = '';
-        updateUserUI(null);
-        hideLoader();
-        showAuthScreen();
-      }
-    });
+      });
     }
 
     /* ── Enter key submit ── */
