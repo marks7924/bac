@@ -1,21 +1,53 @@
 -- ─────────────────────────────────────────────────────────────
--- SEED DATA SCRIPT FOR ACCT: marksamer010@gmail.com
+-- SCRIPT: CREATE USER & SEED DATA (100% FOOLPROOF, NO CONFLICT ERRORS)
 -- Paste and run this script in Supabase SQL Editor: https://supabase.com/dashboard
 -- ─────────────────────────────────────────────────────────────
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 DO $$
 DECLARE
     target_user_id uuid;
 BEGIN
-    -- 1. Get user ID for marksamer010@gmail.com
-    SELECT id INTO target_user_id FROM auth.users WHERE email = 'marksamer010@gmail.com';
-    
-    IF target_user_id IS NULL THEN
-        RAISE NOTICE '⚠️ الحساب marksamer010@gmail.com غير موجود في جدول auth.users! يرجى إنشاء الحساب من الموقع أو لوحة تحكم Supabase أولاً.';
-        RETURN;
+    -- 1. Create account marksamer010@gmail.com if it does not exist (Password: 12345678)
+    IF NOT EXISTS (SELECT 1 FROM auth.users WHERE email = 'marksamer010@gmail.com') THEN
+        INSERT INTO auth.users (
+            instance_id,
+            id,
+            aud,
+            role,
+            email,
+            encrypted_password,
+            email_confirmed_at,
+            raw_app_meta_data,
+            raw_user_meta_data,
+            created_at,
+            updated_at
+        )
+        VALUES (
+            '00000000-0000-0000-0000-000000000000',
+            gen_random_uuid(),
+            'authenticated',
+            'authenticated',
+            'marksamer010@gmail.com',
+            crypt('12345678', gen_salt('bf')), -- كلمة المرور الإفتراضية: 12345678
+            NOW(),
+            '{"provider": "email", "providers": ["email"]}',
+            '{"full_name": "Mark"}',
+            NOW(),
+            NOW()
+        );
     END IF;
 
-    -- 2. Columns config
+    -- 2. Fetch the target user_id
+    SELECT id INTO target_user_id FROM auth.users WHERE email = 'marksamer010@gmail.com';
+
+    -- 3. Delete old entries for this user to avoid any ON CONFLICT errors
+    DELETE FROM public.schedule_data 
+    WHERE user_id = target_user_id 
+       OR (user_id IS NULL AND id IN ('columns','template','week-2026-09-12','lt-teachers','lt-lectures','subjects'));
+
+    -- 4. Insert Columns
     INSERT INTO public.schedule_data (id, user_id, data, updated_at)
     VALUES (
         'columns',
@@ -26,10 +58,9 @@ BEGIN
             {"key": "online", "label": "ONLINE", "icon": "fa-laptop"}
         ]'::jsonb,
         NOW()
-    )
-    ON CONFLICT (id, user_id) DO UPDATE SET data = EXCLUDED.data, updated_at = NOW();
+    );
 
-    -- 3. Schedule Template (From Screenshot 2)
+    -- 5. Insert Weekly Template
     INSERT INTO public.schedule_data (id, user_id, data, updated_at)
     VALUES (
         'template',
@@ -75,10 +106,9 @@ BEGIN
             }
         }'::jsonb,
         NOW()
-    )
-    ON CONFLICT (id, user_id) DO UPDATE SET data = EXCLUDED.data, updated_at = NOW();
+    );
 
-    -- 4. Current Week Check States (week-2026-09-12)
+    -- 6. Insert Current Week States
     INSERT INTO public.schedule_data (id, user_id, data, updated_at)
     VALUES (
         'week-2026-09-12',
@@ -101,10 +131,9 @@ BEGIN
             "goals": { "Sat": [], "Sun": [], "Mon": [], "Tue": [], "Wed": [], "Thu": [], "Fri": [] }
         }'::jsonb,
         NOW()
-    )
-    ON CONFLICT (id, user_id) DO UPDATE SET data = EXCLUDED.data, updated_at = NOW();
+    );
 
-    -- 5. Teachers List (From Screenshot 1)
+    -- 7. Insert Teachers
     INSERT INTO public.schedule_data (id, user_id, data, updated_at)
     VALUES (
         'lt-teachers',
@@ -116,10 +145,9 @@ BEGIN
             {"id": "t4", "name": "ا. احمد طارق", "subject": "انجليزي", "platform": "احمد طارق", "link": "", "time": "00:00", "days": ["Sun"], "emoji": "✏️", "color": "#06b6d4"}
         ]'::jsonb,
         NOW()
-    )
-    ON CONFLICT (id, user_id) DO UPDATE SET data = EXCLUDED.data, updated_at = NOW();
+    );
 
-    -- 6. Lectures List (From Screenshot 1)
+    -- 8. Insert Lectures
     INSERT INTO public.schedule_data (id, user_id, data, updated_at)
     VALUES (
         'lt-lectures',
@@ -133,10 +161,9 @@ BEGIN
             {"id": "l6", "teacherId": "t4", "title": "محاضرة أسبوع 1", "weekNum": 1, "date": "2026-09-13", "watched": false, "link": "", "notes": ""}
         ]'::jsonb,
         NOW()
-    )
-    ON CONFLICT (id, user_id) DO UPDATE SET data = EXCLUDED.data, updated_at = NOW();
+    );
 
-    -- 7. Subjects List
+    -- 9. Insert Subjects
     INSERT INTO public.schedule_data (id, user_id, data, updated_at)
     VALUES (
         'subjects',
@@ -148,8 +175,7 @@ BEGIN
             {"id": "sub-4", "name": "برمجه", "color": "blue", "totalLessons": 15, "coveredLessons": 3}
         ]'::jsonb,
         NOW()
-    )
-    ON CONFLICT (id, user_id) DO UPDATE SET data = EXCLUDED.data, updated_at = NOW();
+    );
 
-    RAISE NOTICE '✅ تم إضافة ومزامنة جميع البيانات من الصور بنجاح للحساب marksamer010@gmail.com 🎉';
+    RAISE NOTICE '✅ تم إنشاء الحساب ومزامنة كافة البيانات بنجاح! كلمة المرور: 12345678 🎉';
 END $$;
