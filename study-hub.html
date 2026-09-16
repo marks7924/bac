@@ -6462,7 +6462,14 @@
     try {
       const sbLib = window.supabase || (typeof supabase !== 'undefined' ? supabase : null);
       if (sbLib && SUPABASE_URL && SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_URL.startsWith('http')) {
-        _sb = sbLib.createClient(SUPABASE_URL, SUPABASE_ANON);
+        _sb = sbLib.createClient(SUPABASE_URL, SUPABASE_ANON, {
+          auth: {
+            autoRefreshToken: true,
+            persistSession: true,
+            detectSessionInUrl: true,
+            flowType: 'implicit'
+          }
+        });
         window._supabase = _sb;
       }
     } catch(e) {
@@ -6566,7 +6573,7 @@
 
     /* ── Google OAuth ── */
     async function doGoogleLogin() {
-      const client = _sb || (window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON) : null);
+      const client = _sb || (window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, { auth: { detectSessionInUrl: true, flowType: 'implicit' } }) : null);
       if (!client) {
         showAuthErr('تعذر الاتصال بسيرفر Supabase. تحقق من اتصال النت واعد التحميل.');
         return;
@@ -6575,7 +6582,10 @@
       const cleanOrigin = window.location.origin + window.location.pathname.replace(/\/+$/, '');
       const { error } = await client.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: cleanOrigin }
+        options: {
+          redirectTo: cleanOrigin,
+          queryParams: { prompt: 'select_account' }
+        }
       });
       if (error) {
         hideLoader();
