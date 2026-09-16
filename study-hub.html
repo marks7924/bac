@@ -4732,25 +4732,67 @@
     const DEF_COLS = [
       { key: 'school', label: 'School', label_ar: 'المدرسة', icon: 'fa-solid fa-school' },
       { key: 'center', label: 'Center', label_ar: 'السنتر', icon: 'fa-solid fa-building-columns' },
-      { key: 'online', label: 'Online', label_ar: 'أونلاين', icon: 'fa-solid fa-laptop' },
-      { key: 'homestudy', label: 'Home Study', label_ar: 'المنزل', icon: 'fa-solid fa-book-open-reader' }
+      { key: 'online', label: 'Online', label_ar: 'أونلاين', icon: 'fa-solid fa-laptop' }
     ];
 
     const DEF_TEMPLATE = {
-      Sat: { school: [], center: [], online: [], homestudy: [] },
-      Sun: { school: [], center: [], online: [], homestudy: [] },
-      Mon: { school: [], center: [], online: [], homestudy: [] },
-      Tue: { school: [], center: [], online: [], homestudy: [] },
-      Wed: { school: [], center: [], online: [], homestudy: [] },
-      Thu: { school: [], center: [], online: [], homestudy: [] },
-      Fri: { school: [], center: [], online: [], homestudy: [] }
+      Sat: {
+        school: [{ id: "xmu42yt2s7dbg", text: "English", teacher: "Mr. Sameh", time: "11 - 1", color: "green", pinned: true, icon: "fa-solid fa-book-open" }],
+        center: [],
+        online: [{ id: "xmu434wmdcnar", text: "Arabic", teacher: "Mr. Salah", time: "10 AM", color: "pink", pinned: true, icon: "fa-solid fa-book-open" }]
+      },
+      Sun: {
+        school: [], center: [],
+        online: [
+          { id: "xmu435jh1ma3p", text: "English", teacher: "Mr. Ahmen Tariq", time: "", color: "green", pinned: true, icon: "fa-solid fa-book-open" },
+          { id: "xmu435yns500q", text: "History", teacher: "Mr. Tolba", time: "", color: "amber", pinned: true, icon: "fa-solid fa-book-open" }
+        ]
+      },
+      Mon: {
+        school: [{ id: "xmu42zm81ijdd", text: "Arabic", teacher: "Mr. Saied", time: "8 - 11", color: "pink", pinned: true, icon: "fa-solid fa-book-open" }],
+        center: [{ id: "xmu432lqxdt87", text: "History", teacher: "Mr. Bassem", time: "2 - 4:30", color: "amber", pinned: true, icon: "fa-solid fa-book-open" }],
+        online: []
+      },
+      Tue: {
+        school: [{ id: "xmu430f84lkwz", text: "History", teacher: "Mr. Bassem", time: "8 - 11", color: "amber", pinned: true, icon: "fa-solid fa-book-open" }],
+        center: [],
+        online: [{ id: "xmu436ndo94yk", text: "Arabic ( HW )", teacher: "Mr. Salah", time: "10 AM", color: "pink", pinned: true, icon: "fa-solid fa-book-open" }]
+      },
+      Wed: {
+        school: [], center: [],
+        online: [{ id: "xmu437oow94uz", text: "English ( Skills / HW )", teacher: "Mr. Ahmed Tariq", time: "", color: "green", pinned: true, icon: "fa-solid fa-book-open" }]
+      },
+      Thu: {
+        school: [{ id: "xmu4312d0xunt", text: "Computer", teacher: "Mrs. Mary", time: "11 - 1", color: "amber", pinned: true, icon: "fa-solid fa-laptop" }],
+        center: [{ id: "xmu4349t8thp3", text: "History", teacher: "Mr. Bassem", time: "2 - 4:30", color: "amber", pinned: true, icon: "fa-solid fa-book-open" }],
+        online: [{ id: "xmu438oek3jdu", text: "Computer", teacher: "Mr. Mohamemd", time: "6 PM", color: "amber", pinned: true, icon: "fa-solid fa-laptop" }]
+      },
+      Fri: { school: [], center: [], online: [] }
     };
 
     const DEF_SUBJECTS = [];
     const DEF_EVENTS   = [];
     const DEF_REVISION = [];
 
-    function defWeek() { return { items: {}, goals: { Sat: [], Sun: [], Mon: [], Tue: [], Wed: [], Thu: [], Fri: [] } }; }
+    function defWeek() {
+      return {
+        items: {
+          "xmu42yt2s7dbg": true,
+          "xmu434wmdcnar": false,
+          "xmu435jh1ma3p": false,
+          "xmu435yns500q": false,
+          "xmu42zm81ijdd": true,
+          "xmu432lqxdt87": true,
+          "xmu430f84lkwz": false,
+          "xmu436ndo94yk": false,
+          "xmu437oow94uz": false,
+          "xmu4312d0xunt": false,
+          "xmu4349t8thp3": false,
+          "xmu438oek3jdu": false
+        },
+        goals: { Sat: [], Sun: [], Mon: [], Tue: [], Wed: [], Thu: [], Fri: [] }
+      };
+    }
     function defMeta() { return { streak: 0, perfectStreak: 0, longestStreak: 0, lastCheckDate: null }; }
 
     /* ─── STORAGE: Supabase-backed loadJ / saveJ ─── */
