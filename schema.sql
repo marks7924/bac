@@ -137,3 +137,23 @@ create index if not exists idx_sessions_user_day on public.schedule_sessions (us
 create index if not exists idx_weekly_user_week on public.weekly_data (user_id, week_key);
 create index if not exists idx_subjects_user on public.subjects (user_id);
 
+-- 8. AUTOMATIC PROFILE CREATION TRIGGER
+create or replace function public.handle_new_user()
+returns trigger as $$
+begin
+  insert into public.profiles (id, full_name, phone)
+  values (
+    new.id,
+    coalesce(new.raw_user_meta_data->>'full_name', split_part(new.email, '@', 1)),
+    new.raw_user_meta_data->>'phone'
+  )
+  on conflict (id) do nothing;
+  return new;
+end;
+$$ language plpgsql security definer;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+

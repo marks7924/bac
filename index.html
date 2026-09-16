@@ -6665,10 +6665,12 @@
       if (error) {
         console.error('Login error:', error);
         const msg = (error.message || '').toLowerCase();
-        if (msg.includes('invalid login credentials') || msg.includes('user not found') || msg.includes('invalid credentials')) {
+        if (msg.includes('email not confirmed')) {
+          showAuthErr('⚠️ لم يتم تفعيل الحساب بعد! تفقد بريدك الإلكتروني واضغط على رابط التفعيل، أو قم بتعطيل Confirm Email من إعدادات Supabase.');
+        } else if (msg.includes('invalid login credentials') || msg.includes('user not found') || msg.includes('invalid credentials')) {
           showAuthErr('❌ البريد الإلكتروني أو كلمة المرور غير صحيحة! إذا لم تكن قد أنشأت حساباً بعد، انتقل لتبويب "إنشاء حساب جديد".');
         } else {
-          showAuthErr(error.message);
+          showAuthErr('خطأ في الدخول: ' + error.message);
         }
         return;
       }
