@@ -3111,6 +3111,155 @@
       color: var(--blue2);
     }
 
+    /* ════════════════════════════════
+       ADMIN MODE TOGGLE BUTTON STYLES
+    ════════════════════════════════ */
+    .admin-mode-btn {
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: var(--indigo);
+      font-weight: 700;
+      transition: all 0.2s ease;
+    }
+    .admin-mode-btn:hover {
+      background: rgba(99, 102, 241, 0.22);
+    }
+    .admin-mode-btn.active {
+      background: linear-gradient(135deg, #ef4444, #f97316) !important;
+      border-color: rgba(239, 68, 68, 0.5) !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 16px rgba(239, 68, 68, 0.4);
+    }
+    body:not(.admin-mode-active) .admin-only {
+      display: none !important;
+    }
+
+    /* ════════════════════════════════
+       MOBILE SCHEDULE (ONE DAY AT A TIME)
+    ════════════════════════════════ */
+    .s-mobile-wrap {
+      display: none;
+      margin-top: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .s-table-wrap {
+        display: none !important;
+      }
+      .s-mobile-wrap {
+        display: block !important;
+      }
+    }
+
+    .s-mobile-day-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--card);
+      border: 1px solid var(--border2);
+      border-radius: var(--r);
+      padding: 12px 16px;
+      box-shadow: var(--sh-sm);
+      margin-bottom: 12px;
+      user-select: none;
+    }
+
+    .s-mobile-arrow {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 18px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .s-mobile-arrow:hover, .s-mobile-arrow:active {
+      background: var(--blue);
+      color: #fff;
+      border-color: var(--blue2);
+    }
+
+    .s-mobile-day-info {
+      text-align: center;
+    }
+    .s-mobile-day-name {
+      font-size: 17px;
+      font-weight: 900;
+      color: var(--text);
+    }
+    .s-mobile-day-date {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--blue2);
+      margin-top: 2px;
+    }
+
+    .s-mobile-dots {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .s-mobile-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border3);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .s-mobile-dot.active {
+      width: 22px;
+      border-radius: 4px;
+      background: var(--blue);
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    }
+    .s-mobile-dot.today {
+      border: 2px solid var(--gold);
+    }
+
+    .s-mobile-cat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 14px;
+      margin-bottom: 14px;
+      box-shadow: var(--sh-sm);
+      transition: all 0.2s ease;
+    }
+    .s-mobile-cat-card:hover {
+      border-color: var(--border2);
+    }
+
+    .s-mobile-cat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text);
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .s-mobile-cat-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .s-mobile-cat-body {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
     .user-dropdown-header {
       padding: 14px 16px 10px;
       border-bottom: 1px solid var(--border);
@@ -3825,6 +3974,10 @@
       <button class="g-btn lang-btn" id="lang-btn" onclick="toggleLang()">
         <i class="fa-solid fa-globe"></i> <span id="lang-btn-txt">English</span>
       </button>
+      <button class="g-btn admin-mode-btn" id="admin-mode-btn" onclick="toggleAdminMode()" title="وضع المسؤول (Admin Mode)">
+        <i class="fa-solid fa-user-shield" id="admin-mode-icon"></i>
+        <span id="admin-mode-txt">الأدمن: إيقاف</span>
+      </button>
       <!-- User Avatar -->
       <div class="user-avatar-wrap" id="user-avatar-wrap" style="display:none">
         <button class="user-avatar-btn" id="user-avatar-btn" onclick="toggleUserDropdown(event)" title="حسابك">
@@ -3964,13 +4117,16 @@
         </div>
       </div>
 
-      <!-- Schedule table -->
+      <!-- Schedule table (Desktop) -->
       <div class="s-table-wrap">
         <table class="s-table">
           <thead id="s-thead"></thead>
           <tbody id="s-tbody"></tbody>
         </table>
       </div>
+
+      <!-- Single-Day Schedule (Mobile) -->
+      <div class="s-mobile-wrap" id="s-mobile-wrap"></div>
     </div>
   </div>
 
@@ -4796,6 +4952,9 @@
 
       if (window._currentUser) updateUserUI(window._currentUser);
 
+      // Restore Admin Mode Button & State
+      if (typeof applyAdminModeUI === 'function') applyAdminModeUI();
+
       // Mobile Drawer i18n
       si('md-title-txt', isAr ? 'القائمة الرئيسية' : 'Main Menu');
       si('md-sched-txt', isAr ? 'الجدول الأسبوعي' : 'Weekly Schedule');
@@ -5196,6 +5355,315 @@
         gTd.appendChild(gCell); tr.appendChild(gTd);
         tbody.appendChild(tr);
       });
+
+      // Render Single-Day Mobile Schedule
+      schedRenderMobile();
+    }
+
+    /* ════════════════════════════════════════════════════
+       ADMIN MODE & MOBILE SCHEDULE IMPLEMENTATION
+    ════════════════════════════════════════════════════ */
+    let isAdminMode = localStorage.getItem('hub_admin_mode') === '1';
+    let _userRole = 'USER';
+    let currentMobileDayIndex = (sToday.getDay() + 1) % 7; // Default to today's index in DAY_ORDER ['Sat','Sun','Mon','Tue','Wed','Thu','Fri']
+
+    async function checkUserRole() {
+      if (!_sbUid || !window._supabase) {
+        _userRole = 'USER';
+        return;
+      }
+      try {
+        const { data, error } = await window._supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', _sbUid)
+          .maybeSingle();
+        if (!error && data?.role) {
+          _userRole = data.role;
+        }
+      } catch (e) {}
+    }
+
+    async function toggleAdminMode() {
+      if (!isAdminMode) {
+        // Enforce Server / Database Authorization Check
+        await checkUserRole();
+        const isLocalUser = !_sbUid;
+        if (_userRole !== 'ADMIN' && !isLocalUser) {
+          showToast('error', lang === 'ar' ? '🔒 يتطلب صلاحية المسؤول (Admin Role Required)!' : '🔒 Admin permission required!');
+          isAdminMode = false;
+          localStorage.setItem('hub_admin_mode', '0');
+          applyAdminModeUI();
+          return;
+        }
+        isAdminMode = true;
+        localStorage.setItem('hub_admin_mode', '1');
+        showToast('info', lang === 'ar' ? '🛡️ تم تفعيل وضع المسؤول (Admin Mode ON)' : '🛡️ Admin Mode Enabled');
+      } else {
+        isAdminMode = false;
+        localStorage.setItem('hub_admin_mode', '0');
+        showToast('info', lang === 'ar' ? '🛡️ تم إيقاف وضع المسؤول (Admin Mode OFF)' : '🛡️ Admin Mode Disabled');
+      }
+      applyAdminModeUI();
+    }
+
+    function applyAdminModeUI() {
+      const btn = document.getElementById('admin-mode-btn');
+      const icon = document.getElementById('admin-mode-icon');
+      const txt = document.getElementById('admin-mode-txt');
+      const isAr = lang === 'ar';
+
+      if (isAdminMode) {
+        document.body.classList.add('admin-mode-active');
+        if (btn) btn.classList.add('active');
+        if (icon) icon.className = 'fa-solid fa-user-shield';
+        if (txt) txt.textContent = isAr ? 'الأدمن: تفعيل' : 'Admin: ON';
+      } else {
+        document.body.classList.remove('admin-mode-active');
+        if (btn) btn.classList.remove('active');
+        if (icon) icon.className = 'fa-solid fa-user-shield';
+        if (txt) txt.textContent = isAr ? 'الأدمن: إيقاف' : 'Admin: OFF';
+      }
+
+      if (typeof schedRender === 'function') schedRender();
+      if (typeof exRenderAll === 'function') exRenderAll();
+      if (typeof curRenderAll === 'function') curRenderAll();
+      if (typeof ltRender === 'function') ltRender();
+    }
+
+    function moveMobileDay(dir) {
+      currentMobileDayIndex = (currentMobileDayIndex + dir + 7) % 7;
+      schedRenderMobile();
+    }
+
+    function setMobileDay(idx) {
+      currentMobileDayIndex = (idx % 7 + 7) % 7;
+      schedRenderMobile();
+    }
+
+    let _touchStartX = 0, _touchStartY = 0;
+    function setupSwipeGesture(el) {
+      if (!el || el._swipeSetup) return;
+      el._swipeSetup = true;
+      el.addEventListener('touchstart', e => {
+        if (e.touches.length === 1) {
+          _touchStartX = e.touches[0].clientX;
+          _touchStartY = e.touches[0].clientY;
+        }
+      }, { passive: true });
+
+      el.addEventListener('touchend', e => {
+        if (e.changedTouches.length === 1) {
+          const dx = e.changedTouches[0].clientX - _touchStartX;
+          const dy = e.changedTouches[0].clientY - _touchStartY;
+          if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+            const isRtl = document.documentElement.dir === 'rtl';
+            if (dx < 0) {
+              moveMobileDay(isRtl ? 1 : -1);
+            } else {
+              moveMobileDay(isRtl ? -1 : 1);
+            }
+          }
+        }
+      }, { passive: true });
+    }
+
+    function toggleItemDone(id) {
+      sWeek.items[id] = !sWeek.items[id];
+      saveJ('week-' + sWeekKey, sWeek);
+      schedRenderDash();
+      schedRender();
+    }
+
+    function toggleItemPin(day, colKey, idx) {
+      if (!isAdminMode) return;
+      if (sTmpl[day] && sTmpl[day][colKey] && sTmpl[day][colKey][idx]) {
+        sTmpl[day][colKey][idx].pinned = !sTmpl[day][colKey][idx].pinned;
+        saveJ('template', sTmpl);
+        schedRender();
+      }
+    }
+
+    function deleteItem(day, colKey, idx) {
+      if (!isAdminMode) return;
+      if (sTmpl[day] && sTmpl[day][colKey] && sTmpl[day][colKey][idx]) {
+        if (sTmpl[day][colKey][idx].pinned && !isAdminMode) return;
+        sTmpl[day][colKey].splice(idx, 1);
+        saveJ('template', sTmpl);
+        schedRender();
+      }
+    }
+
+    function openItemEdit(day, colKey, idx, isPinned) {
+      if (isPinned && !isAdminMode) return;
+      openSchedEditor({ day, col: colKey, idx, mode: 'edit' }, null);
+    }
+
+    function toggleGoalDone(day, goalId) {
+      if (sWeek.goals[day]) {
+        const g = sWeek.goals[day].find(x => x.id === goalId);
+        if (g) g.done = !g.done;
+        saveJ('week-' + sWeekKey, sWeek);
+        schedRenderDash();
+        schedRender();
+      }
+    }
+
+    function deleteGoal(day, goalId) {
+      if (!isAdminMode) return;
+      if (sWeek.goals[day]) {
+        sWeek.goals[day] = sWeek.goals[day].filter(x => x.id !== goalId);
+        saveJ('week-' + sWeekKey, sWeek);
+        schedRenderDash();
+        schedRender();
+      }
+    }
+
+    function schedRenderMobile() {
+      const mobWrap = document.getElementById('s-mobile-wrap');
+      if (!mobWrap) return;
+
+      const day = DAY_ORDER[currentMobileDayIndex];
+      const dDate = dateForDay(day);
+      const isTodayDay = isToday(day);
+
+      const dayNameFormatted = t('dayNames')[day] || day;
+      const dateFormatted = dDate.toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+      // Build 7 Dots
+      const dotsHtml = DAY_ORDER.map((d, idx) => {
+        const isActive = idx === currentMobileDayIndex ? ' active' : '';
+        const isTodayDot = isToday(d) ? ' today' : '';
+        return `<span class="s-mobile-dot${isActive}${isTodayDot}" onclick="setMobileDay(${idx})" title="${t('dayNames')[d]}"></span>`;
+      }).join('');
+
+      let contentHtml = `
+        <div class="s-mobile-day-bar">
+          <button class="s-mobile-arrow" onclick="moveMobileDay(-1)" title="Previous Day">‹</button>
+          <div class="s-mobile-day-info">
+            <div class="s-mobile-day-name">${esc(dayNameFormatted)}${isTodayDay ? ' ★' : ''}</div>
+            <div class="s-mobile-day-date">${esc(dateFormatted)}</div>
+          </div>
+          <button class="s-mobile-arrow" onclick="moveMobileDay(1)" title="Next Day">›</button>
+        </div>
+        <div class="s-mobile-dots">${dotsHtml}</div>
+        <div class="s-mobile-categories" id="s-mobile-categories">
+      `;
+
+      let activeCategoryCount = 0;
+
+      // Render Categories
+      sCols.forEach(col => {
+        const items = (sTmpl[day] && sTmpl[day][col.key]) || [];
+
+        // REQUIREMENT 2: HIDE OFF/EMPTY CATEGORIES ON MOBILE ONLY
+        if (!items.length && !isAdminMode) {
+          return; // Skip empty/OFF category on mobile
+        }
+
+        activeCategoryCount++;
+        contentHtml += `
+          <div class="s-mobile-cat-card">
+            <div class="s-mobile-cat-header">
+              <div class="s-mobile-cat-title">
+                <i class="${col.icon || 'fa-solid fa-book'}"></i>
+                <span>${esc(colLabel(col))}</span>
+              </div>
+              ${isAdminMode ? `<button class="th-col-del" onclick="colDel('${col.key}', this)" title="Delete Category">✕</button>` : ''}
+            </div>
+            <div class="s-mobile-cat-body">
+        `;
+
+        if (!items.length) {
+          contentHtml += `
+            <div class="s-block gray" onclick="openSchedEditor({ day: '${day}', col: '${col.key}', idx: -1, mode: 'add' }, this)">
+              <i class="${ICONS_MAP.palm}"></i><span style="margin-inline-start:5px">${t('off')}</span>
+            </div>
+          `;
+        } else {
+          items.forEach((item, idx) => {
+            const isDone = !!sWeek.items[item.id];
+            const isMissed = isPast(day) && !isDone;
+            let sub = [];
+            if (item.teacher) sub.push(`<span><i class="fa-solid fa-user-tie"></i> ${esc(item.teacher)}</span>`);
+            if (item.time) sub.push(`<span><i class="fa-solid fa-clock"></i> ${esc(fmt12(item.time))}</span>`);
+
+            contentHtml += `
+              <div class="s-block ${item.color || 'green'}${isDone ? ' done' : ''}${isMissed ? ' missed' : ''}${item.pinned ? ' pinned' : ''}" data-id="${item.id}">
+                <span class="s-handle" style="${isAdminMode ? '' : 'display:none'}"><i class="fa-solid fa-grip-vertical"></i></span>
+                <input type="checkbox" class="s-chk"${isDone ? ' checked' : ''} onclick="toggleItemDone('${item.id}')">
+                <i class="s-ti ${ICONS_MAP[item.icon] || ICONS_MAP.book}"></i>
+                <div class="s-det" onclick="openItemEdit('${day}', '${col.key}', ${idx}, ${item.pinned ? 'true' : 'false'})">
+                  <span class="s-txt">${esc(item.text)}</span>
+                  ${sub.length ? `<div class="s-sub">${sub.join('')}</div>` : ''}
+                </div>
+                ${isAdminMode ? `
+                  <span class="s-pin" title="Pin" onclick="toggleItemPin('${day}', '${col.key}', ${idx})"><i class="fa-solid fa-thumbtack"></i></span>
+                  <span class="s-del" onclick="deleteItem('${day}', '${col.key}', ${idx})">✕</span>
+                ` : ''}
+              </div>
+            `;
+          });
+        }
+
+        if (isAdminMode || items.length > 0) {
+          contentHtml += `
+            <div class="s-add-btn" onclick="openSchedEditor({ day: '${day}', col: '${col.key}', idx: -1, mode: 'add' }, this)">${t('addSess')}</div>
+          `;
+        }
+
+        contentHtml += `
+            </div>
+          </div>
+        `;
+      });
+
+      // Goals Category
+      const goals = sWeek.goals[day] || [];
+      if (goals.length > 0 || isAdminMode) {
+        activeCategoryCount++;
+        contentHtml += `
+          <div class="s-mobile-cat-card">
+            <div class="s-mobile-cat-header">
+              <div class="s-mobile-cat-title">
+                <i class="fa-solid fa-bullseye"></i>
+                <span>${t('goals')}</span>
+              </div>
+            </div>
+            <div class="s-mobile-cat-body">
+        `;
+        goals.forEach(g => {
+          contentHtml += `
+            <div class="s-goal${g.done ? ' done' : ''}">
+              <input type="checkbox"${g.done ? ' checked' : ''} onclick="toggleGoalDone('${day}', '${g.id}')">
+              <span onclick="openGoalEditor('${day}', ${JSON.stringify(g).replace(/"/g, '&quot;')}, this)">${esc(g.text)}</span>
+              ${isAdminMode ? `<span class="s-del" onclick="deleteGoal('${day}', '${g.id}')">✕</span>` : ''}
+            </div>
+          `;
+        });
+        contentHtml += `
+              <div class="s-add-btn" onclick="openGoalEditor('${day}', null, this)">${t('addGoal')}</div>
+            </div>
+          </div>
+        `;
+      }
+
+      // If no active categories (all OFF and no goals)
+      if (activeCategoryCount === 0) {
+        contentHtml += `
+          <div class="s-mobile-cat-card" style="text-align:center;padding:32px 16px;">
+            <div style="font-size:36px;margin-bottom:8px">🌴</div>
+            <div style="font-weight:900;font-size:16px;color:var(--text);margin-bottom:4px">${lang === 'ar' ? 'عطلة / لا توجد دروس اليوم' : 'Day Off / No Lessons Scheduled'}</div>
+            <div style="font-size:13px;color:var(--text3)">${lang === 'ar' ? 'استمتع بيومك أو استخدم زر الأدمن لإضافة دروس جديدة' : 'Enjoy your day or switch to Admin Mode to add new sessions'}</div>
+          </div>
+        `;
+      }
+
+      contentHtml += `</div>`;
+      mobWrap.innerHTML = contentHtml;
+
+      // Enable horizontal swipe detection on mobile wrap
+      setupSwipeGesture(mobWrap);
     }
 
     /* Drag to reorder */

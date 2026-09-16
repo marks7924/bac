@@ -74,7 +74,20 @@ create table if not exists public.schedule_data (
 );
 
 -- ─────────────────────────────────────────────────────────────
--- ENABLE ROW LEVEL SECURITY (RLS) FOR STRICT USER ISOLATION
+-- HELPER FUNCTION FOR ADMIN ROLE VERIFICATION
+-- ─────────────────────────────────────────────────────────────
+create or replace function public.is_admin()
+returns boolean as $$
+begin
+  return exists (
+    select 1 from public.profiles
+    where id = auth.uid() and role = 'ADMIN'
+  );
+end;
+$$ language plpgsql security definer;
+
+-- ─────────────────────────────────────────────────────────────
+-- ENABLE ROW LEVEL SECURITY (RLS) FOR USER & ADMIN ACCESS
 -- ─────────────────────────────────────────────────────────────
 
 alter table public.profiles enable row level security;
@@ -87,32 +100,32 @@ alter table public.schedule_data enable row level security;
 -- PROFILES RLS
 drop policy if exists "Users read write own profile" on public.profiles;
 create policy "Users read write own profile" on public.profiles
-  for all using (auth.uid() = id) with check (auth.uid() = id);
+  for all using (auth.uid() = id or public.is_admin()) with check (auth.uid() = id or public.is_admin());
 
 -- SCHEDULE COLUMNS RLS
 drop policy if exists "Users manage own columns" on public.schedule_columns;
 create policy "Users manage own columns" on public.schedule_columns
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+  for all using (auth.uid() = user_id or public.is_admin()) with check (auth.uid() = user_id or public.is_admin());
 
 -- SCHEDULE SESSIONS RLS
 drop policy if exists "Users manage own sessions" on public.schedule_sessions;
 create policy "Users manage own sessions" on public.schedule_sessions
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+  for all using (auth.uid() = user_id or public.is_admin()) with check (auth.uid() = user_id or public.is_admin());
 
 -- WEEKLY DATA RLS
 drop policy if exists "Users manage own weekly data" on public.weekly_data;
 create policy "Users manage own weekly data" on public.weekly_data
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+  for all using (auth.uid() = user_id or public.is_admin()) with check (auth.uid() = user_id or public.is_admin());
 
 -- USER META RLS
 drop policy if exists "Users manage own meta" on public.user_meta;
 create policy "Users manage own meta" on public.user_meta
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+  for all using (auth.uid() = user_id or public.is_admin()) with check (auth.uid() = user_id or public.is_admin());
 
 -- SCHEDULE DATA RLS
 drop policy if exists "Users manage own schedule data" on public.schedule_data;
 create policy "Users manage own schedule data" on public.schedule_data
-  for all using (auth.uid() = user_id or user_id is null) with check (auth.uid() = user_id or user_id is null);
+  for all using (auth.uid() = user_id or user_id is null or public.is_admin()) with check (auth.uid() = user_id or user_id is null or public.is_admin());
 
 -- 7. SUBJECTS TABLE (Curriculum & subject metrics)
 create table if not exists public.subjects (
@@ -130,7 +143,7 @@ create table if not exists public.subjects (
 alter table public.subjects enable row level security;
 drop policy if exists "Users manage own subjects" on public.subjects;
 create policy "Users manage own subjects" on public.subjects
-  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+  for all using (auth.uid() = user_id or public.is_admin()) with check (auth.uid() = user_id or public.is_admin());
 
 -- INDEXES FOR PERFORMANCE
 create index if not exists idx_sessions_user_day on public.schedule_sessions (user_id, day_name);
