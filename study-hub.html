@@ -6459,6 +6459,57 @@
     }
 
     let _sb = null;
+    let _appInited = false;
+
+    async function handleAuthStateChange(event, session) {
+      const user = session?.user || null;
+      const hasAuthParams = window.location.search.includes('code=') ||
+                            window.location.hash.includes('access_token=') ||
+                            window.location.hash.includes('error=');
+
+      if (user) {
+        _sbUid = user.id;
+        hideAuthScreen();
+        updateUserUI(user);
+
+        if (!_appInited) {
+          _appInited = true;
+          if (hasAuthParams) {
+            try { history.replaceState(null, '', window.location.pathname); } catch(e) {}
+          }
+          await loadAllDataAndInit();
+
+          // Show welcome for new users
+          const isNew = localStorage.getItem('bac_new_user_' + user.id);
+          if (isNew || (event === 'SIGNED_IN' && !localStorage.getItem('bac_toured_' + user.id))) {
+            localStorage.removeItem('bac_new_user_' + user.id);
+            setTimeout(() => showWelcome(), 800);
+          }
+        }
+      } else {
+        // If returning from OAuth redirect with code/token in URL, wait for Supabase exchange before showing auth screen
+        if (hasAuthParams && (event === 'INITIAL_SESSION' || !event)) {
+          console.log('⏳ Exchanging OAuth token/code...');
+          showLoader('جاري تسجيل الدخول بحساب Google...');
+          return;
+        }
+
+        _sbUid = '';
+        updateUserUI(null);
+        hideLoader();
+        showAuthScreen();
+
+        if (window.location.hash.includes('error_description=') || window.location.search.includes('error_description=')) {
+          try {
+            const raw = window.location.hash.includes('error_description=') ? window.location.hash.substring(1) : window.location.search.substring(1);
+            const params = new URLSearchParams(raw);
+            const errDesc = params.get('error_description');
+            if (errDesc) showAuthErr(decodeURIComponent(errDesc.replace(/\+/g, ' ')));
+          } catch(e) {}
+        }
+      }
+    }
+
     try {
       const sbLib = window.supabase || (typeof supabase !== 'undefined' ? supabase : null);
       if (sbLib && SUPABASE_URL && SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_URL.startsWith('http')) {
@@ -6466,11 +6517,17 @@
           auth: {
             autoRefreshToken: true,
             persistSession: true,
-            detectSessionInUrl: true,
-            flowType: 'implicit'
+            detectSessionInUrl: true
           }
         });
         window._supabase = _sb;
+
+        // Attach listener IMMEDIATELY
+        _sb.auth.onAuthStateChange((event, session) => handleAuthStateChange(event, session));
+        // Also check session explicitly
+        _sb.auth.getSession().then(({ data: { session } }) => {
+          if (session) handleAuthStateChange('INITIAL_SESSION', session);
+        });
       }
     } catch(e) {
       console.error('Supabase init error:', e);
@@ -6573,7 +6630,7 @@
 
     /* ── Google OAuth ── */
     async function doGoogleLogin() {
-      const client = _sb || (window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, { auth: { detectSessionInUrl: true, flowType: 'implicit' } }) : null);
+      const client = _sb || (window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, { auth: { detectSessionInUrl: true } }) : null);
       if (!client) {
         showAuthErr('تعذر الاتصال بسيرفر Supabase. تحقق من اتصال النت واعد التحميل.');
         return;
@@ -6727,56 +6784,7 @@
       init();
     }
 
-    /* ── Auth State Listener (central entry point) ── */
-    let _appInited = false;
-    if (_sb) {
-      _sb.auth.onAuthStateChange(async (event, session) => {
-        const user = session?.user || null;
-        const hasAuthParams = window.location.search.includes('code=') ||
-                              window.location.hash.includes('access_token=') ||
-                              window.location.hash.includes('error=');
 
-        if (user) {
-          _sbUid = user.id;
-          hideAuthScreen();
-          updateUserUI(user);
-
-          if (!_appInited) {
-            _appInited = true;
-            if (hasAuthParams) {
-              try { history.replaceState(null, '', window.location.pathname); } catch(e) {}
-            }
-            await loadAllDataAndInit();
-
-            // Show welcome for new users
-            const isNew = localStorage.getItem('bac_new_user_' + user.id);
-            if (isNew || (event === 'SIGNED_IN' && !localStorage.getItem('bac_toured_' + user.id))) {
-              localStorage.removeItem('bac_new_user_' + user.id);
-              setTimeout(() => showWelcome(), 800);
-            }
-          }
-        } else {
-          // If returning from OAuth redirect with code/token in URL, wait for Supabase exchange before showing auth screen
-          if (hasAuthParams && event === 'INITIAL_SESSION') {
-            console.log('⏳ Exchanging OAuth token/code...');
-            return;
-          }
-
-          _sbUid = '';
-          updateUserUI(null);
-          hideLoader();
-          showAuthScreen();
-
-          if (window.location.hash.includes('error_description=')) {
-            try {
-              const params = new URLSearchParams(window.location.hash.substring(1));
-              const errDesc = params.get('error_description');
-              if (errDesc) showAuthErr(decodeURIComponent(errDesc));
-            } catch(e) {}
-          }
-        }
-      });
-    }
 
     /* ── Enter key submit ── */
     document.getElementById('login-pass').addEventListener('keydown', e => { if(e.key === 'Enter') doLogin(); });
