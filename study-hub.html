@@ -4208,19 +4208,19 @@
           </div>
           <button class="user-dropdown-item" onclick="openAcademicSettingsModal();closeUserDropdown()">
             <i class="fa-solid fa-graduation-cap"></i>
-            <span>الإعدادات الأكاديمية</span>
+            <span id="ud-acad-txt">الإعدادات الأكاديمية</span>
           </button>
           <button class="user-dropdown-item student-only" onclick="openParentAccessModal();closeUserDropdown()">
             <i class="fa-solid fa-link"></i>
-            <span>ربط ولي الأمر (Parent Code)</span>
+            <span id="ud-pcode-txt">ربط ولي الأمر (Parent Code)</span>
           </button>
           <button class="user-dropdown-item parent-only" onclick="openParentConnectModal();closeUserDropdown()">
             <i class="fa-solid fa-user-plus"></i>
-            <span>ربط طالب جديد</span>
+            <span id="ud-pconn-txt">ربط طالب جديد</span>
           </button>
           <button class="user-dropdown-item main-admin-only" onclick="switchPage('admin');closeUserDropdown()">
             <i class="fa-solid fa-sliders"></i>
-            <span>لوحة التحكم الرئيسية (Admin)</span>
+            <span id="ud-admin-txt">لوحة التحكم الرئيسية (Admin)</span>
           </button>
           <button class="user-dropdown-item" onclick="syncAllToSupabase();closeUserDropdown()">
             <i class="fa-solid fa-cloud-arrow-up"></i>
@@ -4699,8 +4699,8 @@
     <div class="an-wrap">
       <div class="ex-top-bar">
         <div>
-          <h2 style="font-size:18px;font-weight:900;color:var(--text)"><i class="fa-solid fa-sliders" style="color:var(--gold);margin-inline-end:8px"></i><span id="adm-h-title">لوحة التحكم الرئيسية (Main Admin Panel)</span></h2>
-          <div style="font-size:12px;color:var(--text3);margin-top:2px" id="adm-h-sub">إدارة الأنظمة التعليمية، الطلاب، أولياء الأمور، المناهج، والتكليفات الإلزامية</div>
+          <h2 style="font-size:18px;font-weight:900;color:var(--text)"><i class="fa-solid fa-sliders" style="color:var(--gold);margin-inline-end:8px"></i><span id="adm-h-title">لوحة التحكم الرئيسية للمدير العام</span></h2>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px" id="adm-h-sub">متابعة حية للطلاب وأولياء الأمور والأنظمة التعليمية والمناهج المرجعية</div>
         </div>
         <button class="s-btn accent" onclick="renderAdminPanel()"><i class="fa-solid fa-rotate"></i> <span id="adm-h-refresh">تحديث لوحة الأدمن</span></button>
       </div>
@@ -4708,11 +4708,11 @@
       <!-- Admin Sub Navigation Tabs -->
       <div class="lt-tabs-row" style="margin-bottom:16px;border-bottom:1px solid var(--border)">
         <button class="lt-tab active" id="adm-tab-overview" onclick="switchAdminSubTab('overview')"><i class="fa-solid fa-chart-line"></i> <span id="adm-t-overview">نظرة عامة</span></button>
-        <button class="lt-tab" id="adm-tab-students" onclick="switchAdminSubTab('students')"><i class="fa-solid fa-user-graduate"></i> <span id="adm-t-students">إدارة الطلاب</span></button>
-        <button class="lt-tab" id="adm-tab-parents" onclick="switchAdminSubTab('parents')"><i class="fa-solid fa-people-roof"></i> <span id="adm-t-parents">إدارة أولياء الأمور</span></button>
+        <button class="lt-tab" id="adm-tab-students" onclick="switchAdminSubTab('students')"><i class="fa-solid fa-user-graduate"></i> <span id="adm-t-students">حسابات الطلاب</span></button>
+        <button class="lt-tab" id="adm-tab-parents" onclick="switchAdminSubTab('parents')"><i class="fa-solid fa-people-roof"></i> <span id="adm-t-parents">أولياء الأمور</span></button>
         <button class="lt-tab" id="adm-tab-systems" onclick="switchAdminSubTab('systems')"><i class="fa-solid fa-network-wired"></i> <span id="adm-t-systems">الأنظمة التعليمية</span></button>
-        <button class="lt-tab" id="adm-tab-curric" onclick="switchAdminSubTab('curric')"><i class="fa-solid fa-book-bookmark"></i> <span id="adm-t-curric">المناهج والتكليفات</span></button>
-        <button class="lt-tab" id="adm-tab-audit" onclick="switchAdminSubTab('audit')"><i class="fa-solid fa-shield-halved"></i> <span id="adm-t-audit">سجل العمليات (Audit Log)</span></button>
+        <button class="lt-tab" id="adm-tab-curric" onclick="switchAdminSubTab('curric')"><i class="fa-solid fa-book-bookmark"></i> <span id="adm-t-curric">المناهج المرجعية</span></button>
+        <button class="lt-tab" id="adm-tab-audit" onclick="switchAdminSubTab('audit')"><i class="fa-solid fa-shield-halved"></i> <span id="adm-t-audit">سجل الأمان</span></button>
       </div>
 
       <div id="admin-sub-content">
@@ -5472,6 +5472,33 @@
       si('an-c3-title', t('anC3Title'));
       si('an-ai-title', t('anAiTitle'));
 
+      // Top navbar i18n
+      si('s-parent', isAr ? 'متابعة الأبناء' : 'Parent View');
+      si('s-admin', isAr ? 'لوحة الأدمن' : 'Admin Panel');
+      si('tab-admin-txt', isAr ? 'لوحة الأدمن' : 'Admin Panel');
+
+      // User Profile Dropdown i18n
+      si('ud-acad-txt', isAr ? 'الإعدادات الأكاديمية' : 'Academic Settings');
+      si('ud-pcode-txt', isAr ? 'ربط ولي الأمر (Parent Code)' : 'Link Parent Account');
+      si('ud-pconn-txt', isAr ? 'ربط طالب جديد' : 'Link New Student');
+      si('ud-admin-txt', isAr ? 'لوحة التحكم الرئيسية (Admin)' : 'Head Admin Panel');
+      si('ud-sync-txt', isAr ? 'مزامنة البيانات سحابياً' : 'Sync Data to Cloud');
+      si('ud-tour-txt', isAr ? 'الجولة التعريفية' : 'Guided Tour');
+      si('ud-logout-txt', isAr ? 'تسجيل الخروج' : 'Log Out');
+      si('ud-delete-txt', isAr ? 'حذف الحساب نهائياً' : 'Delete Account');
+
+      // Admin Panel i18n
+      si('adm-h-title', t('admPanelTitle'));
+      si('adm-h-sub', t('admPanelSub'));
+      si('adm-h-refresh', t('anRefresh'));
+      si('adm-t-overview', t('admTabOverview'));
+      si('adm-t-students', t('admTabStudents'));
+      si('adm-t-parents', t('admTabParents'));
+      si('adm-t-systems', t('admTabSystems'));
+      si('adm-t-curric', t('admTabCurric'));
+      si('adm-t-audit', t('admTabAudit'));
+      si('cur-btn-import-txt', t('admImportMcBtn'));
+
       updateWeekLabel();
       renderAcadProgress();
       renderMissedBanner();
@@ -5482,6 +5509,7 @@
       curRenderAll();
       repRenderAll();
       anRenderAll();
+      if (typeof renderAdminPanel === 'function') renderAdminPanel();
     }
 
     function si(id, txt) {
@@ -9174,17 +9202,43 @@
 
       const isAr = lang === 'ar';
 
+      // Dynamic counts from active profiles / state
+      let studentsList = (shAllAdminProfiles || []).filter(p => (p.role || 'USER') === 'USER' || p.role === 'student');
+      if (studentsList.length === 0) {
+        const cu = window._currentUser || {};
+        let localEmail = '';
+        try { localEmail = JSON.parse(localStorage.getItem('bac_local_user') || '{}').email || ''; } catch(e){}
+        const uEmail = cu.email || localEmail || 'marksamer010@gmail.com';
+        studentsList = [
+          {
+            full_name: isAr ? 'مارك سامر (طالب)' : 'Mark Samer (Student)',
+            email: uEmail,
+            track: isAr ? 'البكالوريا - مسار الهندسة وعلوم الحاسب' : 'Baccalaureate - Engineering & CS Track',
+            status: 'ACTIVE'
+          }
+        ];
+      }
+
+      let parentsList = (shAllAdminProfiles || []).filter(p => p.role === 'PARENT' || p.role === 'parent');
+      if (parentsList.length === 0 && shParentStudents.length > 0) {
+        parentsList = shParentStudents.map(rel => ({
+          full_name: isAr ? 'حساب ولي أمر مرتبط' : 'Linked Parent Account',
+          student_id: rel.student_id,
+          code: rel.code || 'PAR-8X92'
+        }));
+      }
+
       if (adminSubTab === 'overview') {
         content.innerHTML = `
           <div class="an-kpi-grid" style="margin-bottom:20px">
             <div class="an-kpi-card blue">
               <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-user-graduate"></i></span><span class="an-kpi-lbl">${t('admTotalStudents')}</span></div>
-              <div class="an-kpi-val">124</div>
+              <div class="an-kpi-val">${studentsList.length}</div>
               <div class="an-kpi-sub">${isAr ? 'عبر كافة الأنظمة التعليمية' : 'Across all education systems'}</div>
             </div>
             <div class="an-kpi-card purple">
               <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-people-roof"></i></span><span class="an-kpi-lbl">${t('admParentAccounts')}</span></div>
-              <div class="an-kpi-val">${shParentStudents.length || 38}</div>
+              <div class="an-kpi-val">${parentsList.length}</div>
               <div class="an-kpi-sub">${isAr ? 'علاقات ربط نشطة مع الطلاب' : 'Active parent-student links'}</div>
             </div>
             <div class="an-kpi-card green">
@@ -9203,7 +9257,7 @@
         content.innerHTML = `
           <div class="rep-card" style="margin-bottom:16px">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-              <div style="font-weight:800;font-size:14px">${isAr ? 'إدارة الأنظمة التعليمية (Education Systems)' : 'Education Systems Management'}</div>
+              <div style="font-weight:800;font-size:14px">${isAr ? 'إدارة الأنظمة التعليمية' : 'Education Systems Management'}</div>
               <button class="s-btn accent" onclick="promptAddEducationSystem()"><i class="fa-solid fa-plus"></i> ${t('admAddSysBtn')}</button>
             </div>
             <div style="display:flex;flex-direction:column;gap:8px">
@@ -9211,9 +9265,9 @@
                 <div style="background:var(--bg2);padding:10px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
                   <div>
                     <div style="font-weight:800;font-size:13px">${esc(s.name)} <span class="week-tag">${esc(s.code)}</span></div>
-                    <div style="font-size:11px;color:var(--text3);margin-top:2px">${esc(s.description || (isAr ? 'نظام مفعّل' : 'Active system'))}</div>
+                    <div style="font-size:11px;color:var(--text3);margin-top:2px">${esc(s.description || (isAr ? 'نظام مفعل بالمنصة' : 'Active education system'))}</div>
                   </div>
-                  <span class="lec-badge ok">${s.status || 'ACTIVE'}</span>
+                  <span class="lec-badge ok">${s.status === 'ACTIVE' ? (isAr ? 'نشط' : 'ACTIVE') : s.status}</span>
                 </div>
               `).join('')}
             </div>
@@ -9225,20 +9279,15 @@
             <div style="font-weight:800;font-size:14px;margin-bottom:6px">${isAr ? 'إدارة حسابات الطلاب المسجلين' : 'Registered Student Accounts'}</div>
             <div style="font-size:12px;color:var(--text3);margin-bottom:14px">${isAr ? 'قائمة الطلاب المسجلين بالمنصة وإدارة بياناتهم الأكاديمية' : 'Registered students directory and academic profile management'}</div>
             <div style="display:flex;flex-direction:column;gap:8px">
-              <div style="background:var(--bg2);padding:10px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
-                <div>
-                  <div style="font-weight:800;font-size:13px">مارك سامر (Student)</div>
-                  <div style="font-size:11px;color:var(--text3)">marksamer010@gmail.com • ${isAr ? 'البكالوريا - مسار هندسة' : 'Baccalaureate - Engineering Track'}</div>
+              ${studentsList.length === 0 ? `<div style="font-size:12px;color:var(--text3);text-align:center;padding:16px">${isAr ? 'لا يوجد طلاب مسجلون حالياً' : 'No registered students found'}</div>` : studentsList.map(st => `
+                <div style="background:var(--bg2);padding:10px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
+                  <div>
+                    <div style="font-weight:800;font-size:13px">${esc(st.full_name || st.name || (isAr ? 'طالب مسجل' : 'Registered Student'))}</div>
+                    <div style="font-size:11px;color:var(--text3);margin-top:2px">${esc(st.email || '')} ${st.email ? '•' : ''} ${esc(st.track || (isAr ? 'البكالوريا - مسار هندسة' : 'Baccalaureate - Engineering Track'))}</div>
+                  </div>
+                  <span class="lec-badge ok">${isAr ? 'نشط' : 'ACTIVE'}</span>
                 </div>
-                <span class="lec-badge ok">${isAr ? 'نشط' : 'ACTIVE'}</span>
-              </div>
-              <div style="background:var(--bg2);padding:10px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
-                <div>
-                  <div style="font-weight:800;font-size:13px">طالب متفوق (Student Demo)</div>
-                  <div style="font-size:11px;color:var(--text3)">student_demo@studyhub.edu • ${isAr ? 'الثانوية العامة - الصف الثالث الثانوي' : '3rd Secondary Grade'}</div>
-                </div>
-                <span class="lec-badge ok">${isAr ? 'نشط' : 'ACTIVE'}</span>
-              </div>
+              `).join('')}
             </div>
           </div>
         `;
@@ -9248,13 +9297,15 @@
             <div style="font-weight:800;font-size:14px;margin-bottom:6px">${isAr ? 'إدارة حسابات أولياء الأمور والعلاقات' : 'Parent Accounts & Student Relationships'}</div>
             <div style="font-size:12px;color:var(--text3);margin-bottom:14px">${isAr ? 'عرض روابط المتابعة النشطة بين الأبناء وأولياء الأمور' : 'View active monitoring relationships between students and parents'}</div>
             <div style="display:flex;flex-direction:column;gap:8px">
-              <div style="background:var(--bg2);padding:10px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
-                <div>
-                  <div style="font-weight:800;font-size:13px">حساب ولي أمر (Parent Demo)</div>
-                  <div style="font-size:11px;color:var(--text3)">${isAr ? 'مربوط بالطالب: مارك سامر (كود: PAR-8X92)' : 'Linked Student: Mark Samer (Code: PAR-8X92)'}</div>
+              ${parentsList.length === 0 ? `<div style="font-size:12px;color:var(--text3);text-align:center;padding:16px">${isAr ? 'لا توجد حسابات أولياء أمور مربوطة حالياً' : 'No parent accounts linked yet'}</div>` : parentsList.map(pr => `
+                <div style="background:var(--bg2);padding:10px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
+                  <div>
+                    <div style="font-weight:800;font-size:13px">${esc(pr.full_name || pr.name || (isAr ? 'حساب ولي أمر' : 'Parent Account'))}</div>
+                    <div style="font-size:11px;color:var(--text3);margin-top:2px">${isAr ? 'مربوط برمز متابعة الطالب:' : 'Linked with student code:'} ${esc(pr.code || 'PAR-8X92')}</div>
+                  </div>
+                  <span class="lec-badge ok">${isAr ? 'ربط نشط' : 'ACTIVE LINK'}</span>
                 </div>
-                <span class="lec-badge ok">${isAr ? 'ربط نشط' : 'LINKED'}</span>
-              </div>
+              `).join('')}
             </div>
           </div>
         `;
@@ -9262,7 +9313,7 @@
         content.innerHTML = `
           <div class="rep-card">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-              <div style="font-weight:800;font-size:14px">${isAr ? 'المناهج المرجعية للمراحل الدراسية (Master Curricula)' : 'Master Curricula by Academic Stage'}</div>
+              <div style="font-weight:800;font-size:14px">${isAr ? 'المناهج المرجعية للمراحل الدراسية' : 'Master Curricula by Academic Stage'}</div>
               <button class="s-btn accent" onclick="promptCreateMasterCurriculum()"><i class="fa-solid fa-plus"></i> ${t('admCreateMcBtn')}</button>
             </div>
             <div style="font-size:12px;color:var(--text3);margin-bottom:14px">${isAr ? 'المناهج الجاهزة المنشورة من المدير العام، يمكن للطلاب استيرادها والتعديل عليها لملفهم الشخصي' : 'Ready master curricula published by Head Admin. Students can import and customize them for their own profile.'}</div>
@@ -9273,21 +9324,28 @@
                     <div style="font-weight:800;font-size:13px">${esc(mc.title)}</div>
                     <div style="font-size:11px;color:var(--text3);margin-top:2px">${esc(mc.targetStage || (isAr ? 'عامة لكافة المراحل' : 'All Stages'))} • ${(mc.subjects || []).length} ${isAr ? 'مواد' : 'Subjects'}</div>
                   </div>
-                  <span class="lec-badge ok">${mc.status || 'PUBLISHED'}</span>
+                  <span class="lec-badge ok">${mc.status === 'PUBLISHED' ? (isAr ? 'منشور' : 'PUBLISHED') : mc.status}</span>
                 </div>
               `).join('')}
             </div>
           </div>
         `;
       } else if (adminSubTab === 'audit') {
+        const auditLogLines = isAr ? [
+          '[2026-09-19 12:00] HEAD_ADMIN (marksamer010@gmail.com) تم نشر منهج مرجعي: مسار الهندسة - البكالوريا',
+          '[2026-09-19 11:30] SYSTEM تم توليد كود ربط ولي الأمر للطالب: PAR-8X92K تلقائياً',
+          '[2026-09-19 11:00] SYSTEM تم تهيئة قاعدة بيانات الأنظمة التعليمية والمراحل الدراسية بنجاح.'
+        ] : [
+          '[2026-09-19 12:00] HEAD_ADMIN (marksamer010@gmail.com) Published Master Curriculum: Baccalaureate Engineering Track',
+          '[2026-09-19 11:30] SYSTEM Auto-generated student parent connection code: PAR-8X92K',
+          '[2026-09-19 11:00] SYSTEM Initialized Education Systems & Academic Levels database.'
+        ];
         content.innerHTML = `
           <div class="rep-card">
-            <div style="font-weight:800;font-size:14px;margin-bottom:12px"><i class="fa-solid fa-shield-halved" style="color:var(--gold)"></i> ${isAr ? 'سجل العمليات الأمني (Audit Log)' : 'Audit Security Log'}</div>
+            <div style="font-weight:800;font-size:14px;margin-bottom:12px"><i class="fa-solid fa-shield-halved" style="color:var(--gold)"></i> ${isAr ? 'سجل العمليات الأمني' : 'Audit Security Log'}</div>
             <div style="font-size:12px;color:var(--text3);margin-bottom:14px">${isAr ? 'تسجيل كامل للعمليات الإدارية، نشر المناهج، وتغيير العلاقات وتراخيص الوصول' : 'Complete logging of admin operations, curriculum publications, and access control.'}</div>
             <div style="font-size:11px;color:var(--text3);font-family:monospace;background:var(--bg2);padding:12px;border-radius:6px;line-height:1.6">
-              [2026-09-19 12:00] HEAD_ADMIN (marksamer010@gmail.com) published Master Curriculum: Baccalaureate Engineering Track<br>
-              [2026-09-19 11:30] SYSTEM auto-generated student parent connection code: PAR-8X92K<br>
-              [2026-09-19 11:00] SYSTEM initialized Education Systems & Academic Levels database.
+              ${auditLogLines.join('<br>')}
             </div>
           </div>
         `;
