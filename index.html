@@ -5569,6 +5569,8 @@
         const lk = _lsKey(key);
         localStorage.setItem(lk, JSON.stringify(obj));
         if (_sbUid) localStorage.setItem(key, JSON.stringify(obj));
+        if (key === 'master_curricula') window.shMasterCurricula = obj;
+        if (key === 'education_systems') window.shEducationSystems = obj;
       } catch (e) {}
 
       clearTimeout(_timers[key]);
@@ -9056,6 +9058,7 @@
 
     let shStudentProfile = null;
     let shMasterCurricula = loadJ('master_curricula', defaultMasterCurricula);
+    window.shMasterCurricula = shMasterCurricula;
     let shAllAdminProfiles = [];
     let shForceAssignments = [];
     let shRequiredProgress = {};
@@ -9718,7 +9721,7 @@
         if (activeTabBtn) activeTabBtn.classList.add('active');
 
         const isAr = lang === 'ar';
-        const allProfs = Array.isArray(window.shAllAdminProfiles) ? window.shAllAdminProfiles : [];
+        const allProfs = (typeof shAllAdminProfiles !== 'undefined' && Array.isArray(shAllAdminProfiles) && shAllAdminProfiles.length) ? shAllAdminProfiles : (Array.isArray(window.shAllAdminProfiles) ? window.shAllAdminProfiles : []);
 
         // Dynamic counts from active profiles / state
         let studentsList = allProfs.filter(p => (p.role || 'USER') === 'USER' || p.role === 'student');
@@ -9738,7 +9741,7 @@
         }
 
         let parentsList = allProfs.filter(p => p.role === 'PARENT' || p.role === 'parent');
-        const parRels = Array.isArray(window.shParentStudents) ? window.shParentStudents : [];
+        const parRels = (typeof shParentStudents !== 'undefined' && Array.isArray(shParentStudents) && shParentStudents.length) ? shParentStudents : (Array.isArray(window.shParentStudents) ? window.shParentStudents : []);
         if (parentsList.length === 0 && parRels.length > 0) {
           parentsList = parRels.map(rel => ({
             full_name: isAr ? 'حساب ولي أمر مرتبط' : 'Linked Parent Account',
@@ -9756,9 +9759,9 @@
           ];
         }
 
-        const sysList = Array.isArray(window.shEducationSystems) ? window.shEducationSystems : [];
-        const mcList = Array.isArray(window.shMasterCurricula) ? window.shMasterCurricula : [];
-        const lvlList = Array.isArray(window.shAcademicLevels) ? window.shAcademicLevels : [];
+        const sysList = (typeof shEducationSystems !== 'undefined' && Array.isArray(shEducationSystems) && shEducationSystems.length) ? shEducationSystems : (Array.isArray(window.shEducationSystems) ? window.shEducationSystems : []);
+        const mcList = (typeof shMasterCurricula !== 'undefined' && Array.isArray(shMasterCurricula)) ? shMasterCurricula : (Array.isArray(window.shMasterCurricula) ? window.shMasterCurricula : []);
+        const lvlList = (typeof shAcademicLevels !== 'undefined' && Array.isArray(shAcademicLevels) && shAcademicLevels.length) ? shAcademicLevels : (Array.isArray(window.shAcademicLevels) ? window.shAcademicLevels : []);
 
         if (!adminSubTab || adminSubTab === 'overview') {
           content.innerHTML = `
@@ -10364,6 +10367,7 @@
 
         shMasterCurricula.push(newMc);
         saveJ('master_curricula', shMasterCurricula);
+        window.shMasterCurricula = shMasterCurricula;
         closeAnyPop();
 
         activeAdminMasterCurricId = newMc.id;
