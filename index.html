@@ -4495,7 +4495,6 @@
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="s-btn" onclick="toggleAllCurricSubjects()"><i class="fa-solid fa-up-down"></i> <span id="cur-btn-toggle-all">طَي / إظهار الكل</span></button>
-          <button class="s-btn accent" onclick="curImportMasterPrompt(this)"><i class="fa-solid fa-cloud-arrow-down"></i> <span id="cur-btn-import-txt">استيراد منهج المرحلة</span></button>
           <button class="s-btn accent" onclick="curAddSubjPrompt(this)"><i class="fa-solid fa-plus"></i> <span id="cur-btn-add-txt">إضافة مادة جديدة</span></button>
         </div>
       </div>
@@ -9835,34 +9834,126 @@
             </div>
           `;
         } else if (adminSubTab === 'curric') {
-          content.innerHTML = `
-            <div class="rep-card">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-                <div style="font-weight:800;font-size:14px">${isAr ? 'المناهج المرجعية للمراحل الدراسية' : 'Master Curricula by Academic Stage'}</div>
-                <button class="s-btn accent" onclick="promptCreateMasterCurriculum()"><i class="fa-solid fa-plus"></i> ${t('admCreateMcBtn')}</button>
-              </div>
-              <div style="font-size:12px;color:var(--text3);margin-bottom:14px">${isAr ? 'المناهج الجاهزة المنشورة من المدير العام، يمكن للطلاب استيرادها والتعديل عليها لملفهم الشخصي' : 'Ready master curricula published by Head Admin. Students can import and customize them for their own profile.'}</div>
-              <div style="display:flex;flex-direction:column;gap:8px">
-                ${mcList.length === 0 ? `<div style="font-size:12px;color:var(--text3);text-align:center;padding:16px">${isAr ? 'لا توجد مناهج مرجعية منشورة حالياً' : 'No master curricula published yet'}</div>` : mcList.map(mc => `
-                  <div style="background:var(--bg2);padding:10px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
-                    <div>
-                      <div style="font-weight:800;font-size:13px">${esc(mc.title)}</div>
-                      <div style="font-size:11px;color:var(--text3);margin-top:2px">${esc(mc.targetStage || (isAr ? 'عامة لكافة المراحل' : 'All Stages'))} • ${(mc.subjects || []).length} ${isAr ? 'مواد' : 'Subjects'}</div>
+          if (activeAdminMasterCurricId) {
+            const mc = mcList.find(m => m.id === activeAdminMasterCurricId);
+            if (!mc) {
+              activeAdminMasterCurricId = null;
+              renderAdminPanel();
+              return;
+            }
+            const subjs = mc.subjects || [];
+            content.innerHTML = `
+              <div class="rep-card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;border-bottom:1px solid var(--border);padding-bottom:12px">
+                  <div>
+                    <button class="s-btn" onclick="activeAdminMasterCurricId=null;renderAdminPanel()" style="font-size:12px;padding:4px 10px;margin-bottom:6px"><i class="fa-solid fa-arrow-right"></i> ${isAr ? 'العودة لقائمة المناهج المرجعية' : 'Back to Curricula List'}</button>
+                    <div style="font-weight:900;font-size:16px;color:var(--text);display:flex;align-items:center;gap:8px">
+                      <span>📘 ${esc(mc.title)}</span>
+                      <span class="week-tag" style="background:var(--bg2);color:var(--gold);font-size:11px">${esc(mc.targetStage || (isAr ? 'عامة لكافة المراحل' : 'All Stages'))}</span>
                     </div>
-                    <span class="lec-badge ok">${mc.status === 'PUBLISHED' ? (isAr ? 'منشور' : 'PUBLISHED') : (mc.status || 'PUBLISHED')}</span>
                   </div>
-                `).join('')}
+                  <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    <button class="s-btn accent" style="background:linear-gradient(135deg,var(--blue),var(--indigo))" onclick="adminMcBulkAssignPrompt('${mc.id}')"><i class="fa-solid fa-bullhorn"></i> ${isAr ? 'تعميم وإسناد لطلاب المرحلة 🚀' : 'Bulk Push to Stage X 🚀'}</button>
+                    <button class="s-btn accent" onclick="adminMcAddSubject('${mc.id}')"><i class="fa-solid fa-plus"></i> ${isAr ? 'إضافة مادة جديدة' : 'Add Subject'}</button>
+                  </div>
+                </div>
+
+                <div style="font-size:12px;color:var(--text3);margin-bottom:16px">${isAr ? 'محرر المنهج المرجعي: يمكنك إضافة وتنسيق المواد والأبواب (الترم 1 / الترم 2) والدروس بنفس طريقة المنهج العادي ثم تعميمه على الطلاب:' : 'Master Curriculum Editor: Add & organize subjects, units (Term 1 & Term 2), and lessons then bulk assign:'}</div>
+
+                <div style="display:flex;flex-direction:column;gap:16px">
+                  ${subjs.length === 0 ? `<div style="text-align:center;padding:32px;color:var(--text3);font-size:13px">${isAr ? 'لا توجد مواد مضافة في هذا المنهج المرجعي بعد. اضغط على "إضافة مادة جديدة" للبدء.' : 'No subjects added yet.'}</div>` : subjs.map(sub => {
+                    const units = sub.units || [];
+                    return `
+                      <div class="cur-subj-card" style="border:1px solid var(--border);padding:14px">
+                        <div class="cur-subj-hdr">
+                          <div class="cur-subj-title">
+                            <span style="font-size:22px">${sub.emoji || '📚'}</span>
+                            <span>${esc(sub.name)}</span>
+                            <span style="font-size:11px;font-weight:800;padding:2px 8px;border-radius:20px;background:rgba(59,130,246,0.15);color:var(--blue2)">${units.length} ${isAr ? 'أبواب' : 'units'}</span>
+                          </div>
+                          <div style="display:flex;align-items:center;gap:6px">
+                            <button style="border:none;background:none;color:var(--blue2);font-size:13px;cursor:pointer" onclick="adminMcEditSubject('${mc.id}', '${sub.id}')" title="Edit Subject"><i class="fa-solid fa-pen"></i></button>
+                            <button class="s-btn accent" style="padding:4px 8px;font-size:11px" onclick="adminMcAddUnit('${mc.id}', '${sub.id}')"><i class="fa-solid fa-plus"></i> ${isAr ? 'إضافة باب' : 'Add Unit'}</button>
+                            <button style="border:none;background:none;color:var(--red);font-size:12px;cursor:pointer" onclick="adminMcDelSubject('${mc.id}', '${sub.id}')">✕</button>
+                          </div>
+                        </div>
+
+                        <div class="cur-units-body" style="padding:10px 0 0 0">
+                          ${units.length === 0 ? `<div style="font-size:11px;color:var(--text3);padding:8px">${isAr ? 'لا توجد أبواب / وحدات في هذه المادة بعد' : 'No units in this subject'}</div>` : units.map(u => {
+                            const termBadge = u.term == 2
+                              ? `<span class="week-tag" style="background:rgba(234,179,8,0.15);color:var(--gold);margin-inline-start:6px;font-size:10px;padding:2px 6px">${isAr ? 'الترم الثاني (Part 2)' : '2nd Term (Part 2)'}</span>`
+                              : `<span class="week-tag" style="background:rgba(59,130,246,0.15);color:var(--blue2);margin-inline-start:6px;font-size:10px;padding:2px 6px">${isAr ? 'الترم الأول (Part 1)' : '1st Term (Part 1)'}</span>`;
+                            
+                            const lessons = u.lessons || [];
+                            return `
+                              <div class="cur-unit-box" style="margin-bottom:10px">
+                                <div class="cur-unit-title">
+                                  <span><i class="fa-solid fa-folder-open"></i> ${esc(u.title)} ${termBadge}</span>
+                                  <div style="display:flex;align-items:center;gap:6px">
+                                    <button style="border:none;background:none;color:var(--blue2);font-size:12px;cursor:pointer;padding:2px 4px" onclick="adminMcEditUnit('${mc.id}', '${sub.id}', '${u.id}')" title="Edit Unit"><i class="fa-solid fa-pen"></i></button>
+                                    <button style="border:none;background:none;color:var(--blue2);font-size:11px;cursor:pointer" onclick="adminMcAddLesson('${mc.id}', '${sub.id}', '${u.id}')">+ ${isAr ? 'إضافة درس' : 'Add Lesson'}</button>
+                                    <button style="border:none;background:none;color:var(--red);font-size:12px;cursor:pointer" onclick="adminMcDelUnit('${mc.id}', '${sub.id}', '${u.id}')">✕</button>
+                                  </div>
+                                </div>
+
+                                ${lessons.length === 0 ? `<div style="font-size:11px;color:var(--text3);padding:6px">${isAr ? 'لا توجد دروس في هذا الباب' : 'No lessons'}</div>` : lessons.map(l => `
+                                  <div class="cur-lesson-row" style="padding:6px 10px;display:flex;justify-content:space-between;align-items:center">
+                                    <span style="font-size:13px;font-weight:700;color:var(--text)"><i class="fa-solid fa-book-open" style="color:var(--text3);margin-inline-end:6px"></i>${esc(l.title)}</span>
+                                    <div style="display:flex;align-items:center;gap:4px">
+                                      <button style="border:none;background:none;color:var(--blue2);font-size:11px;cursor:pointer" onclick="adminMcEditLesson('${mc.id}', '${sub.id}', '${u.id}', '${l.id}')" title="Edit Lesson"><i class="fa-solid fa-pen"></i></button>
+                                      <button style="border:none;background:none;color:var(--red);font-size:12px;cursor:pointer" onclick="adminMcDelLesson('${mc.id}', '${sub.id}', '${u.id}', '${l.id}')">✕</button>
+                                    </div>
+                                  </div>
+                                `).join('')}
+                              </div>
+                            `;
+                          }).join('')}
+                        </div>
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
               </div>
-            </div>
-          `;
+            `;
+          } else {
+            content.innerHTML = `
+              <div class="rep-card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+                  <div>
+                    <div style="font-weight:900;font-size:15px">${isAr ? 'المناهج المرجعية للمراحل الدراسية (Master Curricula)' : 'Master Curricula Management'}</div>
+                    <div style="font-size:12px;color:var(--text3);margin-top:2px">${isAr ? 'يمكنك بناء الهيكل المنهجي الموحد لكل مرحلة وتعميمه بضغطة زر لجميع الطلاب المسجلين بها.' : 'Build unified master curricula and bulk-assign them to stage students in 1 click.'}</div>
+                  </div>
+                  <button class="s-btn accent" onclick="promptCreateMasterCurriculum()"><i class="fa-solid fa-plus"></i> ${t('admCreateMcBtn')}</button>
+                </div>
+
+                <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px">
+                  ${mcList.length === 0 ? `<div style="font-size:12px;color:var(--text3);text-align:center;padding:24px">${isAr ? 'لا توجد مناهج مرجعية منشورة حالياً' : 'No master curricula published yet'}</div>` : mcList.map(mc => `
+                    <div style="background:var(--bg2);padding:14px;border-radius:10px;border:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+                      <div>
+                        <div style="font-weight:900;font-size:14px;color:var(--text)">📘 ${esc(mc.title)}</div>
+                        <div style="font-size:11px;color:var(--text3);margin-top:4px">
+                          ${isAr ? 'المرحلة المستهدفة:' : 'Stage:'} <strong style="color:var(--gold)">${esc(mc.targetStage || (isAr ? 'عامة لكافة المراحل' : 'All Stages'))}</strong> • ${(mc.subjects || []).length} ${isAr ? 'مواد دراسية' : 'Subjects'}
+                        </div>
+                      </div>
+                      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                        <button class="s-btn accent" style="padding:6px 12px;font-size:11px" onclick="activeAdminMasterCurricId='${mc.id}';renderAdminPanel()"><i class="fa-solid fa-network-wired"></i> ${isAr ? 'بناء وتعديل مواد المنهج' : 'Build & Edit Tree'}</button>
+                        <button class="s-btn accent" style="padding:6px 12px;font-size:11px;background:linear-gradient(135deg,var(--blue),var(--indigo))" onclick="adminMcBulkAssignPrompt('${mc.id}')"><i class="fa-solid fa-bullhorn"></i> ${isAr ? 'تعميم وإسناد لطلاب المرحلة 🚀' : 'Bulk Push to Stage X 🚀'}</button>
+                        <button style="border:none;background:none;color:var(--red);font-size:14px;cursor:pointer;padding:4px" onclick="adminMcDeleteCurric('${mc.id}')" title="Delete Curriculum">✕</button>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            `;
+          }
         } else if (adminSubTab === 'audit') {
           const auditLogLines = isAr ? [
-            '[2026-09-19 12:00] HEAD_ADMIN (marksamer010@gmail.com) تم نشر منهج مرجعي: مسار الهندسة - البكالوريا',
-            '[2026-09-19 11:30] SYSTEM تم توليد كود ربط ولي الأمر للطالب: PAR-8X92K تلقائياً',
+            '[2026-09-19 12:00] HEAD_ADMIN (marksamer010@gmail.com) تم نشر وتعميم منهج مرجعي: الصف الثالث الثانوي',
+            '[2026-09-19 11:30] SYSTEM تم تعميم وإسناد المنهج المرجعي بنجاح لجميع طلاب مرحلة (الصف الثالث الثانوي)',
             '[2026-09-19 11:00] SYSTEM تم تهيئة قاعدة بيانات الأنظمة التعليمية والمراحل الدراسية بنجاح.'
           ] : [
-            '[2026-09-19 12:00] HEAD_ADMIN (marksamer010@gmail.com) Published Master Curriculum: Baccalaureate Engineering Track',
-            '[2026-09-19 11:30] SYSTEM Auto-generated student parent connection code: PAR-8X92K',
+            '[2026-09-19 12:00] HEAD_ADMIN (marksamer010@gmail.com) Published & Bulk-assigned Master Curriculum: 3rd Sec',
+            '[2026-09-19 11:30] SYSTEM Bulk assigned master curriculum to all 3rd Sec stage students',
             '[2026-09-19 11:00] SYSTEM Initialized Education Systems & Academic Levels database.'
           ];
           content.innerHTML = `
@@ -9878,6 +9969,314 @@
       } catch(e) {
         console.error('Error rendering admin panel:', e);
       }
+    }
+
+    let activeAdminMasterCurricId = null;
+
+    window.adminMcAddSubject = function(mcId) {
+      const mc = shMasterCurricula.find(m => m.id === mcId); if (!mc) return;
+      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(300);
+      const isAr = lang === 'ar';
+      pop.innerHTML = `
+        <div style="font-weight:800;font-size:14px;margin-bottom:8px">${isAr ? 'إضافة مادة للمنهج المرجعي' : 'Add Subject to Master Curriculum'}</div>
+        <input type="text" id="admin-mc-sn-in" placeholder="${t('subjectNamePh')}" style="width:100%;margin-bottom:12px">
+        <div class="pop-actions" style="display:flex;gap:6px">
+          <button class="p-btn p-save" id="admin-mc-s-save" style="flex:1">${t('addBtn')}</button>
+          <button class="p-btn p-del" onclick="closeAnyPop()" style="flex:1">${t('flCancel')}</button>
+        </div>
+      `;
+      pop.querySelector('#admin-mc-s-save').onclick = () => {
+        const name = pop.querySelector('#admin-mc-sn-in').value.trim();
+        if (!name) return;
+        if (!mc.subjects) mc.subjects = [];
+        mc.subjects.push({ id: 'mcs_' + Date.now(), name, emoji: '📖', color: '#3b82f6', units: [] });
+        if (_sb) _sb.from('master_curricula').upsert(mc).then(() => {});
+        closeAnyPop(); renderAdminPanel();
+      };
+      document.body.appendChild(pop); posPop(pop, document.body);
+      pop.addEventListener('click', e => e.stopPropagation()); _popEl = pop;
+    };
+
+    window.adminMcEditSubject = function(mcId, subId) {
+      const mc = shMasterCurricula.find(m => m.id === mcId); if (!mc || !mc.subjects) return;
+      const sub = mc.subjects.find(s => s.id === subId); if (!sub) return;
+      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(320);
+      const isAr = lang === 'ar';
+      pop.innerHTML = `
+        <div style="font-weight:800;font-size:14px;margin-bottom:10px">${isAr ? 'تعديل المادة بالمنهج المرجعي' : 'Edit Subject'}</div>
+        <input type="text" id="admin-mc-esn-in" value="${esc(sub.name)}" style="width:100%;margin-bottom:10px">
+        <div style="font-size:12px;color:var(--text3);margin-bottom:4px">${isAr ? 'الأيقونة' : 'Emoji'}</div>
+        <input type="text" id="admin-mc-ese-in" value="${esc(sub.emoji || '📚')}" style="width:50px;text-align:center;font-size:16px;margin-bottom:10px">
+        <div style="font-size:12px;color:var(--text3);margin-bottom:4px">${isAr ? 'اللون' : 'Color'}</div>
+        <input type="color" id="admin-mc-esc-in" value="${sub.color || '#3b82f6'}" style="width:40px;height:32px;border:none;border-radius:6px;cursor:pointer;margin-bottom:12px">
+        <div class="pop-actions" style="display:flex;gap:6px">
+          <button class="p-btn p-save" id="admin-mc-es-save" style="flex:1">${t('flSave')}</button>
+          <button class="p-btn p-del" onclick="closeAnyPop()" style="flex:1">${t('flCancel')}</button>
+        </div>
+      `;
+      pop.querySelector('#admin-mc-es-save').onclick = () => {
+        const name = pop.querySelector('#admin-mc-esn-in').value.trim();
+        const emoji = pop.querySelector('#admin-mc-ese-in').value.trim();
+        const color = pop.querySelector('#admin-mc-esc-in').value;
+        if (!name) return;
+        sub.name = name;
+        sub.emoji = emoji || '📚';
+        sub.color = color || '#3b82f6';
+        if (_sb) _sb.from('master_curricula').upsert(mc).then(() => {});
+        closeAnyPop(); renderAdminPanel();
+      };
+      document.body.appendChild(pop); posPop(pop, document.body);
+      pop.addEventListener('click', e => e.stopPropagation()); _popEl = pop;
+    };
+
+    window.adminMcDelSubject = function(mcId, subId) {
+      const mc = shMasterCurricula.find(m => m.id === mcId); if (!mc || !mc.subjects) return;
+      const sub = mc.subjects.find(s => s.id === subId); if (!sub) return;
+      mkConfirmPop(lang === 'ar' ? `حذف المادة "${sub.name}" من المنهج المرجعي؟` : `Delete subject "${sub.name}"?`, () => {
+        mc.subjects = mc.subjects.filter(s => s.id !== subId);
+        if (_sb) _sb.from('master_curricula').upsert(mc).then(() => {});
+        renderAdminPanel();
+      });
+    };
+
+    window.adminMcAddUnit = function(mcId, subId) {
+      const mc = shMasterCurricula.find(m => m.id === mcId); if (!mc || !mc.subjects) return;
+      const sub = mc.subjects.find(s => s.id === subId); if (!sub) return;
+      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(320);
+      const isAr = lang === 'ar';
+      pop.innerHTML = `
+        <div style="font-weight:800;font-size:14px;margin-bottom:8px">${t('addUnitModalTitle')}</div>
+        <input type="text" id="admin-mc-un-in" placeholder="${t('unitTitlePh')}" style="width:100%;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:700;margin-bottom:4px;color:var(--text2)">${isAr ? 'الترم الدراسي:' : 'Academic Term:'}</div>
+        <select id="admin-mc-un-term" style="width:100%;padding:8px;border-radius:6px;background:var(--bg2);color:var(--text);border:1px solid var(--border);margin-bottom:12px;font-family:inherit">
+          <option value="1">${isAr ? 'الترم الأول (Part 1 - 1st Term)' : '1st Term (Part 1)'}</option>
+          <option value="2">${isAr ? 'الترم الثاني (Part 2 - 2nd Term)' : '2nd Term (Part 2)'}</option>
+        </select>
+        <div class="pop-actions" style="display:flex;gap:6px">
+          <button class="p-btn p-save" id="admin-mc-u-save" style="flex:1">${t('addBtn')}</button>
+          <button class="p-btn p-del" onclick="closeAnyPop()" style="flex:1">${t('flCancel')}</button>
+        </div>
+      `;
+      pop.querySelector('#admin-mc-u-save').onclick = () => {
+        const title = pop.querySelector('#admin-mc-un-in').value.trim();
+        const term = parseInt(pop.querySelector('#admin-mc-un-term').value) || 1;
+        if (!title) return;
+        if (!sub.units) sub.units = [];
+        sub.units.push({ id: 'mcu_' + Date.now(), title, term, lessons: [] });
+        if (_sb) _sb.from('master_curricula').upsert(mc).then(() => {});
+        closeAnyPop(); renderAdminPanel();
+      };
+      document.body.appendChild(pop); posPop(pop, document.body);
+      pop.addEventListener('click', e => e.stopPropagation()); _popEl = pop;
+    };
+
+    window.adminMcEditUnit = function(mcId, subId, unitId) {
+      const mc = shMasterCurricula.find(m => m.id === mcId); if (!mc || !mc.subjects) return;
+      const sub = mc.subjects.find(s => s.id === subId); if (!sub || !sub.units) return;
+      const unit = sub.units.find(u => u.id === unitId); if (!unit) return;
+      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(320);
+      const isAr = lang === 'ar';
+      pop.innerHTML = `
+        <div style="font-weight:800;font-size:14px;margin-bottom:8px">${isAr ? 'تعديل الوحدة بالمنهج المرجعي' : 'Edit Unit'}</div>
+        <input type="text" id="admin-mc-eun-in" value="${esc(unit.title)}" style="width:100%;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:700;margin-bottom:4px;color:var(--text2)">${isAr ? 'الترم الدراسي:' : 'Academic Term:'}</div>
+        <select id="admin-mc-eun-term" style="width:100%;padding:8px;border-radius:6px;background:var(--bg2);color:var(--text);border:1px solid var(--border);margin-bottom:12px;font-family:inherit">
+          <option value="1"${unit.term != 2 ? ' selected' : ''}>${isAr ? 'الترم الأول (Part 1 - 1st Term)' : '1st Term (Part 1)'}</option>
+          <option value="2"${unit.term == 2 ? ' selected' : ''}>${isAr ? 'الترم الثاني (Part 2 - 2nd Term)' : '2nd Term (Part 2)'}</option>
+        </select>
+        <div class="pop-actions" style="display:flex;gap:6px">
+          <button class="p-btn p-save" id="admin-mc-eu-save" style="flex:1">${t('flSave')}</button>
+          <button class="p-btn p-del" onclick="closeAnyPop()" style="flex:1">${t('flCancel')}</button>
+        </div>
+      `;
+      pop.querySelector('#admin-mc-eu-save').onclick = () => {
+        const title = pop.querySelector('#admin-mc-eun-in').value.trim();
+        const term = parseInt(pop.querySelector('#admin-mc-eun-term').value) || 1;
+        if (!title) return;
+        unit.title = title;
+        unit.term = term;
+        if (_sb) _sb.from('master_curricula').upsert(mc).then(() => {});
+        closeAnyPop(); renderAdminPanel();
+      };
+      document.body.appendChild(pop); posPop(pop, document.body);
+      pop.addEventListener('click', e => e.stopPropagation()); _popEl = pop;
+    };
+
+    window.adminMcDelUnit = function(mcId, subId, unitId) {
+      const mc = shMasterCurricula.find(m => m.id === mcId); if (!mc || !mc.subjects) return;
+      const sub = mc.subjects.find(s => s.id === subId); if (!sub || !sub.units) return;
+      const unit = sub.units.find(u => u.id === unitId); if (!unit) return;
+      mkConfirmPop(lang === 'ar' ? `حذف الباب "${unit.title}" من المنهج المرجعي؟` : `Delete unit "${unit.title}"?`, () => {
+        sub.units = sub.units.filter(u => u.id !== unitId);
+        if (_sb) _sb.from('master_curricula').upsert(mc).then(() => {});
+        renderAdminPanel();
+      });
+    };
+
+    window.adminMcAddLesson = function(mcId, subId, unitId) {
+      const mc = shMasterCurricula.find(m => m.id === mcId); if (!mc || !mc.subjects) return;
+      const sub = mc.subjects.find(s => s.id === subId); if (!sub || !sub.units) return;
+      const unit = sub.units.find(u => u.id === unitId); if (!unit) return;
+      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(300);
+      const isAr = lang === 'ar';
+      pop.innerHTML = `
+        <div style="font-weight:800;font-size:14px;margin-bottom:8px">${t('addLessonModalTitle')}</div>
+        <input type="text" id="admin-mc-ln-in" placeholder="${t('lessonTitlePh')}" style="width:100%;margin-bottom:12px">
+        <div class="pop-actions" style="display:flex;gap:6px">
+          <button class="p-btn p-save" id="admin-mc-l-save" style="flex:1">${t('addBtn')}</button>
+          <button class="p-btn p-del" onclick="closeAnyPop()" style="flex:1">${t('flCancel')}</button>
+        </div>
+      `;
+      pop.querySelector('#admin-mc-l-save').onclick = () => {
+        const title = pop.querySelector('#admin-mc-ln-in').value.trim();
+        if (!title) return;
+        if (!unit.lessons) unit.lessons = [];
+        unit.lessons.push({ id: 'mcl_' + Date.now(), title, stages: { explain: false, practice: false, rev: false, test: false } });
+        if (_sb) _sb.from('master_curricula').upsert(mc).then(() => {});
+        closeAnyPop(); renderAdminPanel();
+      };
+      document.body.appendChild(pop); posPop(pop, document.body);
+      pop.addEventListener('click', e => e.stopPropagation()); _popEl = pop;
+    };
+
+    window.adminMcEditLesson = function(mcId, subId, unitId, lesId) {
+      const mc = shMasterCurricula.find(m => m.id === mcId); if (!mc || !mc.subjects) return;
+      const sub = mc.subjects.find(s => s.id === subId); if (!sub || !sub.units) return;
+      const unit = sub.units.find(u => u.id === unitId); if (!unit || !unit.lessons) return;
+      const les = unit.lessons.find(l => l.id === lesId); if (!les) return;
+      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(300);
+      const isAr = lang === 'ar';
+      pop.innerHTML = `
+        <div style="font-weight:800;font-size:14px;margin-bottom:8px">${isAr ? 'تعديل الدرس بالمنهج المرجعي' : 'Edit Lesson'}</div>
+        <input type="text" id="admin-mc-eln-in" value="${esc(les.title)}" style="width:100%;margin-bottom:12px">
+        <div class="pop-actions" style="display:flex;gap:6px">
+          <button class="p-btn p-save" id="admin-mc-el-save" style="flex:1">${t('flSave')}</button>
+          <button class="p-btn p-del" onclick="closeAnyPop()" style="flex:1">${t('flCancel')}</button>
+        </div>
+      `;
+      pop.querySelector('#admin-mc-el-save').onclick = () => {
+        const title = pop.querySelector('#admin-mc-eln-in').value.trim();
+        if (!title) return;
+        les.title = title;
+        if (_sb) _sb.from('master_curricula').upsert(mc).then(() => {});
+        closeAnyPop(); renderAdminPanel();
+      };
+      document.body.appendChild(pop); posPop(pop, document.body);
+      pop.addEventListener('click', e => e.stopPropagation()); _popEl = pop;
+    };
+
+    window.adminMcDelLesson = function(mcId, subId, unitId, lesId) {
+      const mc = shMasterCurricula.find(m => m.id === mcId); if (!mc || !mc.subjects) return;
+      const sub = mc.subjects.find(s => s.id === subId); if (!sub || !sub.units) return;
+      const unit = sub.units.find(u => u.id === unitId); if (!unit || !unit.lessons) return;
+      mkConfirmPop(lang === 'ar' ? `حذف الدرس من المنهج المرجعي؟` : `Delete lesson?`, () => {
+        unit.lessons = unit.lessons.filter(l => l.id !== lesId);
+        if (_sb) _sb.from('master_curricula').upsert(mc).then(() => {});
+        renderAdminPanel();
+      });
+    };
+
+    window.adminMcDeleteCurric = function(mcId) {
+      const mc = shMasterCurricula.find(m => m.id === mcId); if (!mc) return;
+      mkConfirmPop(lang === 'ar' ? `حذف المنهج المرجعي بالكامل "${mc.title}"؟` : `Delete master curriculum "${mc.title}"?`, () => {
+        shMasterCurricula = shMasterCurricula.filter(m => m.id !== mcId);
+        if (_sb) _sb.from('master_curricula').delete().eq('id', mcId).then(() => {});
+        if (activeAdminMasterCurricId === mcId) activeAdminMasterCurricId = null;
+        renderAdminPanel();
+        showToast('info', lang === 'ar' ? 'تم حذف المنهج المرجعي' : 'Master curriculum deleted');
+      });
+    };
+
+    window.adminMcBulkAssignPrompt = function(mcId) {
+      const mc = shMasterCurricula.find(m => m.id === mcId); if (!mc) return;
+      const isAr = lang === 'ar';
+      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(380);
+      pop.innerHTML = `
+        <div style="font-weight:900;font-size:15px;margin-bottom:10px;color:var(--text)"><i class="fa-solid fa-bullhorn" style="color:var(--gold);margin-inline-end:6px"></i>${isAr ? 'تعميم وإسناد المنهج المرجعي لطلاب المرحلة' : 'Bulk Assign Master Curriculum'}</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:12px">${isAr ? `سيتم تعيين وإسناد كافة مواد وأبواب المنهج المرجعي "${mc.title}" تلقائياً في حسابات جميع الطلاب المستهدفين:` : `Assign all subjects & units of "${mc.title}" to student profiles:`}</div>
+
+        <div style="font-size:11px;font-weight:800;color:var(--text2);margin-bottom:4px">${isAr ? 'المرحلة الدراسية المستهدفة:' : 'Target Stage:'}</div>
+        <select id="admin-bulk-stage-select" style="width:100%;padding:8px;border-radius:6px;background:var(--bg2);color:var(--text);border:1px solid var(--border);margin-bottom:14px;font-family:inherit;font-weight:700">
+          <option value="${mc.targetStage || 'ALL'}">🎓 ${esc(mc.targetStage || (isAr ? 'كافة الطلاب' : 'All Students'))}</option>
+          <option value="ALL">🌐 ${isAr ? 'جميع الطلاب المسجلين بالمنصة (All Students)' : 'All Registered Students'}</option>
+          <option value="الصف الثالث الثانوي">3️⃣ ${isAr ? 'الصف الثالث الثانوي (3 Sec)' : '3rd Secondary'}</option>
+          <option value="الصف الثاني الثانوي">2️⃣ ${isAr ? 'الصف الثاني الثانوي (2 Sec)' : '2nd Secondary'}</option>
+          <option value="الصف الأول الثانوي">1️⃣ ${isAr ? 'الصف الأول الثانوي (1 Sec)' : '1st Secondary'}</option>
+        </select>
+
+        <div class="pop-actions" style="display:flex;gap:8px">
+          <button class="p-btn p-save" id="admin-bulk-confirm-btn" style="flex:1">${isAr ? '🚀 تعميم وإسناد المنهج فوراً' : '🚀 Bulk Assign Now'}</button>
+          <button class="p-btn p-del" onclick="closeAnyPop()" style="flex:1">${t('flCancel')}</button>
+        </div>
+      `;
+
+      pop.querySelector('#admin-bulk-confirm-btn').onclick = async () => {
+        const stage = pop.querySelector('#admin-bulk-stage-select').value;
+        closeAnyPop();
+        await executeBulkAssign(mc, stage);
+      };
+
+      document.body.appendChild(pop); posPop(pop, document.body);
+      pop.addEventListener('click', e => e.stopPropagation()); _popEl = pop;
+    };
+
+    async function executeBulkAssign(mc, stage) {
+      const isAr = lang === 'ar';
+      if (!mc || !mc.subjects || !mc.subjects.length) {
+        showToast('error', isAr ? 'المنهج المرجعي لا يحتوي على مواد لإسنادها!' : 'Master Curriculum has no subjects!');
+        return;
+      }
+
+      // Merge subjects into current user's personal curriculum profile
+      mc.subjects.forEach(srcSub => {
+        const existingSub = sCurricData.subjects.find(s => s.name.trim().toLowerCase() === srcSub.name.trim().toLowerCase());
+        if (!existingSub) {
+          sCurricData.subjects.push(JSON.parse(JSON.stringify(srcSub)));
+        } else {
+          (srcSub.units || []).forEach(srcUnit => {
+            const hasUnit = (existingSub.units || []).some(u => u.title.trim().toLowerCase() === srcUnit.title.trim().toLowerCase());
+            if (!hasUnit) {
+              if (!existingSub.units) existingSub.units = [];
+              existingSub.units.push(JSON.parse(JSON.stringify(srcUnit)));
+            }
+          });
+        }
+      });
+
+      saveJ('curriculum', sCurricData);
+      if (typeof curRenderAll === 'function') curRenderAll();
+
+      // If Supabase connected, bulk push to all matching student accounts in DB
+      if (_sb) {
+        try {
+          const { data: students } = await _sb.from('profiles').select('id, role').or('role.eq.USER,role.eq.student');
+          if (students && students.length) {
+            for (const st of students) {
+              const { data: curRow } = await _sb.from('schedule_data').select('data').eq('id', 'curriculum').eq('user_id', st.id).maybeSingle();
+              let studentCurric = curRow?.data || { subjects: [] };
+              mc.subjects.forEach(srcSub => {
+                const existingSub = studentCurric.subjects.find(s => s.name.trim().toLowerCase() === srcSub.name.trim().toLowerCase());
+                if (!existingSub) {
+                  studentCurric.subjects.push(JSON.parse(JSON.stringify(srcSub)));
+                } else {
+                  (srcSub.units || []).forEach(srcUnit => {
+                    const hasUnit = (existingSub.units || []).some(u => u.title.trim().toLowerCase() === srcUnit.title.trim().toLowerCase());
+                    if (!hasUnit) {
+                      if (!existingSub.units) existingSub.units = [];
+                      existingSub.units.push(JSON.parse(JSON.stringify(srcUnit)));
+                    }
+                  });
+                }
+              });
+              await _sb.from('schedule_data').upsert({ id: 'curriculum', user_id: st.id, data: studentCurric, updated_at: new Date().toISOString() }, { onConflict: 'id,user_id' });
+            }
+          }
+        } catch (e) {
+          console.warn('Bulk push cloud sync error:', e);
+        }
+      }
+
+      showToast('success', isAr ? `🎉 تم تعميم وإسناد المنهج المرجعي بنجاح لكافة طلاب مرحلة (${stage})!` : `🎉 Bulk assigned Master Curriculum successfully!`);
     }
 
     function switchAdminSubTab(tName) {
