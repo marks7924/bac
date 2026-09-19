@@ -9126,6 +9126,10 @@
             if (!shStudentProfile) {
               shStudentProfile = loadJ('student_profile', null);
             }
+            const stStage = shStudentProfile?.academic_stage || shStudentProfile?.stage_name;
+            if (stStage && typeof syncPushedMasterCurriculumForStudent === 'function') {
+              syncPushedMasterCurriculumForStudent(stStage);
+            }
             checkStudentStageBanner();
 
             // Fetch required curriculum assignments
@@ -9254,6 +9258,37 @@
       if (typeof curRenderAll === 'function') curRenderAll();
     }
 
+    window.syncPushedMasterCurriculumForStudent = function(stageName) {
+      if (!stageName) return false;
+      const isAr = lang === 'ar';
+      
+      if (typeof shMasterCurricula === 'undefined' || !Array.isArray(shMasterCurricula)) return false;
+
+      const matchesTargetStage = (stStage, targetStage) => {
+        if (!stStage || !targetStage) return false;
+        return stStage.trim().toLowerCase() === targetStage.trim().toLowerCase();
+      };
+
+      const pushedMc = shMasterCurricula.find(m => 
+        (m.pushed === true || m.status === 'published') && 
+        matchesTargetStage(stageName, m.target_stage || m.targetStage)
+      );
+
+      if (pushedMc && pushedMc.subjects && pushedMc.subjects.length > 0) {
+        sCurricData = { subjects: JSON.parse(JSON.stringify(pushedMc.subjects)) };
+        saveJ('curriculum', sCurricData);
+        saveJ('bac_curriculum_data', sCurricData);
+        if (typeof curRenderAll === 'function') curRenderAll();
+        return true;
+      } else {
+        sCurricData = { subjects: [] };
+        saveJ('curriculum', sCurricData);
+        saveJ('bac_curriculum_data', sCurricData);
+        if (typeof curRenderAll === 'function') curRenderAll();
+        return false;
+      }
+    };
+
     function checkStudentStageBanner() {
       const banner = document.getElementById('student-stage-notice-banner');
       if (!banner) return;
@@ -9288,7 +9323,7 @@
       closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(420);
       pop.innerHTML = `
         <div style="font-weight:900;font-size:15px;margin-bottom:10px;color:var(--text)"><i class="fa-solid fa-graduation-cap" style="color:var(--gold);margin-inline-end:6px"></i>${isAr ? 'تحديد المرحلة والتخصص الدراسي' : 'Select Academic Stage & Track'}</div>
-        <div style="font-size:12px;color:var(--text3);margin-bottom:14px">${isAr ? 'اختر مرحلتك الدراسية بدقة ليتسنّى للمنصة إرسال وتخصيص المناهج المرجعية والدروس المناسبة لمرحلتك تلقائياً:' : 'Select your grade/stage to receive customized stage curricula automatically:'}</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:14px">${isAr ? 'اختر مرحلتك الدراسية بدقة ليتسنّى للمنصة تخصيص المناهج المرجعية والدروس المناسبة لمرحلتك:' : 'Select your grade/stage to receive customized stage curricula:'}</div>
 
         <div style="font-size:11px;font-weight:800;color:var(--text2);margin-bottom:4px">${isAr ? 'اختر المرحلة / التخصص:' : 'Select Grade / Track:'}</div>
         <select id="stu-stage-select-in" style="width:100%;padding:10px;border-radius:8px;background:var(--bg2);color:var(--text);border:1px solid var(--border);margin-bottom:16px;font-family:inherit;font-weight:700">
@@ -9296,7 +9331,7 @@
         </select>
 
         <div class="pop-actions" style="display:flex;gap:8px">
-          <button class="p-btn p-save" id="stu-stage-save-btn" style="flex:1">${isAr ? '🎓 حفظ وتخصيص المناهج تلقائياً' : '🎓 Save & Sync Stage Curricula'}</button>
+          <button class="p-btn p-save" id="stu-stage-save-btn" style="flex:1">${isAr ? '🎓 حفظ وتخصيص المناهج' : '🎓 Save Stage'}</button>
           ${!isForced ? `<button class="p-btn p-del" onclick="closeAnyPop()" style="flex:1">${t('flCancel')}</button>` : ''}
         </div>
       `;
@@ -9308,21 +9343,52 @@
           return;
         }
 
-        if (!shStudentProfile) shStudentProfile = {};
-        shStudentProfile.student_id = _sbUid;
-        shStudentProfile.academic_stage = selectedStage;
-        shStudentProfile.stage_name = selectedStage;
+        const executeStageSave = async () => {
+          // If changing stage from an existing stage, clear previous curriculum data
+          if (currentStage && currentStage.trim().toLowerCase() !== selectedStage.trim().toLowerCase()) {
+            sCurricData = { subjects: [] };
+            saveJ('curriculum', sCurricData);
+            saveJ('bac_curriculum_data', sCurricData);
+            shRequiredProgress = {};
+          }
 
-        saveJ('student_profile', shStudentProfile);
-        if (_sb && _sbUid) {
-          try {
-            await _sb.from('student_academic_profiles').upsert(shStudentProfile, { onConflict: 'student_id' });
-          } catch(e) {}
+          if (!shStudentProfile) shStudentProfile = {};
+          shStudentProfile.student_id = _sbUid;
+          shStudentProfile.academic_stage = selectedStage;
+          shStudentProfile.stage_name = selectedStage;
+
+          saveJ('student_profile', shStudentProfile);
+          if (_sb && _sbUid) {
+            try {
+              await _sb.from('student_academic_profiles').upsert(shStudentProfile, { onConflict: 'student_id' });
+            } catch(e) {}
+          }
+
+          const hasPushed = syncPushedMasterCurriculumForStudent(selectedStage);
+
+          closeAnyPop();
+          checkStudentStageBanner();
+          if (typeof curRenderAll === 'function') curRenderAll();
+
+          if (hasPushed) {
+            showToast('success', isAr ? `🎉 تم حفظ مرحلتك (${selectedStage}) وتحميل المنهج المرجعي المنشور!` : `🎉 Stage saved (${selectedStage}) and pushed master curriculum loaded!`);
+          } else {
+            showToast('success', isAr ? `🎉 تم حفظ مرحلتك الدراسية (${selectedStage}) بنجاح!` : `🎉 Stage saved (${selectedStage})!`);
+          }
+        };
+
+        if (currentStage && currentStage.trim().toLowerCase() !== selectedStage.trim().toLowerCase()) {
+          mkConfirmPop(
+            isAr 
+              ? `⚠️ تنبيه هام: تغيير المرحلة الدراسية\n\nتغيير مرحلتك الدراسية من (${esc(currentStage)}) إلى (${esc(selectedStage)}) سيؤدي إلى مسح كافّة بيانات المنهج الدراسي السابق ودروسه وحالة إنجازك للمرحلة القديمة.\n\nهل أنت متأكد من رغبتك في متابعة التغيير؟` 
+              : `⚠️ Warning: Changing Academic Stage\n\nChanging stage from (${esc(currentStage)}) to (${esc(selectedStage)}) will delete all previous curriculum data and progress.\n\nAre you sure you want to proceed?`,
+            () => {
+              executeStageSave();
+            }
+          );
+        } else {
+          await executeStageSave();
         }
-
-        closeAnyPop();
-        checkStudentStageBanner();
-        showToast('success', isAr ? `🎉 تم حفظ مرحلتك الدراسية (${selectedStage}) بنجاح!` : `🎉 Stage saved (${selectedStage})!`);
       };
 
       document.body.appendChild(pop); posPop(pop, document.body);
@@ -10471,11 +10537,24 @@
         return stStage.trim().toLowerCase() === targetStage.trim().toLowerCase();
       };
 
+      // Mark this master curriculum as published/pushed for target stage
+      mc.pushed = true;
+      mc.status = 'published';
+      mc.target_stage = stage;
+      mc.pushed_at = new Date().toISOString();
+      saveJ('master_curricula', shMasterCurricula);
+      if (_sb) {
+        try {
+          await _sb.from('schedule_data').upsert({ id: 'master_curricula', data: shMasterCurricula, updated_at: new Date().toISOString() });
+        } catch(e) {}
+      }
+
       // 1. Replace current user's personal curriculum ONLY if their stage strictly matches target stage
       const currentStStage = shStudentProfile?.academic_stage || shStudentProfile?.stage_name || '';
       if (matchesTargetStage(currentStStage, stage)) {
-        sCurricData.subjects = JSON.parse(JSON.stringify(mc.subjects));
+        sCurricData = { subjects: JSON.parse(JSON.stringify(mc.subjects)) };
         saveJ('curriculum', sCurricData);
+        saveJ('bac_curriculum_data', sCurricData);
         if (typeof curRenderAll === 'function') curRenderAll();
       }
 
