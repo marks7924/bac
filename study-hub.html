@@ -3144,6 +3144,20 @@
       padding-bottom: 12px;
       border-bottom: 1px solid var(--border);
     }
+    .icon-reorder-btn {
+      background: none;
+      border: none;
+      color: var(--text3);
+      cursor: pointer;
+      font-size: 11px;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: all .15s ease;
+    }
+    .icon-reorder-btn:hover {
+      color: var(--blue2);
+      background: var(--bg2);
+    }
     .g-mobile-drawer-body {
       display: flex;
       flex-direction: column;
@@ -6632,6 +6646,14 @@
     </div>
     <button class="tc-add-lec admin-only" onclick="openAddLecModal('${tc.id}')"><i class="fa-solid fa-plus"></i> ${t('ltAddManual')}</button>
   `;
+
+      card.querySelectorAll('.lec-item').forEach(lecEl => {
+        const handle = lecEl.querySelector('.lec-drag-handle');
+        if (handle) {
+          enableDrag(lecEl, handle, 'lec-item', () => ltLectures, () => { ltSave(); ltRenderAll(); });
+        }
+      });
+
       return card;
     }
 
@@ -6644,7 +6666,8 @@
         badge = `<span class="lec-badge over">${t('ltOverBadge')} ${wks > 1 ? wks + ' ' + t('ltWeeksPlural') : t('ltWeek')}</span>`;
       } else badge = `<span class="lec-badge new">${t('ltNewBadge')}</span>`;
       let ageText = age === 0 ? t('ltToday') : age === 1 ? t('ltYesterday') : t('ltDaysAgo').replace('{n}', age);
-      return `<div class="lec-item ${status}" onclick="ltToggleWatch('${lec.id}')">
+      return `<div class="lec-item ${status}" data-id="${lec.id}" onclick="ltToggleWatch('${lec.id}')">
+    <span class="s-handle admin-only lec-drag-handle" style="cursor:grab;color:var(--text3);font-size:12px;margin-inline-end:6px" onclick="event.stopPropagation()"><i class="fa-solid fa-grip-vertical"></i></span>
     <div class="lec-chk">${status === 'watched' ? '<i class="fa-solid fa-check"></i>' : ''}</div>
     <div class="lec-info">
       <div class="lec-ttl ${status === 'watched' ? 'watched' : ''}">${esc(lec.title)} <span class="week-tag"><i class="fa-solid fa-hashtag"></i>${lec.weekNum || '?'}</span></div>
@@ -6652,11 +6675,26 @@
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
       ${badge}
-      ${lec.link ? `<a href="${esc(lec.link)}" target="_blank" onclick="event.stopPropagation()" class="lec-open"><i class="fa-solid fa-play"></i> ${t('ltOpenBtn')}</a>` : ''}
-      <button class="admin-only" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;padding:2px" onclick="event.stopPropagation();openEditLecModal('${lec.id}','${lec.teacherId}')"><i class="fa-solid fa-pen"></i></button>
+      <div style="display:flex;align-items:center;gap:4px">
+        <button class="admin-only icon-reorder-btn" onclick="event.stopPropagation();ltMoveLec('${lec.id}', -1)" title="Move Up"><i class="fa-solid fa-chevron-up"></i></button>
+        <button class="admin-only icon-reorder-btn" onclick="event.stopPropagation();ltMoveLec('${lec.id}', 1)" title="Move Down"><i class="fa-solid fa-chevron-down"></i></button>
+        ${lec.link ? `<a href="${esc(lec.link)}" target="_blank" onclick="event.stopPropagation()" class="lec-open"><i class="fa-solid fa-play"></i> ${t('ltOpenBtn')}</a>` : ''}
+        <button class="admin-only" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;padding:2px" onclick="event.stopPropagation();openEditLecModal('${lec.id}','${lec.teacherId}')"><i class="fa-solid fa-pen"></i></button>
+      </div>
     </div>
   </div>`;
     }
+
+    window.ltMoveLec = function(lecId, dir) {
+      const idx = ltLectures.findIndex(l => l.id === lecId);
+      if (idx === -1) return;
+      const targetIdx = idx + dir;
+      if (targetIdx < 0 || targetIdx >= ltLectures.length) return;
+      const item = ltLectures.splice(idx, 1)[0];
+      ltLectures.splice(targetIdx, 0, item);
+      ltSave();
+      ltRenderAll();
+    };
 
     function ltToggle(tid) {
       const tog = document.getElementById('ltog-' + tid), list = document.getElementById('llecs-' + tid);
@@ -7005,7 +7043,8 @@
         return;
       }
 
-      ct.innerHTML = sCurricData.subjects.map(sub => {
+      ct.innerHTML = '';
+      sCurricData.subjects.forEach(sub => {
         let totStages = 0, doneStages = 0;
         (sub.units || []).forEach(u => {
           (u.lessons || []).forEach(l => {
@@ -7023,10 +7062,14 @@
         let unitsHTML = (sub.units || []).map(u => {
           let lessonsHTML = (u.lessons || []).map(l => {
             const st = l.stages || {};
-            return `<div class="cur-lesson-row">
-          <div style="display:flex;align-items:center;gap:8px">
+            return `<div class="cur-lesson-row" data-id="${l.id}">
+          <div style="display:flex;align-items:center;gap:6px">
+            <span class="s-handle admin-only cur-lesson-drag-handle" style="cursor:grab;color:var(--text3);font-size:12px" onclick="event.stopPropagation()"><i class="fa-solid fa-grip-vertical"></i></span>
             <span style="font-size:13px;font-weight:700;color:var(--text)">${esc(l.title)}</span>
-            <button style="border:none;background:none;color:var(--red);font-size:12px;cursor:pointer;opacity:0.6;padding:2px 6px;border-radius:4px" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6" onclick="curDelLesson('${sub.id}','${u.id}','${l.id}', this)" title="${t('deleteLessonTitle')}">✕</button>
+            <button class="admin-only icon-reorder-btn" style="border:none;background:none;color:var(--text3);font-size:10px;cursor:pointer;padding:2px 4px" onclick="curMoveLesson('${sub.id}','${u.id}','${l.id}',-1)" title="Move Up"><i class="fa-solid fa-chevron-up"></i></button>
+            <button class="admin-only icon-reorder-btn" style="border:none;background:none;color:var(--text3);font-size:10px;cursor:pointer;padding:2px 4px" onclick="curMoveLesson('${sub.id}','${u.id}','${l.id}',1)" title="Move Down"><i class="fa-solid fa-chevron-down"></i></button>
+            <button class="admin-only" style="border:none;background:none;color:var(--blue2);font-size:11px;cursor:pointer;opacity:0.8;padding:2px 4px" onclick="curEditLessonPrompt(this, '${sub.id}','${u.id}','${l.id}')" title="Edit Lesson"><i class="fa-solid fa-pen"></i></button>
+            <button class="admin-only" style="border:none;background:none;color:var(--red);font-size:12px;cursor:pointer;opacity:0.6;padding:2px 4px" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6" onclick="curDelLesson('${sub.id}','${u.id}','${l.id}', this)" title="${t('deleteLessonTitle')}">✕</button>
           </div>
           <div class="cur-stage-chips">
             <span class="cur-stage-chip ${st.explain ? 'on' : ''}" onclick="curToggleStage('${sub.id}','${u.id}','${l.id}','explain')"><i class="fa-solid fa-video"></i> ${t('stageExplain')}</span>
@@ -7037,10 +7080,16 @@
         </div>`;
           }).join('');
 
-          return `<div class="cur-unit-box">
+          return `<div class="cur-unit-box" data-id="${u.id}">
         <div class="cur-unit-title">
-          <span><i class="fa-solid fa-folder-open"></i> ${esc(u.title)}</span>
-          <div style="display:flex;align-items:center;gap:10px">
+          <span style="display:flex;align-items:center;gap:6px">
+            <span class="s-handle admin-only cur-unit-drag-handle" style="cursor:grab;color:var(--text3);font-size:13px" onclick="event.stopPropagation()"><i class="fa-solid fa-grip-vertical"></i></span>
+            <i class="fa-solid fa-folder-open"></i> ${esc(u.title)}
+          </span>
+          <div style="display:flex;align-items:center;gap:6px">
+            <button class="admin-only icon-reorder-btn" style="border:none;background:none;color:var(--text3);font-size:11px;cursor:pointer;padding:2px 4px" onclick="curMoveUnit('${sub.id}','${u.id}',-1)" title="Move Up"><i class="fa-solid fa-chevron-up"></i></button>
+            <button class="admin-only icon-reorder-btn" style="border:none;background:none;color:var(--text3);font-size:11px;cursor:pointer;padding:2px 4px" onclick="curMoveUnit('${sub.id}','${u.id}',1)" title="Move Down"><i class="fa-solid fa-chevron-down"></i></button>
+            <button class="admin-only" style="border:none;background:none;color:var(--blue2);font-size:12px;cursor:pointer;padding:2px 4px" onclick="curEditUnitPrompt(this, '${sub.id}','${u.id}')" title="Edit Unit"><i class="fa-solid fa-pen"></i></button>
             <button class="admin-only" style="border:none;background:none;color:var(--blue2);font-size:11px;cursor:pointer;font-family:inherit" onclick="curAddLessonPrompt(this,'${sub.id}','${u.id}')">${t('addLessonBtn')}</button>
             <button class="admin-only" style="border:none;background:none;color:var(--red);font-size:12px;cursor:pointer;opacity:0.7;padding:2px 6px" onclick="curDelUnit('${sub.id}','${u.id}', this)" title="${t('deleteUnitTitle')}">✕</button>
           </div>
@@ -7049,26 +7098,67 @@
       </div>`;
         }).join('');
 
-        return `<div class="cur-subj-card">
+        const card = document.createElement('div');
+        card.className = 'cur-subj-card';
+        card.dataset.id = sub.id;
+        card.innerHTML = `
       <div class="cur-subj-hdr">
         <div class="cur-subj-title">
+          <span class="s-handle admin-only cur-subj-drag-handle" style="cursor:grab;color:var(--text3);font-size:15px;margin-inline-end:4px" onclick="event.stopPropagation()"><i class="fa-solid fa-grip-vertical"></i></span>
           <span style="font-size:22px">${sub.emoji || '📚'}</span>
           <span>${esc(sub.name)}</span>
           <span style="font-size:11px;font-weight:800;padding:2px 8px;border-radius:20px;background:${pacing[1]};color:${pacing[2]}">${pacing[0]}</span>
         </div>
-        <div style="display:flex;align-items:center;gap:10px">
+        <div style="display:flex;align-items:center;gap:8px">
           <div style="text-align:end">
             <div style="font-size:15px;font-weight:900;color:var(--gold)">${pct}%</div>
             <div style="font-size:10px;color:var(--text3)">${t('syllabusProgress')}</div>
           </div>
+          <button class="admin-only icon-reorder-btn" style="border:none;background:none;color:var(--text3);font-size:12px;cursor:pointer;padding:3px 6px" onclick="curMoveSubj('${sub.id}',-1)" title="Move Up"><i class="fa-solid fa-chevron-up"></i></button>
+          <button class="admin-only icon-reorder-btn" style="border:none;background:none;color:var(--text3);font-size:12px;cursor:pointer;padding:3px 6px" onclick="curMoveSubj('${sub.id}',1)" title="Move Down"><i class="fa-solid fa-chevron-down"></i></button>
+          <button class="admin-only" style="border:none;background:none;color:var(--blue2);font-size:13px;cursor:pointer" onclick="curEditSubjPrompt(this, '${sub.id}')" title="Edit Subject"><i class="fa-solid fa-pen"></i></button>
           <button class="s-btn admin-only" onclick="curAddUnitPrompt(this, '${sub.id}')"><i class="fa-solid fa-plus"></i> ${t('addUnitBtn')}</button>
           <button class="admin-only" style="border:none;background:none;color:var(--red);font-size:12px;cursor:pointer" onclick="curDelSubj('${sub.id}', this)">✕</button>
         </div>
       </div>
       <div class="tc-prog-track"><div class="tc-prog-fill" style="width:${pct}%;background:${sub.color || 'var(--blue)'}"></div></div>
       ${unitsHTML}
-    </div>`;
-      }).join('');
+    `;
+
+        // Enable unit dragging inside card
+        card.querySelectorAll('.cur-unit-box').forEach(unitEl => {
+          const unitHandle = unitEl.querySelector('.cur-unit-drag-handle');
+          if (unitHandle) {
+            enableDrag(unitEl, unitHandle, 'cur-unit-box', () => sub.units, () => {
+              saveJ('curriculum', sCurricData);
+              curRenderAll();
+            });
+          }
+
+          // Enable lesson dragging inside unit
+          unitEl.querySelectorAll('.cur-lesson-row').forEach(lesEl => {
+            const lesHandle = lesEl.querySelector('.cur-lesson-drag-handle');
+            const unitObj = sub.units.find(u => u.id === unitEl.dataset.id);
+            if (lesHandle && unitObj) {
+              enableDrag(lesEl, lesHandle, 'cur-lesson-row', () => unitObj.lessons, () => {
+                saveJ('curriculum', sCurricData);
+                curRenderAll();
+              });
+            }
+          });
+        });
+
+        ct.appendChild(card);
+
+        // Enable subject dragging in container
+        const subjHandle = card.querySelector('.cur-subj-drag-handle');
+        if (subjHandle) {
+          enableDrag(card, subjHandle, 'cur-subj-card', () => sCurricData.subjects, () => {
+            saveJ('curriculum', sCurricData);
+            curRenderAll();
+          });
+        }
+      });
     }
 
     window.curToggleStage = function (subId, unitId, lesId, stageKey) {
@@ -7101,6 +7191,47 @@
       pop.addEventListener('click', e => e.stopPropagation()); _popEl = pop;
     };
 
+    window.curEditSubjPrompt = function (anchor, subId) {
+      const sub = sCurricData.subjects.find(s => s.id === subId);
+      if (!sub) return;
+      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(320);
+      pop.innerHTML = `
+    <div style="font-weight:800;font-size:14px;margin-bottom:10px">${lang === 'ar' ? 'تعديل المادة' : 'Edit Subject'}</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:4px">${lang === 'ar' ? 'اسم المادة' : 'Subject Name'}</div>
+    <input type="text" id="cur-esn-in" value="${esc(sub.name)}" style="width:100%;margin-bottom:10px">
+    <div style="font-size:12px;color:var(--text3);margin-bottom:4px">${lang === 'ar' ? 'الأيقونة' : 'Emoji'}</div>
+    <div style="display:flex;gap:6px;align-items:center;margin-bottom:10px">
+      <input type="text" id="cur-ese-in" value="${esc(sub.emoji || '📚')}" style="width:50px;text-align:center;font-size:16px">
+      <div style="display:flex;gap:4px;flex-wrap:wrap">
+        ${['📚','📐','🧪','🧬','🌍','📖','💻','🎨','⚖️','📈'].map(e => `<span style="cursor:pointer;font-size:16px;padding:2px 4px;border-radius:4px;background:var(--card2)" onclick="document.getElementById('cur-ese-in').value='${e}'">${e}</span>`).join('')}
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:4px">${lang === 'ar' ? 'اللون' : 'Color'}</div>
+    <div style="display:flex;gap:6px;align-items:center;margin-bottom:12px">
+      <input type="color" id="cur-esc-in" value="${sub.color || '#3b82f6'}" style="width:40px;height:32px;border:none;border-radius:6px;cursor:pointer">
+      <div style="display:flex;gap:4px">
+        ${['#3b82f6','#8b5cf6','#22c55e','#ef4444','#f97316','#06b6d4','#f4c430','#ec4899'].map(c => `<span style="width:20px;height:20px;border-radius:50%;background:${c};cursor:pointer;display:inline-block" onclick="document.getElementById('cur-esc-in').value='${c}'"></span>`).join('')}
+      </div>
+    </div>
+    <div class="pop-actions" style="display:flex;gap:6px">
+      <button class="p-btn p-save" id="cur-es-save" style="flex:1">${t('flSave')}</button>
+      <button class="p-btn p-del" onclick="closeAnyPop()" style="flex:1">${t('flCancel')}</button>
+    </div>
+  `;
+      pop.querySelector('#cur-es-save').onclick = () => {
+        const name = pop.querySelector('#cur-esn-in').value.trim();
+        const emoji = pop.querySelector('#cur-ese-in').value.trim();
+        const color = pop.querySelector('#cur-esc-in').value;
+        if (!name) return;
+        sub.name = name;
+        sub.emoji = emoji || '📚';
+        sub.color = color || '#3b82f6';
+        saveJ('curriculum', sCurricData); closeAnyPop(); curRenderAll();
+      };
+      document.body.appendChild(pop); posPop(pop, anchor || document.body);
+      pop.addEventListener('click', e => e.stopPropagation()); _popEl = pop;
+    };
+
     window.curAddUnitPrompt = function (anchor, subId) {
       closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(300);
       pop.innerHTML = `
@@ -7120,6 +7251,28 @@
           sub.units.push({ id: genId(), title, lessons: [] });
           saveJ('curriculum', sCurricData); closeAnyPop(); curRenderAll();
         }
+      };
+      document.body.appendChild(pop); posPop(pop, anchor || document.body);
+      pop.addEventListener('click', e => e.stopPropagation()); _popEl = pop;
+    };
+
+    window.curEditUnitPrompt = function (anchor, subId, unitId) {
+      const sub = sCurricData.subjects.find(s => s.id === subId); if (!sub || !sub.units) return;
+      const unit = sub.units.find(u => u.id === unitId); if (!unit) return;
+      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(300);
+      pop.innerHTML = `
+    <div style="font-weight:800;font-size:14px;margin-bottom:8px">${lang === 'ar' ? 'تعديل الباب / الوحدة' : 'Edit Unit'}</div>
+    <input type="text" id="cur-eun-in" value="${esc(unit.title)}" style="width:100%;margin-bottom:12px">
+    <div class="pop-actions" style="display:flex;gap:6px">
+      <button class="p-btn p-save" id="cur-eu-save" style="flex:1">${t('flSave')}</button>
+      <button class="p-btn p-del" onclick="closeAnyPop()" style="flex:1">${t('flCancel')}</button>
+    </div>
+  `;
+      pop.querySelector('#cur-eu-save').onclick = () => {
+        const title = pop.querySelector('#cur-eun-in').value.trim();
+        if (!title) return;
+        unit.title = title;
+        saveJ('curriculum', sCurricData); closeAnyPop(); curRenderAll();
       };
       document.body.appendChild(pop); posPop(pop, anchor || document.body);
       pop.addEventListener('click', e => e.stopPropagation()); _popEl = pop;
@@ -7150,6 +7303,68 @@
       };
       document.body.appendChild(pop); posPop(pop, anchor || document.body);
       pop.addEventListener('click', e => e.stopPropagation()); _popEl = pop;
+    };
+
+    window.curEditLessonPrompt = function (anchor, subId, unitId, lesId) {
+      const sub = sCurricData.subjects.find(s => s.id === subId); if (!sub || !sub.units) return;
+      const unit = sub.units.find(u => u.id === unitId); if (!unit || !unit.lessons) return;
+      const les = unit.lessons.find(l => l.id === lesId); if (!les) return;
+      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(300);
+      pop.innerHTML = `
+    <div style="font-weight:800;font-size:14px;margin-bottom:8px">${lang === 'ar' ? 'تعديل الدرس' : 'Edit Lesson'}</div>
+    <input type="text" id="cur-eln-in" value="${esc(les.title)}" style="width:100%;margin-bottom:12px">
+    <div class="pop-actions" style="display:flex;gap:6px">
+      <button class="p-btn p-save" id="cur-el-save" style="flex:1">${t('flSave')}</button>
+      <button class="p-btn p-del" onclick="closeAnyPop()" style="flex:1">${t('flCancel')}</button>
+    </div>
+  `;
+      pop.querySelector('#cur-el-save').onclick = () => {
+        const title = pop.querySelector('#cur-eln-in').value.trim();
+        if (!title) return;
+        les.title = title;
+        saveJ('curriculum', sCurricData); closeAnyPop(); curRenderAll();
+      };
+      document.body.appendChild(pop); posPop(pop, anchor || document.body);
+      pop.addEventListener('click', e => e.stopPropagation()); _popEl = pop;
+    };
+
+    window.curMoveSubj = function (subId, dir) {
+      const idx = sCurricData.subjects.findIndex(s => s.id === subId);
+      if (idx === -1) return;
+      const targetIdx = idx + dir;
+      if (targetIdx < 0 || targetIdx >= sCurricData.subjects.length) return;
+      const item = sCurricData.subjects.splice(idx, 1)[0];
+      sCurricData.subjects.splice(targetIdx, 0, item);
+      saveJ('curriculum', sCurricData);
+      curRenderAll();
+    };
+
+    window.curMoveUnit = function (subId, unitId, dir) {
+      const sub = sCurricData.subjects.find(s => s.id === subId);
+      if (!sub || !sub.units) return;
+      const idx = sub.units.findIndex(u => u.id === unitId);
+      if (idx === -1) return;
+      const targetIdx = idx + dir;
+      if (targetIdx < 0 || targetIdx >= sub.units.length) return;
+      const item = sub.units.splice(idx, 1)[0];
+      sub.units.splice(targetIdx, 0, item);
+      saveJ('curriculum', sCurricData);
+      curRenderAll();
+    };
+
+    window.curMoveLesson = function (subId, unitId, lesId, dir) {
+      const sub = sCurricData.subjects.find(s => s.id === subId);
+      if (!sub || !sub.units) return;
+      const unit = sub.units.find(u => u.id === unitId);
+      if (!unit || !unit.lessons) return;
+      const idx = unit.lessons.findIndex(l => l.id === lesId);
+      if (idx === -1) return;
+      const targetIdx = idx + dir;
+      if (targetIdx < 0 || targetIdx >= unit.lessons.length) return;
+      const item = unit.lessons.splice(idx, 1)[0];
+      unit.lessons.splice(targetIdx, 0, item);
+      saveJ('curriculum', sCurricData);
+      curRenderAll();
     };
 
     window.curDelSubj = function (subId, anchor) {
