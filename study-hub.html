@@ -9066,6 +9066,7 @@
     let shAuditLogs = [];
     let currentUserRole = 'USER';
     let adminSubTab = 'overview';
+    var activeAdminMasterCurricId = null;
 
     async function loadPlatformData() {
       if (_sb) {
@@ -9971,8 +9972,6 @@
       }
     }
 
-    let activeAdminMasterCurricId = null;
-
     window.adminMcAddSubject = function(mcId) {
       const mc = shMasterCurricula.find(m => m.id === mcId); if (!mc) return;
       closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(300);
@@ -10298,26 +10297,25 @@
 
     window.promptCreateMasterCurriculum = function () {
       const isAr = lang === 'ar';
-      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(380);
+      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(400);
       pop.innerHTML = `
         <div style="font-weight:900;font-size:15px;margin-bottom:10px;color:var(--text)"><i class="fa-solid fa-layer-group" style="color:var(--gold);margin-inline-end:6px"></i>${isAr ? 'إنشاء منهج مرجعي جديد (Master Curriculum)' : 'Create New Master Curriculum'}</div>
-        <div style="font-size:12px;color:var(--text3);margin-bottom:12px">${isAr ? 'قم بإضافة منهج مرحلة دراسية شامل لجميع الأترام لتمكين جميع الطلاب من استيراده:' : 'Create a master curriculum for a target grade to publish to all students:'}</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:12px">${isAr ? 'أنشئ منهجاً دراسياً للمرحلة لبنائه وإضافة مواده وأبوابه بنفسك وتعميمه على الطلاب:' : 'Create a master curriculum for a target grade to build from scratch:'}</div>
         
         <div style="font-size:11px;font-weight:800;color:var(--text2);margin-bottom:4px">${isAr ? 'عنوان المنهج المرجعي:' : 'Curriculum Title:'}</div>
         <input type="text" id="mc-title-in" placeholder="${isAr ? 'مثال: منهج 3 ثانوي - شعبة علمي 2026' : 'e.g. 3rd Sec Science 2026'}" style="width:100%;margin-bottom:10px">
 
         <div style="font-size:11px;font-weight:800;color:var(--text2);margin-bottom:4px">${isAr ? 'المرحلة المستهدفة:' : 'Target Stage:'}</div>
-        <input type="text" id="mc-stage-in" placeholder="${isAr ? 'مثال: الصف الثالث الثانوي' : 'e.g. 3rd Secondary Grade'}" style="width:100%;margin-bottom:14px">
+        <input type="text" id="mc-stage-in" placeholder="${isAr ? 'مثال: الصف الثالث الثانوي' : 'e.g. 3rd Secondary Grade'}" style="width:100%;margin-bottom:12px">
 
-        <div style="font-size:11px;font-weight:800;color:var(--text2);margin-bottom:6px">${isAr ? 'تجميع المواد النموذجية تلقائياً:' : 'Include Standard Subjects Auto-Seeding:'}</div>
-        <div style="display:flex;gap:10px;margin-bottom:14px">
-          <label style="font-size:12px;color:var(--text);display:flex;align-items:center;gap:4px;cursor:pointer">
-            <input type="checkbox" id="mc-auto-seed" checked style="accent-color:var(--blue)"> ${isAr ? 'تضمين وحدات الترم الأول والترم الثاني للمواد الرئيسية' : 'Include 1st & 2nd Term Units'}
-          </label>
-        </div>
+        <div style="font-size:11px;font-weight:800;color:var(--text2);margin-bottom:6px">${isAr ? 'خيارات الهيكل الأولي:' : 'Initial Setup Option:'}</div>
+        <select id="mc-start-mode" style="width:100%;padding:8px;border-radius:6px;background:var(--bg2);color:var(--text);border:1px solid var(--border);margin-bottom:16px;font-family:inherit;font-weight:700">
+          <option value="empty">🔨 ${isAr ? 'منهج فارغ تماماً (لبنائه وإضافة المواد بنفسك من الصفر)' : 'Empty (Build from scratch)'}</option>
+          <option value="template">⚡ ${isAr ? 'تضمين هيكل نموذجي جاهز (الرياضيات، الفيزياء، الكيمياء)' : 'Standard Template'}</option>
+        </select>
 
         <div class="pop-actions" style="display:flex;gap:8px">
-          <button class="p-btn p-save" id="mc-btn-save" style="flex:1">${isAr ? 'إنشاء ونشر المنهج 🚀' : 'Create & Publish 🚀'}</button>
+          <button class="p-btn p-save" id="mc-btn-save" style="flex:1">${isAr ? 'إنشاء وفتح محرر المنهج 🚀' : 'Create & Open Builder 🚀'}</button>
           <button class="p-btn p-del" onclick="closeAnyPop()" style="flex:1">${t('flCancel')}</button>
         </div>
       `;
@@ -10325,50 +10323,51 @@
       pop.querySelector('#mc-btn-save').onclick = () => {
         const title = pop.querySelector('#mc-title-in').value.trim();
         const targetStage = pop.querySelector('#mc-stage-in').value.trim() || (isAr ? 'عامة' : 'General');
-        const autoSeed = pop.querySelector('#mc-auto-seed').checked;
+        const startMode = pop.querySelector('#mc-start-mode').value;
 
         if (!title) {
           showToast('error', isAr ? 'يرجى إدخال عنوان المنهج المرجعي' : 'Please enter curriculum title');
           return;
         }
 
-        let defaultSubjs = [
-          {
-            id: 'mcs_1', name: isAr ? 'الرياضيات' : 'Mathematics', emoji: '📐', color: '#3b82f6', units: [
-              { id: 'mcu_1', term: 1, title: isAr ? 'الوحدة الأولى: التفاضل والتكامل (الترم الأول)' : 'Unit 1: Calculus (1st Term)', lessons: [{ id: 'mcl_1', title: isAr ? 'اشتقاق الدوال المثلثية' : 'Trig Derivatives' }] },
-              { id: 'mcu_2', term: 2, title: isAr ? 'الوحدة الثانية: الديناميكا (الترم الثاني)' : 'Unit 2: Dynamics (2nd Term)', lessons: [{ id: 'mcl_2', title: isAr ? 'قوانين نيوتن للحركة' : "Newton's Laws" }] }
-            ]
-          },
-          {
-            id: 'mcs_2', name: isAr ? 'الفيزياء' : 'Physics', emoji: '🧪', color: '#8b5cf6', units: [
-              { id: 'mcu_3', term: 1, title: isAr ? 'الوحدة الأولى: الكهربية وقانون أوم (الترم الأول)' : 'Unit 1: Electricity (1st Term)', lessons: [{ id: 'mcl_3', title: isAr ? 'قانون أوم وقوانين كيرشوف' : "Ohm's & Kirchhoff's Laws" }] },
-              { id: 'mcu_4', term: 2, title: isAr ? 'الوحدة الثانية: الكهرومغناطيسية والفيزياء الحديثة (الترم الثاني)' : 'Unit 2: Electromagnetism & Modern Physics (2nd Term)', lessons: [{ id: 'mcl_4', title: isAr ? 'قانون فاراداي والمحث' : "Faraday's Law" }] }
-            ]
-          },
-          {
-            id: 'mcs_3', name: isAr ? 'الكيمياء' : 'Chemistry', emoji: '🧬', color: '#22c55e', units: [
-              { id: 'mcu_5', term: 1, title: isAr ? 'الوحدة الأولى: العناصر الانتقالية (الترم الأول)' : 'Unit 1: Transition Elements (1st Term)', lessons: [{ id: 'mcl_5', title: isAr ? 'الخواص العامة لعناصر السلسلة الانتقالية' : 'Transition Series Properties' }] },
-              { id: 'mcu_6', term: 2, title: isAr ? 'الوحدة الثانية: الكيمياء العضوية (الترم الثاني)' : 'Unit 2: Organic Chemistry (2nd Term)', lessons: [{ id: 'mcl_6', title: isAr ? 'الهيدروكربونات والألكانات' : 'Hydrocarbons & Alkanes' }] }
-            ]
-          }
-        ];
+        let initialSubjs = [];
+        if (startMode === 'template') {
+          initialSubjs = [
+            {
+              id: 'mcs_1', name: isAr ? 'الرياضيات' : 'Mathematics', emoji: '📐', color: '#3b82f6', units: [
+                { id: 'mcu_1', term: 1, title: isAr ? 'الوحدة الأولى: التفاضل والتكامل (الترم الأول)' : 'Unit 1: Calculus (1st Term)', lessons: [{ id: 'mcl_1', title: isAr ? 'اشتقاق الدوال المثلثية' : 'Trig Derivatives' }] },
+                { id: 'mcu_2', term: 2, title: isAr ? 'الوحدة الثانية: الديناميكا (الترم الثاني)' : 'Unit 2: Dynamics (2nd Term)', lessons: [{ id: 'mcl_2', title: isAr ? 'قوانين نيوتن للحركة' : "Newton's Laws" }] }
+              ]
+            },
+            {
+              id: 'mcs_2', name: isAr ? 'الفيزياء' : 'Physics', emoji: '🧪', color: '#8b5cf6', units: [
+                { id: 'mcu_3', term: 1, title: isAr ? 'الوحدة الأولى: الكهربية (الترم الأول)' : 'Unit 1: Electricity (1st Term)', lessons: [{ id: 'mcl_3', title: isAr ? 'قانون أوم وقوانين كيرشوف' : "Ohm's & Kirchhoff's Laws" }] }
+              ]
+            }
+          ];
+        }
 
         const newMc = {
           id: 'mc-' + Date.now(),
           title,
           targetStage,
           status: 'PUBLISHED',
-          subjects: autoSeed ? defaultSubjs : []
+          subjects: initialSubjs
         };
 
         shMasterCurricula.push(newMc);
         if (_sb) _sb.from('master_curricula').insert(newMc).then(() => {});
         closeAnyPop();
+
+        activeAdminMasterCurricId = newMc.id;
+        adminSubTab = 'curric';
         renderAdminPanel();
-        showToast('success', isAr ? 'تم إنشاء ونشر المنهج المرجعي بنجاح! 🔒' : 'Master Curriculum published successfully! 🔒');
+        showToast('success', isAr ? 'تم إنشاء المنهج بنجاح! يمكنك الآن إضافة المواد والأبواب فوراً.' : 'Master Curriculum created & builder opened!');
       };
 
       document.body.appendChild(pop); posPop(pop, document.body);
+      pop.addEventListener('click', e => e.stopPropagation()); _popEl = pop;
+    };
       pop.addEventListener('click', e => e.stopPropagation()); _popEl = pop;
     };
 
