@@ -4494,8 +4494,9 @@
           <div style="font-size:12px;color:var(--text3);margin-top:2px" id="cur-sub-txt">تابع نسبة إنجاز كل مادة والدروس بالمراحل الأربعة</div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="s-btn" onclick="toggleAllCurricSubjects()"><i class="fa-solid fa-up-down"></i> <span id="cur-btn-toggle-all">طَي / إظهار الكل</span></button>
           <button class="s-btn accent" onclick="curImportMasterPrompt(this)"><i class="fa-solid fa-cloud-arrow-down"></i> <span id="cur-btn-import-txt">استيراد منهج المرحلة</span></button>
-          <button class="s-btn accent admin-only" onclick="curAddSubjPrompt(this)"><i class="fa-solid fa-plus"></i> <span id="cur-btn-add-txt">إضافة مادة جديدة</span></button>
+          <button class="s-btn accent" onclick="curAddSubjPrompt(this)"><i class="fa-solid fa-plus"></i> <span id="cur-btn-add-txt">إضافة مادة جديدة</span></button>
         </div>
       </div>
 
@@ -5438,6 +5439,7 @@
       si('cur-t-all', isAr ? 'كافة الأترام' : 'All Terms');
       si('cur-t-term1', isAr ? 'الترم الأول (1st Term)' : '1st Term (Part 1)');
       si('cur-t-term2', isAr ? 'الترم الثاني (2nd Term)' : '2nd Term (Part 2)');
+      si('cur-btn-toggle-all', isAr ? 'طَي / إظهار الكل' : 'Collapse / Expand All');
 
       // Reports page
       si('rep-title-txt', t('repTitle'));
@@ -5564,12 +5566,15 @@
 
     let _timers = {};
     function saveJ(key, obj) {
+      try {
+        const lk = _lsKey(key);
+        localStorage.setItem(lk, JSON.stringify(obj));
+        if (_sbUid) localStorage.setItem(key, JSON.stringify(obj));
+      } catch (e) {}
+
       clearTimeout(_timers[key]);
       _timers[key] = setTimeout(() => {
         try {
-          const lk = _lsKey(key);
-          localStorage.setItem(lk, JSON.stringify(obj));
-          // Also sync to Supabase if logged in
           if (_sbUid && window._supabase) {
             window._supabase.from('schedule_data')
               .upsert({ id: key, user_id: _sbUid, data: obj, updated_at: new Date().toISOString() }, { onConflict: 'id,user_id' })
@@ -7296,8 +7301,8 @@
         card.dataset.id = sub.id;
         card.innerHTML = `
       <div class="cur-subj-hdr">
-        <div class="cur-subj-title">
-          <span class="s-handle admin-only cur-subj-drag-handle" style="cursor:grab;color:var(--text3);font-size:15px;margin-inline-end:4px" onclick="event.stopPropagation()"><i class="fa-solid fa-grip-vertical"></i></span>
+        <div class="cur-subj-title" style="cursor:pointer" onclick="toggleSubjUnits(this.querySelector('.subj-toggle-btn'), '${sub.id}')">
+          <span class="s-handle cur-subj-drag-handle" style="cursor:grab;color:var(--text3);font-size:15px;margin-inline-end:4px" onclick="event.stopPropagation()"><i class="fa-solid fa-grip-vertical"></i></span>
           <span style="font-size:22px">${sub.emoji || '📚'}</span>
           <span>${esc(sub.name)}</span>
           <span style="font-size:11px;font-weight:800;padding:2px 8px;border-radius:20px;background:${pacing[1]};color:${pacing[2]}">${pacing[0]}</span>
@@ -7307,15 +7312,16 @@
             <div style="font-size:15px;font-weight:900;color:var(--gold)">${pct}%</div>
             <div style="font-size:10px;color:var(--text3)">${t('syllabusProgress')}</div>
           </div>
-          <button class="admin-only icon-reorder-btn" style="border:none;background:none;color:var(--text3);font-size:12px;cursor:pointer;padding:3px 6px" onclick="curMoveSubj('${sub.id}',-1)" title="Move Up"><i class="fa-solid fa-chevron-up"></i></button>
-          <button class="admin-only icon-reorder-btn" style="border:none;background:none;color:var(--text3);font-size:12px;cursor:pointer;padding:3px 6px" onclick="curMoveSubj('${sub.id}',1)" title="Move Down"><i class="fa-solid fa-chevron-down"></i></button>
-          <button class="admin-only" style="border:none;background:none;color:var(--blue2);font-size:13px;cursor:pointer" onclick="curEditSubjPrompt(this, '${sub.id}')" title="Edit Subject"><i class="fa-solid fa-pen"></i></button>
-          <button class="s-btn admin-only" onclick="curAddUnitPrompt(this, '${sub.id}')"><i class="fa-solid fa-plus"></i> ${t('addUnitBtn')}</button>
-          <button class="admin-only" style="border:none;background:none;color:var(--red);font-size:12px;cursor:pointer" onclick="curDelSubj('${sub.id}', this)">✕</button>
+          <button class="s-btn subj-toggle-btn" onclick="toggleSubjUnits(this, '${sub.id}')" style="padding:4px 8px;font-size:11px" title="${isAr ? 'طَي أو إظهار وحدات المادة' : 'Collapse/Expand units'}"><i class="fa-solid fa-chevron-up subj-toggle-icon"></i> <span class="subj-toggle-lbl">${isAr ? 'طَي' : 'Collapse'}</span></button>
+          <button class="icon-reorder-btn" style="border:none;background:none;color:var(--text3);font-size:12px;cursor:pointer;padding:3px 6px" onclick="curMoveSubj('${sub.id}',-1)" title="Move Up"><i class="fa-solid fa-chevron-up"></i></button>
+          <button class="icon-reorder-btn" style="border:none;background:none;color:var(--text3);font-size:12px;cursor:pointer;padding:3px 6px" onclick="curMoveSubj('${sub.id}',1)" title="Move Down"><i class="fa-solid fa-chevron-down"></i></button>
+          <button style="border:none;background:none;color:var(--blue2);font-size:13px;cursor:pointer" onclick="curEditSubjPrompt(this, '${sub.id}')" title="Edit Subject"><i class="fa-solid fa-pen"></i></button>
+          <button class="s-btn accent" onclick="curAddUnitPrompt(this, '${sub.id}')"><i class="fa-solid fa-plus"></i> ${t('addUnitBtn')}</button>
+          <button style="border:none;background:none;color:var(--red);font-size:12px;cursor:pointer" onclick="curDelSubj('${sub.id}', this)">✕</button>
         </div>
       </div>
       <div class="tc-prog-track"><div class="tc-prog-fill" style="width:${pct}%;background:${sub.color || 'var(--blue)'}"></div></div>
-      ${unitsHTML}
+      <div class="cur-units-body">${unitsHTML}</div>
     `;
 
         // Enable unit dragging inside card
@@ -7353,6 +7359,61 @@
         }
       });
     }
+
+    window.toggleSubjUnits = function (btnEl, subId) {
+      const isAr = lang === 'ar';
+      const card = btnEl ? btnEl.closest('.cur-subj-card') : document.querySelector(`.cur-subj-card[data-id="${subId}"]`);
+      if (!card) return;
+      const body = card.querySelector('.cur-units-body');
+      if (!body) return;
+      const isHidden = body.style.display === 'none';
+      if (isHidden) {
+        body.style.display = 'block';
+        if (btnEl) {
+          const lbl = btnEl.querySelector('.subj-toggle-lbl');
+          const icon = btnEl.querySelector('.subj-toggle-icon');
+          if (lbl) lbl.textContent = isAr ? 'طَي' : 'Collapse';
+          if (icon) icon.className = 'fa-solid fa-chevron-up subj-toggle-icon';
+        }
+      } else {
+        body.style.display = 'none';
+        if (btnEl) {
+          const lbl = btnEl.querySelector('.subj-toggle-lbl');
+          const icon = btnEl.querySelector('.subj-toggle-icon');
+          if (lbl) lbl.textContent = isAr ? 'إظهار' : 'Expand';
+          if (icon) icon.className = 'fa-solid fa-chevron-down subj-toggle-icon';
+        }
+      }
+    };
+
+    window.toggleAllCurricSubjects = function () {
+      const isAr = lang === 'ar';
+      const cards = document.querySelectorAll('.cur-subj-card');
+      if (!cards.length) return;
+      let anyExpanded = false;
+      cards.forEach(c => {
+        const body = c.querySelector('.cur-units-body');
+        if (body && body.style.display !== 'none') anyExpanded = true;
+      });
+
+      const targetState = anyExpanded ? 'none' : 'block';
+      cards.forEach(c => {
+        const body = c.querySelector('.cur-units-body');
+        const btn = c.querySelector('.subj-toggle-btn');
+        if (body) body.style.display = targetState;
+        if (btn) {
+          const lbl = btn.querySelector('.subj-toggle-lbl');
+          const icon = btn.querySelector('.subj-toggle-icon');
+          if (lbl) lbl.textContent = targetState === 'none' ? (isAr ? 'إظهار' : 'Expand') : (isAr ? 'طَي' : 'Collapse');
+          if (icon) icon.className = targetState === 'none' ? 'fa-solid fa-chevron-down subj-toggle-icon' : 'fa-solid fa-chevron-up subj-toggle-icon';
+        }
+      });
+
+      const topBtnLbl = document.getElementById('cur-btn-toggle-all');
+      if (topBtnLbl) {
+        topBtnLbl.textContent = targetState === 'none' ? (isAr ? 'إظهار الكل' : 'Expand All') : (isAr ? 'طَي الكل' : 'Collapse All');
+      }
+    };
 
     window.curToggleStage = function (subId, unitId, lesId, stageKey) {
       const sub = sCurricData.subjects.find(s => s.id === subId); if (!sub) return;
@@ -8959,8 +9020,43 @@
       { id: 'yr-2027', name: '2027/2028', status: 'ACTIVE' }
     ];
 
+    const defaultMasterCurricula = [
+      {
+        id: 'mc_sec3_science',
+        title: lang === 'ar' ? 'منهج الصف الثالث الثانوي - شعبة علمي (2026)' : '3rd Sec - Science Track (2026)',
+        targetStage: lang === 'ar' ? 'الصف الثالث الثانوي' : '3rd Secondary',
+        status: 'PUBLISHED',
+        subjects: [
+          {
+            id: 'mcs_m1', name: lang === 'ar' ? 'الرياضيات (البحتة والتطبيقية)' : 'Mathematics', emoji: '📐', color: '#3b82f6', units: [
+              { id: 'mcu_m1', term: 1, title: lang === 'ar' ? 'الوحدة الأولى: التفاضل والتكامل' : 'Unit 1: Calculus', lessons: [{ id: 'mcl_m1', title: lang === 'ar' ? 'اشتقاق الدوال المثلثية' : 'Trig Derivatives' }, { id: 'mcl_m2', title: lang === 'ar' ? 'التفاضل الضمني والبارامتري' : 'Implicit Differentiation' }] },
+              { id: 'mcu_m2', term: 1, title: lang === 'ar' ? 'الوحدة الثانية: الجبر والهندسة الفراغية' : 'Unit 2: Algebra & Solid Geometry', lessons: [{ id: 'mcl_m3', title: lang === 'ar' ? 'التباديل والتوافيق ونظرية ذات الحدين' : 'Binomial Theorem' }] },
+              { id: 'mcu_m3', term: 2, title: lang === 'ar' ? 'الوحدة الثالثة: الاستاتيكا' : 'Unit 3: Statics', lessons: [{ id: 'mcl_m4', title: lang === 'ar' ? 'احتتاك الأجسام والعزوم' : 'Friction & Moments' }] },
+              { id: 'mcu_m4', term: 2, title: lang === 'ar' ? 'الوحدة الرابعة: الديناميكا' : 'Unit 4: Dynamics', lessons: [{ id: 'mcl_m5', title: lang === 'ar' ? 'قوانين نيوتن للحركة والشغل والقدرة' : "Newton's Laws & Work" }] }
+            ]
+          },
+          {
+            id: 'mcs_p1', name: lang === 'ar' ? 'الفيزياء' : 'Physics', emoji: '🧪', color: '#8b5cf6', units: [
+              { id: 'mcu_p1', term: 1, title: lang === 'ar' ? 'الوحدة الأولى: التيار الكهربي وقانون أوم' : 'Unit 1: Electricity & Ohm Law', lessons: [{ id: 'mcl_p1', title: lang === 'ar' ? 'التيار الكهربي وقوانين كيرشوف' : "Electric Current & Kirchhoff's Laws" }] },
+              { id: 'mcu_p2', term: 1, title: lang === 'ar' ? 'الوحدة الثانية: التأثير المغناطيسي للتيار' : 'Unit 2: Magnetic Effects', lessons: [{ id: 'mcl_p2', title: lang === 'ar' ? 'القوة المغناطيسية وأجهزة القياس' : 'Magnetic Force & Meters' }] },
+              { id: 'mcu_p3', term: 2, title: lang === 'ar' ? 'الوحدة الثالثة: الحث الكهرومغناطيسي' : 'Unit 3: EM Induction', lessons: [{ id: 'mcl_p3', title: lang === 'ar' ? 'قانون فاراداي الدينامو والمحول' : "Faraday's Law & Dynamo" }] },
+              { id: 'mcu_p4', term: 2, title: lang === 'ar' ? 'الوحدة الرابعة: الفيزياء الحديثة' : 'Unit 4: Modern Physics', lessons: [{ id: 'mcl_p4', title: lang === 'ar' ? 'إشعاع الجسم الأسود واختبار بلانك' : 'Blackbody & Planck' }] }
+            ]
+          },
+          {
+            id: 'mcs_c1', name: lang === 'ar' ? 'الكيمياء' : 'Chemistry', emoji: '🧬', color: '#22c55e', units: [
+              { id: 'mcu_c1', term: 1, title: lang === 'ar' ? 'الوحدة الأولى: العناصر الانتقالية' : 'Unit 1: Transition Elements', lessons: [{ id: 'mcl_c1', title: lang === 'ar' ? 'الخواص العامة وسبائك الحديد' : 'Properties & Iron Alloys' }] },
+              { id: 'mcu_c2', term: 1, title: lang === 'ar' ? 'الوحدة الثانية: التحليل الكيميائي' : 'Unit 2: Chemical Analysis', lessons: [{ id: 'mcl_c2', title: lang === 'ar' ? 'التحليل الوصفي والكمي والمعايرة' : 'Qualitative & Quantitative' }] },
+              { id: 'mcu_c3', term: 2, title: lang === 'ar' ? 'الوحدة الثالثة: الاتزان الكيميائي' : 'Unit 3: Chemical Equilibrium', lessons: [{ id: 'mcl_c3', title: lang === 'ar' ? 'قانون فعل الكتلة والاتزان الأيوني' : 'Mass Action & Ionic Equilibrium' }] },
+              { id: 'mcu_c4', term: 2, title: lang === 'ar' ? 'الوحدة الرابعة: الكيمياء العضوية' : 'Unit 4: Organic Chemistry', lessons: [{ id: 'mcl_c4', title: lang === 'ar' ? 'الهيدروكربونات والألكانات والألكينات' : 'Hydrocarbons & Alkanes' }] }
+            ]
+          }
+        ]
+      }
+    ];
+
     let shStudentProfile = null;
-    let shMasterCurricula = [];
+    let shMasterCurricula = defaultMasterCurricula;
     let shAllAdminProfiles = [];
     let shForceAssignments = [];
     let shRequiredProgress = {};
@@ -9002,7 +9098,7 @@
             const { data: fa } = await _sb.from('force_curriculum_assignments').select('*').eq('is_active', true);
             if (fa) shForceAssignments = fa;
             const { data: mc } = await _sb.from('master_curricula').select('*');
-            if (mc) shMasterCurricula = mc;
+            if (mc && mc.length) shMasterCurricula = mc;
             const { data: rp } = await _sb.from('student_required_curriculum_progress').select('*').eq('student_id', _sbUid);
             if (rp) {
               rp.forEach(r => { shRequiredProgress[r.master_lesson_id] = r; });
@@ -9499,27 +9595,81 @@
       showToast(isAr ? 'تم إضافة النظام التعليمي بنجاح! 🎓' : 'Education system added successfully! 🎓');
     }
 
-    function promptCreateMasterCurriculum() {
+    window.promptCreateMasterCurriculum = function () {
       const isAr = lang === 'ar';
-      const title = prompt(isAr ? 'عنوان المنهج المرجعي (مثال: منهج الثانوية العامة - شعبة علوم 2026):' : 'Master Curriculum Title (e.g. 3rd Sec Science Track 2026):');
-      if (!title) return;
-      const targetStage = prompt(isAr ? 'المرحلة الدراسية المستهدفة (مثال: البكالوريا / 3 ثانوية / 1 إعدادي):' : 'Target Stage (e.g. Baccalaureate / 3rd Sec):') || (isAr ? 'عامة' : 'General');
-      
-      const newMc = {
-        id: 'mc-' + Date.now(),
-        title,
-        targetStage,
-        status: 'PUBLISHED',
-        subjects: [
-          { id: 'mcs_1', name: isAr ? 'الرياضيات' : 'Mathematics', emoji: '📐', color: '#3b82f6', units: [{ id: 'mcu_1', title: isAr ? 'الوحدة الأولى: التفاضل' : 'Unit 1: Calculus', lessons: [{ id: 'mcl_1', title: isAr ? 'اشتقاق الدوال المثلثية' : 'Trigonometric Derivatives' }] }] },
-          { id: 'mcs_2', name: isAr ? 'الفيزياء' : 'Physics', emoji: '🧪', color: '#8b5cf6', units: [{ id: 'mcu_2', title: isAr ? 'الوحدة الأولى: الكهربية' : 'Unit 1: Electricity', lessons: [{ id: 'mcl_2', title: isAr ? 'قانون أوم وقوانين كيرشوف' : "Ohm's & Kirchhoff's Laws" }] }] }
-        ]
+      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(380);
+      pop.innerHTML = `
+        <div style="font-weight:900;font-size:15px;margin-bottom:10px;color:var(--text)"><i class="fa-solid fa-layer-group" style="color:var(--gold);margin-inline-end:6px"></i>${isAr ? 'إنشاء منهج مرجعي جديد (Master Curriculum)' : 'Create New Master Curriculum'}</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:12px">${isAr ? 'قم بإضافة منهج مرحلة دراسية شامل لجميع الأترام لتمكين جميع الطلاب من استيراده:' : 'Create a master curriculum for a target grade to publish to all students:'}</div>
+        
+        <div style="font-size:11px;font-weight:800;color:var(--text2);margin-bottom:4px">${isAr ? 'عنوان المنهج المرجعي:' : 'Curriculum Title:'}</div>
+        <input type="text" id="mc-title-in" placeholder="${isAr ? 'مثال: منهج 3 ثانوي - شعبة علمي 2026' : 'e.g. 3rd Sec Science 2026'}" style="width:100%;margin-bottom:10px">
+
+        <div style="font-size:11px;font-weight:800;color:var(--text2);margin-bottom:4px">${isAr ? 'المرحلة المستهدفة:' : 'Target Stage:'}</div>
+        <input type="text" id="mc-stage-in" placeholder="${isAr ? 'مثال: الصف الثالث الثانوي' : 'e.g. 3rd Secondary Grade'}" style="width:100%;margin-bottom:14px">
+
+        <div style="font-size:11px;font-weight:800;color:var(--text2);margin-bottom:6px">${isAr ? 'تجميع المواد النموذجية تلقائياً:' : 'Include Standard Subjects Auto-Seeding:'}</div>
+        <div style="display:flex;gap:10px;margin-bottom:14px">
+          <label style="font-size:12px;color:var(--text);display:flex;align-items:center;gap:4px;cursor:pointer">
+            <input type="checkbox" id="mc-auto-seed" checked style="accent-color:var(--blue)"> ${isAr ? 'تضمين وحدات الترم الأول والترم الثاني للمواد الرئيسية' : 'Include 1st & 2nd Term Units'}
+          </label>
+        </div>
+
+        <div class="pop-actions" style="display:flex;gap:8px">
+          <button class="p-btn p-save" id="mc-btn-save" style="flex:1">${isAr ? 'إنشاء ونشر المنهج 🚀' : 'Create & Publish 🚀'}</button>
+          <button class="p-btn p-del" onclick="closeAnyPop()" style="flex:1">${t('flCancel')}</button>
+        </div>
+      `;
+
+      pop.querySelector('#mc-btn-save').onclick = () => {
+        const title = pop.querySelector('#mc-title-in').value.trim();
+        const targetStage = pop.querySelector('#mc-stage-in').value.trim() || (isAr ? 'عامة' : 'General');
+        const autoSeed = pop.querySelector('#mc-auto-seed').checked;
+
+        if (!title) {
+          showToast('error', isAr ? 'يرجى إدخال عنوان المنهج المرجعي' : 'Please enter curriculum title');
+          return;
+        }
+
+        let defaultSubjs = [
+          {
+            id: 'mcs_1', name: isAr ? 'الرياضيات' : 'Mathematics', emoji: '📐', color: '#3b82f6', units: [
+              { id: 'mcu_1', term: 1, title: isAr ? 'الوحدة الأولى: التفاضل والتكامل (الترم الأول)' : 'Unit 1: Calculus (1st Term)', lessons: [{ id: 'mcl_1', title: isAr ? 'اشتقاق الدوال المثلثية' : 'Trig Derivatives' }] },
+              { id: 'mcu_2', term: 2, title: isAr ? 'الوحدة الثانية: الديناميكا (الترم الثاني)' : 'Unit 2: Dynamics (2nd Term)', lessons: [{ id: 'mcl_2', title: isAr ? 'قوانين نيوتن للحركة' : "Newton's Laws" }] }
+            ]
+          },
+          {
+            id: 'mcs_2', name: isAr ? 'الفيزياء' : 'Physics', emoji: '🧪', color: '#8b5cf6', units: [
+              { id: 'mcu_3', term: 1, title: isAr ? 'الوحدة الأولى: الكهربية وقانون أوم (الترم الأول)' : 'Unit 1: Electricity (1st Term)', lessons: [{ id: 'mcl_3', title: isAr ? 'قانون أوم وقوانين كيرشوف' : "Ohm's & Kirchhoff's Laws" }] },
+              { id: 'mcu_4', term: 2, title: isAr ? 'الوحدة الثانية: الكهرومغناطيسية والفيزياء الحديثة (الترم الثاني)' : 'Unit 2: Electromagnetism & Modern Physics (2nd Term)', lessons: [{ id: 'mcl_4', title: isAr ? 'قانون فاراداي والمحث' : "Faraday's Law" }] }
+            ]
+          },
+          {
+            id: 'mcs_3', name: isAr ? 'الكيمياء' : 'Chemistry', emoji: '🧬', color: '#22c55e', units: [
+              { id: 'mcu_5', term: 1, title: isAr ? 'الوحدة الأولى: العناصر الانتقالية (الترم الأول)' : 'Unit 1: Transition Elements (1st Term)', lessons: [{ id: 'mcl_5', title: isAr ? 'الخواص العامة لعناصر السلسلة الانتقالية' : 'Transition Series Properties' }] },
+              { id: 'mcu_6', term: 2, title: isAr ? 'الوحدة الثانية: الكيمياء العضوية (الترم الثاني)' : 'Unit 2: Organic Chemistry (2nd Term)', lessons: [{ id: 'mcl_6', title: isAr ? 'الهيدروكربونات والألكانات' : 'Hydrocarbons & Alkanes' }] }
+            ]
+          }
+        ];
+
+        const newMc = {
+          id: 'mc-' + Date.now(),
+          title,
+          targetStage,
+          status: 'PUBLISHED',
+          subjects: autoSeed ? defaultSubjs : []
+        };
+
+        shMasterCurricula.push(newMc);
+        if (_sb) _sb.from('master_curricula').insert(newMc).then(() => {});
+        closeAnyPop();
+        renderAdminPanel();
+        showToast('success', isAr ? 'تم إنشاء ونشر المنهج المرجعي بنجاح! 🔒' : 'Master Curriculum published successfully! 🔒');
       };
-      shMasterCurricula.push(newMc);
-      if (_sb) _sb.from('master_curricula').insert(newMc).then(() => {});
-      renderAdminPanel();
-      showToast(isAr ? 'تم إنشاء ونشر المنهج المرجعي بنجاح! 🔒' : 'Master Curriculum published successfully! 🔒');
-    }
+
+      document.body.appendChild(pop); posPop(pop, document.body);
+      pop.addEventListener('click', e => e.stopPropagation()); _popEl = pop;
+    };
 
     window.curImportMasterPrompt = function(anchor) {
       const isAr = lang === 'ar';
