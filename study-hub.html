@@ -7227,7 +7227,12 @@
       if (!ct) return;
 
       if (!sCurricData.subjects || !sCurricData.subjects.length) {
-        ct.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text3);font-size:13px;font-weight:700">${t('noSubjectsYet')}</div>`;
+        const isAr = lang === 'ar';
+        const stage = shStudentProfile?.academic_stage || shStudentProfile?.stage_name;
+        const msg = stage 
+          ? (isAr ? `لا يوجد منهج دراسي منشور لمرحلة (${esc(stage)}) حتى الآن. يمكنك إضافة موادك الخاصة يدوياً من زر "إضافة مادة جديدة".` : `No master curriculum published for stage (${esc(stage)}) yet. You can add custom subjects manually using "Add New Subject".`)
+          : t('noSubjectsYet');
+        ct.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text3);font-size:13px;font-weight:700">${msg}</div>`;
         return;
       }
 
@@ -9329,33 +9334,32 @@
     };
 
     function autoSyncMasterCurriculumForStudentStage(stageName) {
-      if (!shMasterCurricula || !shMasterCurricula.length) return;
+      if (!stageName) return;
       const isAr = lang === 'ar';
       
-      const matchingMcs = shMasterCurricula.filter(mc => {
-        if (!mc.targetStage || mc.targetStage === 'ALL' || mc.targetStage === 'عامة لكافة المراحل والصفوف') return true;
-        if (stageName && (mc.targetStage === stageName || stageName.includes(mc.targetStage) || mc.targetStage.includes(stageName))) return true;
-        return false;
+      const matchesStage = (mcStage, targetStage) => {
+        if (!mcStage || !targetStage) return false;
+        if (mcStage === targetStage) return true;
+        if (targetStage.includes('الإعدادية') && mcStage.includes('الإعدادي')) return true;
+        if (targetStage.includes('الثانوية العامة') && mcStage.includes('الثانوي')) return true;
+        if (targetStage.includes('البكالوريا') && mcStage.includes('البكالوريا')) return true;
+        return mcStage.toLowerCase().includes(targetStage.toLowerCase()) || targetStage.toLowerCase().includes(mcStage.toLowerCase());
+      };
+
+      const matchingMcs = (shMasterCurricula || []).filter(mc => {
+        return matchesStage(mc.targetStage, stageName);
       });
 
-      if (!matchingMcs.length) return;
+      // Clear previous mismatched stage subjects so only stage-specific curriculum is displayed
+      sCurricData.subjects = [];
 
-      matchingMcs.forEach(mc => {
-        (mc.subjects || []).forEach(srcSub => {
-          const existingSub = sCurricData.subjects.find(s => s.name.trim().toLowerCase() === srcSub.name.trim().toLowerCase());
-          if (!existingSub) {
+      if (matchingMcs.length > 0) {
+        matchingMcs.forEach(mc => {
+          (mc.subjects || []).forEach(srcSub => {
             sCurricData.subjects.push(JSON.parse(JSON.stringify(srcSub)));
-          } else {
-            (srcSub.units || []).forEach(srcUnit => {
-              const hasUnit = (existingSub.units || []).some(u => u.title.trim().toLowerCase() === srcUnit.title.trim().toLowerCase());
-              if (!hasUnit) {
-                if (!existingSub.units) existingSub.units = [];
-                existingSub.units.push(JSON.parse(JSON.stringify(srcUnit)));
-              }
-            });
-          }
+          });
         });
-      });
+      }
 
       saveJ('curriculum', sCurricData);
       if (typeof curRenderAll === 'function') curRenderAll();
