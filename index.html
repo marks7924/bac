@@ -9290,7 +9290,7 @@
 
         <div style="font-size:11px;font-weight:800;color:var(--text2);margin-bottom:4px">${isAr ? 'اختر المرحلة / التخصص:' : 'Select Grade / Track:'}</div>
         <select id="stu-stage-select-in" style="width:100%;padding:10px;border-radius:8px;background:var(--bg2);color:var(--text);border:1px solid var(--border);margin-bottom:16px;font-family:inherit;font-weight:700">
-          ${buildStageSelectOptions(currentStage)}
+          ${buildStageSelectOptions(currentStage, true)}
         </select>
 
         <div class="pop-actions" style="display:flex;gap:8px">
@@ -10329,11 +10329,11 @@
       });
     };
 
-    function buildStageSelectOptions(selectedVal) {
+    function buildStageSelectOptions(selectedVal, hideAllOption = false) {
       const isAr = lang === 'ar';
       const sel = selectedVal || '';
       return `
-        <option value="ALL"${sel === 'ALL' || sel === 'عامة لكافة المراحل والصفوف' || !sel ? ' selected' : ''}>🌐 ${isAr ? 'عامة لكافة المراحل والصفوف (All Stages)' : 'All Stages & Grades'}</option>
+        ${!hideAllOption ? `<option value="ALL"${sel === 'ALL' || sel === 'عامة لكافة المراحل والصفوف' || !sel ? ' selected' : ''}>🌐 ${isAr ? 'عامة لكافة المراحل والصفوف (All Stages)' : 'All Stages & Grades'}</option>` : ''}
         
         <optgroup label="${isAr ? '📚 المرحلة الإعدادية (Preparatory)' : 'Preparatory Grades'}">
           <option value="الصف الأول الإعدادي"${sel === 'الصف الأول الإعدادي' ? ' selected' : ''}>1️⃣ ${isAr ? 'الصف الأول الإعدادي (1st Prep)' : '1st Prep'}</option>
@@ -10503,48 +10503,67 @@
         return;
       }
 
-      // Merge subjects into current user's personal curriculum profile
-      mc.subjects.forEach(srcSub => {
-        const existingSub = sCurricData.subjects.find(s => s.name.trim().toLowerCase() === srcSub.name.trim().toLowerCase());
-        if (!existingSub) {
-          sCurricData.subjects.push(JSON.parse(JSON.stringify(srcSub)));
-        } else {
-          (srcSub.units || []).forEach(srcUnit => {
-            const hasUnit = (existingSub.units || []).some(u => u.title.trim().toLowerCase() === srcUnit.title.trim().toLowerCase());
-            if (!hasUnit) {
-              if (!existingSub.units) existingSub.units = [];
-              existingSub.units.push(JSON.parse(JSON.stringify(srcUnit)));
-            }
-          });
-        }
-      });
+      const matchesTargetStage = (stStage, targetStage) => {
+        if (!stStage || !targetStage) return false;
+        if (targetStage === 'ALL' || targetStage === 'عامة لكافة المراحل والصفوف') return true;
+        if (stStage === targetStage) return true;
+        if (targetStage.includes('الإعدادية') && stStage.includes('الإعدادي')) return true;
+        if (targetStage.includes('الثانوية العامة') && stStage.includes('الثانوي')) return true;
+        if (targetStage.includes('البكالوريا') && stStage.includes('البكالوريا')) return true;
+        return stStage.toLowerCase().includes(targetStage.toLowerCase()) || targetStage.toLowerCase().includes(stStage.toLowerCase());
+      };
 
-      saveJ('curriculum', sCurricData);
-      if (typeof curRenderAll === 'function') curRenderAll();
+      // 1. Merge into current user's personal curriculum profile ONLY if their stage matches
+      const currentStStage = shStudentProfile?.academic_stage || shStudentProfile?.stage_name || '';
+      if (matchesTargetStage(currentStStage, stage)) {
+        mc.subjects.forEach(srcSub => {
+          const existingSub = sCurricData.subjects.find(s => s.name.trim().toLowerCase() === srcSub.name.trim().toLowerCase());
+          if (!existingSub) {
+            sCurricData.subjects.push(JSON.parse(JSON.stringify(srcSub)));
+          } else {
+            (srcSub.units || []).forEach(srcUnit => {
+              const hasUnit = (existingSub.units || []).some(u => u.title.trim().toLowerCase() === srcUnit.title.trim().toLowerCase());
+              if (!hasUnit) {
+                if (!existingSub.units) existingSub.units = [];
+                existingSub.units.push(JSON.parse(JSON.stringify(srcUnit)));
+              }
+            });
+          }
+        });
+        saveJ('curriculum', sCurricData);
+        if (typeof curRenderAll === 'function') curRenderAll();
+      }
 
-      // If Supabase connected, bulk push to all matching student accounts in DB
+      // 2. Push ONLY to DB student accounts whose assigned academic stage matches
+      let pushedCount = 0;
       if (_sb) {
         try {
           const { data: students } = await _sb.from('profiles').select('id, role').or('role.eq.USER,role.eq.student');
           if (students && students.length) {
             for (const st of students) {
-              const { data: curRow } = await _sb.from('schedule_data').select('data').eq('id', 'curriculum').eq('user_id', st.id).maybeSingle();
-              let studentCurric = curRow?.data || { subjects: [] };
-              mc.subjects.forEach(srcSub => {
-                const existingSub = studentCurric.subjects.find(s => s.name.trim().toLowerCase() === srcSub.name.trim().toLowerCase());
-                if (!existingSub) {
-                  studentCurric.subjects.push(JSON.parse(JSON.stringify(srcSub)));
-                } else {
-                  (srcSub.units || []).forEach(srcUnit => {
-                    const hasUnit = (existingSub.units || []).some(u => u.title.trim().toLowerCase() === srcUnit.title.trim().toLowerCase());
-                    if (!hasUnit) {
-                      if (!existingSub.units) existingSub.units = [];
-                      existingSub.units.push(JSON.parse(JSON.stringify(srcUnit)));
-                    }
-                  });
-                }
-              });
-              await _sb.from('schedule_data').upsert({ id: 'curriculum', user_id: st.id, data: studentCurric, updated_at: new Date().toISOString() }, { onConflict: 'id,user_id' });
+              const { data: sp } = await _sb.from('student_academic_profiles').select('academic_stage, stage_name').eq('student_id', st.id).maybeSingle();
+              const stStage = sp?.academic_stage || sp?.stage_name || '';
+
+              if (matchesTargetStage(stStage, stage)) {
+                pushedCount++;
+                const { data: curRow } = await _sb.from('schedule_data').select('data').eq('id', 'curriculum').eq('user_id', st.id).maybeSingle();
+                let studentCurric = curRow?.data || { subjects: [] };
+                mc.subjects.forEach(srcSub => {
+                  const existingSub = studentCurric.subjects.find(s => s.name.trim().toLowerCase() === srcSub.name.trim().toLowerCase());
+                  if (!existingSub) {
+                    studentCurric.subjects.push(JSON.parse(JSON.stringify(srcSub)));
+                  } else {
+                    (srcSub.units || []).forEach(srcUnit => {
+                      const hasUnit = (existingSub.units || []).some(u => u.title.trim().toLowerCase() === srcUnit.title.trim().toLowerCase());
+                      if (!hasUnit) {
+                        if (!existingSub.units) existingSub.units = [];
+                        existingSub.units.push(JSON.parse(JSON.stringify(srcUnit)));
+                      }
+                    });
+                  }
+                });
+                await _sb.from('schedule_data').upsert({ id: 'curriculum', user_id: st.id, data: studentCurric, updated_at: new Date().toISOString() }, { onConflict: 'id,user_id' });
+              }
             }
           }
         } catch (e) {
@@ -10552,7 +10571,7 @@
         }
       }
 
-      showToast('success', isAr ? `🎉 تم تعميم وإسناد المنهج المرجعي بنجاح لكافة طلاب مرحلة (${stage})!` : `🎉 Bulk assigned Master Curriculum successfully!`);
+      showToast('success', isAr ? `🎉 تم تعميم المنهج المرجعي بنجاح حصرياً لطلاب مرحلة (${stage})!` : `🎉 Master Curriculum pushed exclusively to stage (${stage})!`);
     }
 
     function switchAdminSubTab(tName) {
