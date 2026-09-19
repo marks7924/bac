@@ -5482,6 +5482,7 @@
 
       // Parent View i18n
       si('s-parent', isAr ? 'متابعة الأبناء' : 'Parent View');
+      si('md-parent-txt', isAr ? 'متابعة الأبناء' : 'Parent View');
       si('par-h-title', isAr ? 'لوحة متابعة أولياء الأمور' : 'Parent Monitoring Dashboard');
       si('par-h-sub', isAr ? 'متابعة دقيقة لمستوى الأبناء والإنجاز الدراسي والجدول والمحاضرات' : 'Comprehensive parent monitoring of student progress, schedule, and lectures');
       si('par-btn-mycode', isAr ? 'كود ولي الأمر 🔑' : 'Parent Access Code 🔑');
@@ -5490,6 +5491,7 @@
       // Top navbar i18n
       si('s-admin', isAr ? 'لوحة الأدمن' : 'Admin Panel');
       si('tab-admin-txt', isAr ? 'لوحة الأدمن' : 'Admin Panel');
+      si('md-admin-txt', isAr ? 'لوحة التحكم (Admin)' : 'Admin Panel');
 
       // User Profile Dropdown i18n
       si('ud-acad-txt', isAr ? 'الإعدادات الأكاديمية' : 'Academic Settings');
@@ -7223,6 +7225,7 @@
 
     function curRenderAll() {
       checkStudentStageBanner();
+      if (typeof anRenderAll === 'function') anRenderAll();
       const ct = document.getElementById('cur-subj-grid');
       if (!ct) return;
 
@@ -7783,10 +7786,17 @@
             subLessons++;
             totalLessons++;
             let lesDoneCount = 0;
-            ['s1', 's2', 's3', 's4'].forEach(st => {
+            const st = les.stages || {};
+            const stageKeys = [
+              Boolean(st.explain || les.explain || les.s1),
+              Boolean(st.practice || les.practice || les.s2),
+              Boolean(st.rev || les.rev || les.s3),
+              Boolean(st.test || les.test || les.s4)
+            ];
+            stageKeys.forEach(isDone => {
               subTotalStages++;
               totalStages++;
-              if (les[st]) {
+              if (isDone) {
                 subDoneStages++;
                 doneStages++;
                 lesDoneCount++;
@@ -7796,7 +7806,14 @@
           });
         });
         const subPct = subTotalStages === 0 ? 0 : Math.round((subDoneStages / subTotalStages) * 100);
-        subjStats.push({ id: sub.id, name: sub.name, color: sub.color || '#3b82f6', icon: sub.icon || '📚', pct: subPct, lessonsCount: subLessons });
+        subjStats.push({ 
+          id: sub.id, 
+          name: sub.name, 
+          color: sub.color || '#3b82f6', 
+          icon: sub.emoji || sub.icon || '📚', 
+          pct: subPct, 
+          lessonsCount: subLessons 
+        });
       });
 
       const curPct = totalStages === 0 ? 0 : Math.round((doneStages / totalStages) * 100);
