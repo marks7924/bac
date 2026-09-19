@@ -9108,10 +9108,26 @@
             const { data: reqs } = await _sb.from('parent_student_relationships').select('*').eq('student_id', _sbUid);
             if (reqs) shParentRequests = reqs;
           } else if (currentUserRole === 'PARENT') {
-            const { data: rels } = await _sb.from('parent_student_relationships').select('*').eq('parent_id', _sbUid).eq('status', 'ACTIVE');
-            if (rels && rels.length) {
-              shParentStudents = rels;
-              if (!shSelectedParentStudentId) shSelectedParentStudentId = rels[0].student_id;
+            if (_sb) {
+              const { data: rels } = await _sb.from('parent_student_relationships').select('*, profiles:student_id(id, full_name, email, code)').eq('parent_id', _sbUid).eq('status', 'ACTIVE');
+              if (rels && rels.length) shParentStudents = rels;
+            }
+
+            if (!shParentStudents || !shParentStudents.length) {
+              try {
+                const stored = localStorage.getItem('bac_parent_students');
+                if (stored) shParentStudents = JSON.parse(stored);
+              } catch(e) {}
+            }
+
+            const savedSelId = localStorage.getItem('bac_selected_parent_student_id');
+            if (shParentStudents && shParentStudents.length) {
+              if (savedSelId && shParentStudents.some(s => (s.student_id || s.code || s.id) === savedSelId)) {
+                shSelectedParentStudentId = savedSelId;
+              } else {
+                shSelectedParentStudentId = shParentStudents[0].student_id || shParentStudents[0].code || shParentStudents[0].id;
+              }
+              await loadSelectedStudentData(shSelectedParentStudentId);
             }
           }
         } catch(e) {
@@ -9324,78 +9340,364 @@
       }
     }
 
-    /* Dedicated Parent Dashboard */
+    /* Dedicated Parent Dashboard with Live Real Student Data */
+    let currentParentStudentData = {
+      profile: null,
+      week: null,
+      lectures: [],
+      curriculum: { subjects: [] },
+      meta: { streak: 0, longestStreak: 0 },
+      events: []
+    };
+    let parentActiveTab = 'overview';
+
+    window.setParentDashboardTab = function(tab) {
+      parentActiveTab = tab;
+      renderParentDashboard();
+    };
+
+    window.loadSelectedStudentData = async function(studentId) {
+      if (!studentId) return;
+
+      currentParentStudentData = {
+        profile: null,
+        week: null,
+        lectures: [],
+        curriculum: { subjects: [] },
+        meta: { streak: 0, longestStreak: 0 },
+        events: []
+      };
+
+      if (_sb) {
+        try {
+          // Fetch student profile
+          const { data: prof } = await _sb.from('profiles').select('*').eq('id', studentId).maybeSingle();
+          if (prof) currentParentStudentData.profile = prof;
+
+          // Fetch student schedule_data rows
+          const { data: rows } = await _sb.from('schedule_data').select('*').eq('user_id', studentId);
+          if (rows && rows.length) {
+            rows.forEach(r => {
+              if (r.id === 'week') currentParentStudentData.week = r.data;
+              else if (r.id === 'lectures') currentParentStudentData.lectures = r.data;
+              else if (r.id === 'curriculum') currentParentStudentData.curriculum = r.data;
+              else if (r.id === 'meta') currentParentStudentData.meta = r.data;
+              else if (r.id === 'events') currentParentStudentData.events = r.data;
+            });
+          }
+        } catch (e) {
+          console.warn('Error fetching student data for parent:', e);
+        }
+      }
+
+      // Fallback to local storage if missing or in local demo mode
+      if (!currentParentStudentData.week) currentParentStudentData.week = loadJ('week', sWeek);
+      if (!currentParentStudentData.lectures || !currentParentStudentData.lectures.length) currentParentStudentData.lectures = loadJ('lectures', ltLectures);
+      if (!currentParentStudentData.curriculum || !currentParentStudentData.curriculum.subjects || !currentParentStudentData.curriculum.subjects.length) currentParentStudentData.curriculum = loadJ('curriculum', sCurricData);
+      if (!currentParentStudentData.meta || !currentParentStudentData.meta.streak) currentParentStudentData.meta = loadJ('meta', sMeta);
+      if (!currentParentStudentData.events || !currentParentStudentData.events.length) currentParentStudentData.events = loadJ('events', sEvents);
+
+      // Mirror into main state if currentUserRole is PARENT so all top navigation tabs show real student data!
+      if (currentUserRole === 'PARENT') {
+        if (currentParentStudentData.week) sWeek = currentParentStudentData.week;
+        if (currentParentStudentData.lectures) ltLectures = currentParentStudentData.lectures;
+        if (currentParentStudentData.curriculum) sCurricData = currentParentStudentData.curriculum;
+        if (currentParentStudentData.meta) sMeta = currentParentStudentData.meta;
+        if (currentParentStudentData.events) sEvents = currentParentStudentData.events;
+
+        if (typeof schedRenderAll === 'function') schedRenderAll();
+        if (typeof ltRenderAll === 'function') ltRenderAll();
+        if (typeof curRenderAll === 'function') curRenderAll();
+        if (typeof repRenderAll === 'function') repRenderAll();
+        if (typeof anRenderAll === 'function') anRenderAll();
+      }
+
+      renderParentDashboard();
+    };
+
+    window.selectParentStudent = async function(stdId) {
+      shSelectedParentStudentId = stdId;
+      localStorage.setItem('bac_selected_parent_student_id', stdId);
+      await loadSelectedStudentData(stdId);
+    };
+
     function renderParentDashboard() {
       const picker = document.getElementById('parent-student-picker');
       const area = document.getElementById('parent-content-area');
       if (!area) return;
 
-      if (picker && shParentStudents.length > 0) {
-        picker.innerHTML = shParentStudents.map((s, idx) => `<option value="${s.student_id}"${s.student_id === shSelectedParentStudentId ? ' selected' : ''}>طالب ${idx + 1} (${s.student_id.substring(0,6)}...)</option>`).join('');
+      const isAr = lang === 'ar';
+
+      if (!shParentStudents || !shParentStudents.length) {
+        try {
+          const stored = localStorage.getItem('bac_parent_students');
+          if (stored) shParentStudents = JSON.parse(stored);
+        } catch (e) {}
       }
 
-      if (!shSelectedParentStudentId && shParentStudents.length === 0) {
+      if (picker && shParentStudents && shParentStudents.length > 0) {
+        picker.innerHTML = shParentStudents.map((s, idx) => {
+          const stdId = s.student_id || s.code || s.id;
+          const stdName = s.profiles?.full_name || s.student_name || (isAr ? `طالب ${idx + 1}` : `Student ${idx + 1}`);
+          const stdCode = s.code || (stdId ? stdId.substring(0, 8) : 'STU');
+          return `<option value="${stdId}"${stdId === shSelectedParentStudentId ? ' selected' : ''}>🎓 ${esc(stdName)} (${esc(stdCode)})</option>`;
+        }).join('');
+      }
+
+      if (!shSelectedParentStudentId && (!shParentStudents || shParentStudents.length === 0)) {
         area.innerHTML = `
-          <div class="s-mobile-cat-card" style="text-align:center;padding:40px 16px;">
-            <div style="font-size:42px;margin-bottom:12px">👨‍👩‍👧‍👦</div>
-            <div style="font-weight:900;font-size:16px;color:var(--text);margin-bottom:6px">لم تقم بربط أي طالب بعد</div>
-            <div style="font-size:13px;color:var(--text3);margin-bottom:16px">اطلب رمز الربط من طالبك واضغط على زر "ربط طالب جديد" للمتابعة</div>
-            <button class="s-btn accent" onclick="openParentConnectModal()"><i class="fa-solid fa-plus"></i> ربط طالب جديد الآن</button>
+          <div class="s-mobile-cat-card" style="text-align:center;padding:40px 16px;background:var(--card);border-radius:12px;border:1px solid var(--border)">
+            <div style="font-size:48px;margin-bottom:12px">👨‍👩‍👧‍👦</div>
+            <div style="font-weight:900;font-size:18px;color:var(--text);margin-bottom:6px">${isAr ? 'لم تقم بربط أي طالب بعد' : 'No Students Linked Yet'}</div>
+            <div style="font-size:13px;color:var(--text3);margin-bottom:20px">${isAr ? 'اطلب رمز الطالب أو رمز ولي الأمر واضغط على زر "ربط طالب جديد" للمتابعة' : 'Enter student or parent code to link your child account'}</div>
+            <button class="s-btn accent" onclick="openParentConnectModal()"><i class="fa-solid fa-plus"></i> ${isAr ? 'ربط طالب جديد الآن' : 'Link New Student Now'}</button>
           </div>
         `;
         return;
       }
 
+      // Calculate REAL Metrics from currentParentStudentData
+      const stdData = currentParentStudentData || {};
+      const stdWeek = stdData.week || sWeek || { items: {}, goals: {} };
+      const stdLecs = stdData.lectures || ltLectures || [];
+      const stdCurric = stdData.curriculum || sCurricData || { subjects: [] };
+      const stdMeta = stdData.meta || sMeta || { streak: 0, longestStreak: 0 };
+      const stdEvents = stdData.events || sEvents || [];
+      const stdProf = stdData.profile || {};
+
+      const activeStudentObj = (shParentStudents || []).find(s => (s.student_id || s.code || s.id) === shSelectedParentStudentId) || {};
+      const studentDisplayName = stdProf.full_name || activeStudentObj.student_name || activeStudentObj.profiles?.full_name || (isAr ? 'الطالب المتابَع' : 'Linked Student');
+      const studentDisplayCode = activeStudentObj.code || stdProf.code || (shSelectedParentStudentId ? shSelectedParentStudentId.substring(0, 8) : 'STU');
+
+      // 1. Weekly Schedule Completion
+      let totTasks = 0, doneTasks = 0;
+      DAY_ORDER.forEach(day => {
+        const items = itemsForDay(day);
+        totTasks += items.length;
+        doneTasks += items.filter(it => (stdWeek.items || {})[it.id]).length;
+        const g = (stdWeek.goals || {})[day] || [];
+        totTasks += g.length;
+        doneTasks += g.filter(it => it.done).length;
+      });
+      const schedPct = totTasks === 0 ? 0 : Math.round((doneTasks / totTasks) * 100);
+
+      // 2. Lectures Watched
+      const totalLecs = stdLecs.length;
+      const watchedLecs = stdLecs.filter(l => l.watched).length;
+      const overdueLecs = stdLecs.filter(l => ltStatus(l) === 'overdue');
+      const lecsPct = totalLecs === 0 ? 0 : Math.round((watchedLecs / totalLecs) * 100);
+
+      // 3. Curriculum Progress
+      let totStages = 0, doneStages = 0;
+      (stdCurric.subjects || []).forEach(sub => {
+        (sub.units || []).forEach(u => {
+          (u.lessons || []).forEach(l => {
+            totStages += 4;
+            const st = l.stages || {};
+            if (st.explain) doneStages++;
+            if (st.practice) doneStages++;
+            if (st.rev) doneStages++;
+            if (st.test) doneStages++;
+          });
+        });
+      });
+      const curricPct = totStages === 0 ? 0 : Math.round((doneStages / totStages) * 100);
+
+      // 4. Streak
+      const streakVal = stdMeta.streak || 0;
+      const longestStreakVal = stdMeta.longestStreak || 0;
+
+      // Alerts
+      let alertsHTML = '';
+      const alertItems = [];
+      if (overdueLecs.length > 0) {
+        const overdueSubjNames = [...new Set(overdueLecs.map(l => l.subj || 'المواد'))].join(', ');
+        alertItems.push(`• <strong style="color:var(--red)">${isAr ? `يوجد ${overdueLecs.length} محاضرات متراكمة لم يتم مشاهدتها` : `There are ${overdueLecs.length} overdue unwatched lectures`}</strong> ${isAr ? `في مواد: (${overdueSubjNames})` : `in: (${overdueSubjNames})`}.`);
+      }
+      if (schedPct < 50 && totTasks > 0) {
+        alertItems.push(`• ${isAr ? `نسبة التزام الطالب بالجدول الأسبوعي منخفضة (${schedPct}%). يرجى التنبيه على الطالب للحاق بحصصه.` : `Weekly schedule completion is low (${schedPct}%).`}`);
+      }
+      const upcomingEvents = stdEvents.filter(e => e.date && new Date(e.date) >= new Date());
+      if (upcomingEvents.length > 0) {
+        const nextEv = upcomingEvents[0];
+        alertItems.push(`• ${isAr ? `حدث/امتحان قادم:` : `Upcoming event/exam:`} <strong>${esc(nextEv.title)}</strong> ${isAr ? `بتاريخ ${nextEv.date}` : `on ${nextEv.date}`}.`);
+      }
+
+      if (alertItems.length > 0) {
+        alertsHTML = `
+          <div class="rep-card" style="margin-bottom:20px;border-inline-start:4px solid var(--orange);background:var(--bg2);padding:14px">
+            <div style="font-weight:900;font-size:14px;color:var(--orange);margin-bottom:8px;display:flex;align-items:center;gap:6px">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              <span>${isAr ? 'تنبيهات متابعة ولي الأمر (مزامنة حية)' : 'Parent Follow-up Alerts (Live Sync)'}</span>
+            </div>
+            <div style="font-size:12px;color:var(--text);line-height:1.7">
+              ${alertItems.join('<br>')}
+            </div>
+          </div>
+        `;
+      } else {
+        alertsHTML = `
+          <div class="rep-card" style="margin-bottom:20px;border-inline-start:4px solid var(--green);background:rgba(34,197,94,0.08);padding:12px 16px">
+            <div style="font-weight:800;font-size:13px;color:var(--green);display:flex;align-items:center;gap:6px">
+              <i class="fa-solid fa-circle-check"></i>
+              <span>${isAr ? 'ممتاز! الطالب منتظم في جميع دروسه وجدوله الأسبوعي بدون أي متأخرات.' : 'Great! Student is on track with all lectures and tasks.'}</span>
+            </div>
+          </div>
+        `;
+      }
+
       area.innerHTML = `
-        <!-- KPI Summary for Parent -->
+        <!-- Student Header Banner -->
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--indigo));color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900">
+              🎓
+            </div>
+            <div>
+              <div style="font-weight:900;font-size:16px;color:var(--text)">${esc(studentDisplayName)}</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:2px">${isAr ? 'رمز الطالب الحصري:' : 'Student Code:'} <span style="font-weight:800;color:var(--gold);background:var(--bg2);padding:2px 6px;border-radius:4px">${esc(studentDisplayCode)}</span></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="s-btn" onclick="loadSelectedStudentData('${shSelectedParentStudentId}')" style="font-size:11px;padding:6px 12px"><i class="fa-solid fa-rotate"></i> ${isAr ? 'تحديث البيانات الحية' : 'Refresh Live Data'}</button>
+          </div>
+        </div>
+
+        <!-- Live KPI Summary for Parent -->
         <div class="an-kpi-grid" style="margin-bottom:20px">
           <div class="an-kpi-card blue">
-            <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-calendar-check"></i></span><span class="an-kpi-lbl">إنجاز الجدول الأسبوعي</span></div>
-            <div class="an-kpi-val">82%</div>
-            <div class="an-kpi-sub">نسبة التزام الطالب بالحساس</div>
+            <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-calendar-check"></i></span><span class="an-kpi-lbl">${isAr ? 'إنجاز الجدول الأسبوعي' : 'Weekly Completion'}</span></div>
+            <div class="an-kpi-val">${schedPct}%</div>
+            <div class="an-kpi-sub">${doneTasks} ${isAr ? `من أصل ${totTasks} مهمة مكتملة` : `of ${totTasks} tasks done`}</div>
           </div>
           <div class="an-kpi-card purple">
-            <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-video"></i></span><span class="an-kpi-lbl">المحاضرات المشاهَدة</span></div>
-            <div class="an-kpi-val">42</div>
-            <div class="an-kpi-sub">من أصل 50 محاضرة مجدولة</div>
+            <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-video"></i></span><span class="an-kpi-lbl">${isAr ? 'المحاضرات المشاهَدة' : 'Lectures Watched'}</span></div>
+            <div class="an-kpi-val">${watchedLecs} / ${totalLecs}</div>
+            <div class="an-kpi-sub">${lecsPct}% ${isAr ? 'نسبة مشاهدة المحاضرات' : 'watch percentage'}</div>
           </div>
           <div class="an-kpi-card green">
-            <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-book-bookmark"></i></span><span class="an-kpi-lbl">تقدم المنهج</span></div>
-            <div class="an-kpi-val">74%</div>
-            <div class="an-kpi-sub">من إجمالي المنهج الدراسي</div>
+            <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-book-bookmark"></i></span><span class="an-kpi-lbl">${isAr ? 'تقدم المنهج' : 'Curriculum Progress'}</span></div>
+            <div class="an-kpi-val">${curricPct}%</div>
+            <div class="an-kpi-sub">${doneStages} ${isAr ? `من أصل ${totStages} مرحلة تعليمية` : `of ${totStages} stages done`}</div>
           </div>
           <div class="an-kpi-card gold">
-            <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-fire"></i></span><span class="an-kpi-lbl">سلسلة الدراسة الحالية</span></div>
-            <div class="an-kpi-val">6 أيام</div>
-            <div class="an-kpi-sub">أطول سلسلة: 14 يوم</div>
+            <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-fire"></i></span><span class="an-kpi-lbl">${isAr ? 'سلسلة الدراسة الحالية' : 'Study Streak'}</span></div>
+            <div class="an-kpi-val">${streakVal} ${isAr ? 'أيام 🔥' : 'days 🔥'}</div>
+            <div class="an-kpi-sub">${isAr ? 'أطول سلسلة:' : 'Best:'} ${longestStreakVal} ${isAr ? 'يوم' : 'days'}</div>
           </div>
         </div>
 
-        <!-- Attention Banners -->
-        <div class="rep-card" style="margin-bottom:20px;border-inline-start:4px solid var(--orange)">
-          <div style="font-weight:800;font-size:14px;color:var(--orange);margin-bottom:6px"><i class="fa-solid fa-triangle-exclamation"></i> تنبيهات متابعة ولي الأمر</div>
-          <div style="font-size:12px;color:var(--text2)">
-            • يوجد 3 محاضرات متراكمة لم يتم مشاهدتها في مادة الفيزياء.<br>
-            • امتحان كيمياء شامل قادم بعد 4 أيام.
-          </div>
-        </div>
+        <!-- Live Attention Banners -->
+        ${alertsHTML}
 
-        <!-- Read Only Schedule Overview -->
-        <div class="rep-card">
-          <div style="font-weight:800;font-size:14px;margin-bottom:12px;display:flex;align-items:center;gap:8px">
-            <i class="fa-solid fa-calendar-week" style="color:var(--blue)"></i>
-            <span>عرض جدول الطالب (قراءة فقط)</span>
+        <!-- Tabbed Detailed Student Views -->
+        <div class="rep-card" style="padding:16px">
+          <div class="lt-tabs-row" style="margin-bottom:16px;border-bottom:1px solid var(--border)">
+            <button class="lt-tab ${parentActiveTab === 'overview' ? 'active' : ''}" onclick="setParentDashboardTab('overview')"><i class="fa-solid fa-chart-line"></i> <span>${isAr ? 'ملخص الأداء والأنشطة' : 'Performance Summary'}</span></button>
+            <button class="lt-tab ${parentActiveTab === 'schedule' ? 'active' : ''}" onclick="setParentDashboardTab('schedule')"><i class="fa-solid fa-calendar-days"></i> <span>${isAr ? 'جدول الطالب الحقيقي' : 'Live Student Schedule'}</span></button>
+            <button class="lt-tab ${parentActiveTab === 'lectures' ? 'active' : ''}" onclick="setParentDashboardTab('lectures')"><i class="fa-solid fa-video"></i> <span>${isAr ? 'سجل المحاضرات والدروس' : 'Lectures Record'}</span></button>
+            <button class="lt-tab ${parentActiveTab === 'curriculum' ? 'active' : ''}" onclick="setParentDashboardTab('curriculum')"><i class="fa-solid fa-book-bookmark"></i> <span>${isAr ? 'منهج الطالب ومواد الدراسة' : 'Curriculum Tree'}</span></button>
           </div>
-          <div id="parent-sched-view">
-            <div style="font-size:12px;color:var(--text3);text-align:center;padding:16px">— جدول الطالب يعكس التحديثات الحية تلقائياً —</div>
+
+          <div id="parent-tab-render-area">
+            ${renderParentTabContent(parentActiveTab, stdWeek, stdLecs, stdCurric, isAr)}
           </div>
         </div>
       `;
     }
 
-    function selectParentStudent(stdId) {
-      shSelectedParentStudentId = stdId;
-      renderParentDashboard();
+    function renderParentTabContent(tab, stdWeek, stdLecs, stdCurric, isAr) {
+      if (tab === 'schedule') {
+        return `
+          <div style="font-size:13px;font-weight:800;margin-bottom:12px;color:var(--text)"><i class="fa-solid fa-calendar-check" style="color:var(--blue)"></i> ${isAr ? 'جدول الأسبوع الجاري للطالب (مكتمل وغير مكتمل):' : 'Student Current Week Schedule:'}</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:12px">
+            ${DAY_ORDER.map(day => {
+              const dayName = t('days')[day] || day;
+              const items = itemsForDay(day);
+              const goals = (stdWeek.goals || {})[day] || [];
+              return `
+                <div style="background:var(--bg2);border-radius:8px;padding:10px;border:1px solid var(--border)">
+                  <div style="font-weight:800;font-size:13px;color:var(--blue2);margin-bottom:6px;border-bottom:1px solid var(--border);padding-bottom:4px">${dayName}</div>
+                  ${items.length === 0 && goals.length === 0 ? `<div style="font-size:11px;color:var(--text3)">${isAr ? 'عطلة / لا يوجد دروس' : 'Off day'}</div>` : ''}
+                  ${items.map(it => {
+                    const done = (stdWeek.items || {})[it.id];
+                    return `<div style="font-size:11px;display:flex;align-items:center;gap:6px;margin-bottom:4px;color:${done ? 'var(--green)' : 'var(--text)'}">
+                      <span>${done ? '✅' : '⏳'}</span>
+                      <span>${esc(it.name || it.subj || 'درس')}</span>
+                    </div>`;
+                  }).join('')}
+                  ${goals.map(g => `<div style="font-size:11px;display:flex;align-items:center;gap:6px;margin-bottom:4px;color:${g.done ? 'var(--green)' : 'var(--text)'}">
+                    <span>${g.done ? '🎯' : '⚪'}</span>
+                    <span>${esc(g.title || g.text || 'هدف')}</span>
+                  </div>`).join('')}
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      } else if (tab === 'lectures') {
+        if (!stdLecs.length) return `<div style="text-align:center;padding:24px;color:var(--text3);font-size:12px">${isAr ? 'لا توجد محاضرات مسجلة للطالب حتى الآن' : 'No lectures recorded for student yet'}</div>`;
+        return `
+          <div style="font-size:13px;font-weight:800;margin-bottom:12px;color:var(--text)"><i class="fa-solid fa-video" style="color:var(--purple)"></i> ${isAr ? 'قائمة المحاضرات والدروس المجدولة:' : 'Scheduled Lectures List:'}</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            ${stdLecs.map(l => {
+              const status = ltStatus(l);
+              const stBadge = l.watched ? `<span style="color:var(--green);font-size:11px;font-weight:800">✅ ${isAr ? 'تمت المشاهدة' : 'Watched'}</span>` : status === 'overdue' ? `<span style="color:var(--red);font-size:11px;font-weight:800">⚠️ ${isAr ? 'متأخرة' : 'Overdue'}</span>` : `<span style="color:var(--blue2);font-size:11px;font-weight:800">⏳ ${isAr ? 'قادمة' : 'Upcoming'}</span>`;
+              return `
+                <div style="background:var(--bg2);padding:10px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
+                  <div>
+                    <div style="font-weight:800;font-size:13px">${esc(l.title || l.subj || 'محاضرة')}</div>
+                    <div style="font-size:11px;color:var(--text3);margin-top:2px">${esc(l.subj || '')} • ${esc(l.teacher || '')}</div>
+                  </div>
+                  <div>${stBadge}</div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      } else if (tab === 'curriculum') {
+        const subjs = stdCurric.subjects || [];
+        if (!subjs.length) return `<div style="text-align:center;padding:24px;color:var(--text3);font-size:12px">${isAr ? 'لا توجد مواد مضافة في منهج الطالب حالياً' : 'No subjects in student curriculum yet'}</div>`;
+        return `
+          <div style="font-size:13px;font-weight:800;margin-bottom:12px;color:var(--text)"><i class="fa-solid fa-book-bookmark" style="color:var(--gold)"></i> ${isAr ? 'مستويات إنجاز المواد والأبواب:' : 'Subject Progress Levels:'}</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            ${subjs.map(sub => {
+              let totStages = 0, doneStages = 0;
+              (sub.units || []).forEach(u => {
+                (u.lessons || []).forEach(l => {
+                  totStages += 4;
+                  const st = l.stages || {};
+                  if (st.explain) doneStages++;
+                  if (st.practice) doneStages++;
+                  if (st.rev) doneStages++;
+                  if (st.test) doneStages++;
+                });
+              });
+              const pct = totStages === 0 ? 0 : Math.round((doneStages / totStages) * 100);
+              return `
+                <div style="background:var(--bg2);padding:12px;border-radius:8px">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                    <span style="font-weight:800;font-size:14px;color:var(--text)">${sub.emoji || '📚'} ${esc(sub.name)}</span>
+                    <span style="font-weight:900;font-size:14px;color:var(--gold)">${pct}%</span>
+                  </div>
+                  <div class="tc-prog-track"><div class="tc-prog-fill" style="width:${pct}%;background:${sub.color || 'var(--blue)'}"></div></div>
+                  <div style="font-size:11px;color:var(--text3);margin-top:6px">${(sub.units || []).length} ${isAr ? 'أبواب / وحدات دراسية' : 'units'} • ${doneStages} / ${totStages} ${isAr ? 'مراحل مكتملة' : 'completed stages'}</div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      } else {
+        return `
+          <div style="font-size:13px;color:var(--text2);line-height:1.8">
+            <div style="font-weight:800;color:var(--text);font-size:14px;margin-bottom:6px">📊 ${isAr ? 'نظرة عامة على نشاط الطالب' : 'Student Activity Overview'}</div>
+            • ${isAr ? `إجمالي المهام والدروس الأسبوعية:` : `Total weekly tasks:`} <strong>${stdWeek.items ? Object.keys(stdWeek.items).length : 0}</strong> ${isAr ? 'درس ومهمة' : 'tasks'}.<br>
+            • ${isAr ? `إجمالي المحاضرات المسجلة:` : `Total lectures:`} <strong>${stdLecs.length}</strong> ${isAr ? 'محاضرة' : 'lectures'}.<br>
+            • ${isAr ? `المواد الدراسية الجارية:` : `Current subjects:`} <strong>${(stdCurric.subjects || []).map(s => s.name).join(', ') || (isAr ? 'لا توجد' : 'None')}</strong>.<br>
+            • ${isAr ? `يمكنك التنقل بين التبويبات أعلاه لعرض التفاصيل الكاملة لجدول الطالب والمحاضرات ومنهجه الدراسي.` : `Use the tabs above to view full details.`}
+          </div>
+        `;
+      }
     }
 
     /* Main Admin Panel */
