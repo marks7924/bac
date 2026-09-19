@@ -7213,6 +7213,24 @@
 
     let sCurricData = loadJ('curriculum', DEF_CURRIC);
 
+    window.saveCurriculumData = function(curricData) {
+      if (curricData) sCurricData = curricData;
+      saveJ('curriculum', sCurricData);
+      saveJ('bac_curriculum_data', sCurricData);
+      
+      if (_sb && _sbUid) {
+        _sb.from('schedule_data')
+          .upsert({ 
+            id: 'curriculum', 
+            user_id: _sbUid, 
+            data: sCurricData, 
+            updated_at: new Date().toISOString() 
+          }, { onConflict: 'id,user_id' })
+          .then(() => {})
+          .catch(e => console.warn('Curriculum cloud save error:', e));
+      }
+    };
+
     let curricActiveTerm = 'all';
 
     function setCurricTerm(tName) {
@@ -7351,7 +7369,7 @@
           const unitHandle = unitEl.querySelector('.cur-unit-drag-handle');
           if (unitHandle) {
             enableDrag(unitEl, unitHandle, 'cur-unit-box', () => sub.units, () => {
-              saveJ('curriculum', sCurricData);
+              saveCurriculumData(sCurricData);
               curRenderAll();
             });
           }
@@ -7362,7 +7380,7 @@
             const unitObj = sub.units.find(u => u.id === unitEl.dataset.id);
             if (lesHandle && unitObj) {
               enableDrag(lesEl, lesHandle, 'cur-lesson-row', () => unitObj.lessons, () => {
-                saveJ('curriculum', sCurricData);
+                saveCurriculumData(sCurricData);
                 curRenderAll();
               });
             }
@@ -7375,7 +7393,7 @@
         const subjHandle = card.querySelector('.cur-subj-drag-handle');
         if (subjHandle) {
           enableDrag(card, subjHandle, 'cur-subj-card', () => sCurricData.subjects, () => {
-            saveJ('curriculum', sCurricData);
+            saveCurriculumData(sCurricData);
             curRenderAll();
           });
         }
@@ -9143,11 +9161,33 @@
             if (!shStudentProfile) {
               shStudentProfile = loadJ('student_profile', null);
             }
-            const stStage = shStudentProfile?.academic_stage || shStudentProfile?.stage_name;
-            if (stStage && typeof syncPushedMasterCurriculumForStudent === 'function') {
-              syncPushedMasterCurriculumForStudent(stStage);
+
+            // Attempt cloud fetch of student's personal saved curriculum
+            try {
+              const { data: curRow } = await _sb.from('schedule_data')
+                .select('data')
+                .eq('id', 'curriculum')
+                .eq('user_id', _sbUid)
+                .maybeSingle();
+
+              if (curRow && curRow.data && curRow.data.subjects && curRow.data.subjects.length > 0) {
+                sCurricData = curRow.data;
+                saveJ('curriculum', sCurricData);
+                saveJ('bac_curriculum_data', sCurricData);
+              }
+            } catch (e) {
+              console.warn('Error fetching cloud student curriculum:', e);
             }
+
+            const stStage = shStudentProfile?.academic_stage || shStudentProfile?.stage_name;
+            if (stStage && (!sCurricData || !sCurricData.subjects || sCurricData.subjects.length === 0)) {
+              if (typeof syncPushedMasterCurriculumForStudent === 'function') {
+                syncPushedMasterCurriculumForStudent(stStage);
+              }
+            }
+
             checkStudentStageBanner();
+            if (typeof curRenderAll === 'function') curRenderAll();
 
             // Fetch required curriculum assignments
             const { data: fa } = await _sb.from('force_curriculum_assignments').select('*').eq('is_active', true);
