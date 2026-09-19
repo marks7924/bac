@@ -4515,6 +4515,13 @@
         </div>
       </div>
 
+      <!-- Term Selector Tabs -->
+      <div class="lt-tabs-row" style="margin-bottom:16px;border-bottom:1px solid var(--border)">
+        <button class="lt-tab active" id="cur-tab-all" onclick="setCurricTerm('all')"><i class="fa-solid fa-layer-group"></i> <span id="cur-t-all">كافة الأترام (All Terms)</span></button>
+        <button class="lt-tab" id="cur-tab-term1" onclick="setCurricTerm('term1')"><i class="fa-solid fa-bookmark" style="color:var(--blue2)"></i> <span id="cur-t-term1">الترم الأول (1st Term)</span></button>
+        <button class="lt-tab" id="cur-tab-term2" onclick="setCurricTerm('term2')"><i class="fa-solid fa-bookmark" style="color:var(--gold)"></i> <span id="cur-t-term2">الترم الثاني (2nd Term)</span></button>
+      </div>
+
       <div class="cur-subj-grid" id="cur-subj-grid"></div>
     </div>
   </div>
@@ -5443,6 +5450,9 @@
       si('cur-title-txt', t('curTitle'));
       si('cur-sub-txt', t('curSub'));
       si('cur-btn-add-txt', t('addSubjectBtn'));
+      si('cur-t-all', isAr ? 'كافة الأترام' : 'All Terms');
+      si('cur-t-term1', isAr ? 'الترم الأول (1st Term)' : '1st Term (Part 1)');
+      si('cur-t-term2', isAr ? 'الترم الثاني (2nd Term)' : '2nd Term (Part 2)');
 
       // Reports page
       si('rep-title-txt', t('repTitle'));
@@ -7196,6 +7206,16 @@
 
     let sCurricData = loadJ('curriculum', DEF_CURRIC);
 
+    let curricActiveTerm = 'all';
+
+    function setCurricTerm(tName) {
+      curricActiveTerm = tName;
+      document.querySelectorAll('#page-curric .lt-tab').forEach(t => t.classList.remove('active'));
+      const btn = document.getElementById('cur-tab-' + tName);
+      if (btn) btn.classList.add('active');
+      curRenderAll();
+    }
+
     function curRenderAll() {
       const ct = document.getElementById('cur-subj-grid');
       if (!ct) return;
@@ -7205,6 +7225,7 @@
         return;
       }
 
+      const isAr = lang === 'ar';
       ct.innerHTML = '';
       sCurricData.subjects.forEach(sub => {
         let totStages = 0, doneStages = 0;
@@ -7221,7 +7242,7 @@
         const pct = totStages === 0 ? 0 : Math.round((doneStages / totStages) * 100);
         const pacing = pct >= 50 ? [t('pacingAhead'), 'rgba(34,197,94,0.2)', 'var(--green)'] : pct >= 25 ? [t('pacingOnTrack'), 'rgba(59,130,246,0.2)', 'var(--blue2)'] : [t('pacingBehind'), 'rgba(239,68,68,0.2)', 'var(--red)'];
 
-        let unitsHTML = (sub.units || []).map(u => {
+        const renderUnitBox = (u) => {
           let lessonsHTML = (u.lessons || []).map(l => {
             const st = l.stages || {};
             return `<div class="cur-lesson-row" data-id="${l.id}">
@@ -7242,11 +7263,15 @@
         </div>`;
           }).join('');
 
+          const termBadge = u.term == 2
+            ? `<span class="week-tag" style="background:rgba(234,179,8,0.15);color:var(--gold);margin-inline-start:6px;font-size:10px;padding:2px 6px">${isAr ? 'الترم الثاني (Part 2)' : '2nd Term (Part 2)'}</span>`
+            : `<span class="week-tag" style="background:rgba(59,130,246,0.15);color:var(--blue2);margin-inline-start:6px;font-size:10px;padding:2px 6px">${isAr ? 'الترم الأول (Part 1)' : '1st Term (Part 1)'}</span>`;
+
           return `<div class="cur-unit-box" data-id="${u.id}">
         <div class="cur-unit-title">
           <span style="display:flex;align-items:center;gap:6px">
             <span class="s-handle admin-only cur-unit-drag-handle" style="cursor:grab;color:var(--text3);font-size:13px" onclick="event.stopPropagation()"><i class="fa-solid fa-grip-vertical"></i></span>
-            <i class="fa-solid fa-folder-open"></i> ${esc(u.title)}
+            <i class="fa-solid fa-folder-open"></i> ${esc(u.title)} ${termBadge}
           </span>
           <div style="display:flex;align-items:center;gap:6px">
             <button class="admin-only icon-reorder-btn" style="border:none;background:none;color:var(--text3);font-size:11px;cursor:pointer;padding:2px 4px" onclick="curMoveUnit('${sub.id}','${u.id}',-1)" title="Move Up"><i class="fa-solid fa-chevron-up"></i></button>
@@ -7258,7 +7283,26 @@
         </div>
         ${lessonsHTML || `<div style="font-size:11px;color:var(--text3);padding:6px">${t('noLessonsInUnit')}</div>`}
       </div>`;
-        }).join('');
+        };
+
+        let unitsHTML = '';
+        const allUnits = sub.units || [];
+        const term1Units = allUnits.filter(u => u.term != 2);
+        const term2Units = allUnits.filter(u => u.term == 2);
+
+        if (curricActiveTerm === 'term1') {
+          unitsHTML = term1Units.length ? term1Units.map(renderUnitBox).join('') : `<div style="font-size:11px;color:var(--text3);padding:12px;text-align:center">${isAr ? 'لا توجد وحدات مضافة للترم الأول' : 'No units for 1st Term yet'}</div>`;
+        } else if (curricActiveTerm === 'term2') {
+          unitsHTML = term2Units.length ? term2Units.map(renderUnitBox).join('') : `<div style="font-size:11px;color:var(--text3);padding:12px;text-align:center">${isAr ? 'لا توجد وحدات مضافة للترم الثاني' : 'No units for 2nd Term yet'}</div>`;
+        } else {
+          const part1HTML = `<div style="margin-top:10px;margin-bottom:6px;font-size:12px;font-weight:800;color:var(--blue2);display:flex;align-items:center;gap:6px"><i class="fa-solid fa-bookmark"></i> ${isAr ? 'الجزء الأول: الترم الأول (Part 1 - 1st Term)' : 'Part 1: 1st Term'}</div>` +
+            (term1Units.length ? term1Units.map(renderUnitBox).join('') : `<div style="font-size:11px;color:var(--text3);padding:8px;background:var(--bg2);border-radius:6px;margin-bottom:8px">${isAr ? 'لا توجد وحدات في الترم الأول' : 'No units in 1st Term'}</div>`);
+          
+          const part2HTML = `<div style="margin-top:14px;margin-bottom:6px;font-size:12px;font-weight:800;color:var(--gold);display:flex;align-items:center;gap:6px"><i class="fa-solid fa-bookmark"></i> ${isAr ? 'الجزء الثاني: الترم الثاني (Part 2 - 2nd Term)' : 'Part 2: 2nd Term'}</div>` +
+            (term2Units.length ? term2Units.map(renderUnitBox).join('') : `<div style="font-size:11px;color:var(--text3);padding:8px;background:var(--bg2);border-radius:6px">${isAr ? 'لا توجد وحدات في الترم الثاني' : 'No units in 2nd Term'}</div>`);
+          
+          unitsHTML = part1HTML + part2HTML;
+        }
 
         const card = document.createElement('div');
         card.className = 'cur-subj-card';
@@ -7395,22 +7439,29 @@
     };
 
     window.curAddUnitPrompt = function (anchor, subId) {
-      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(300);
+      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(320);
+      const isAr = lang === 'ar';
       pop.innerHTML = `
     <div style="font-weight:800;font-size:14px;margin-bottom:8px">${t('addUnitModalTitle')}</div>
-    <input type="text" id="cur-un-in" placeholder="${t('unitTitlePh')}">
-    <div class="pop-actions" style="margin-top:12px;display:flex;gap:6px">
+    <input type="text" id="cur-un-in" placeholder="${t('unitTitlePh')}" style="width:100%;margin-bottom:10px">
+    <div style="font-size:11px;font-weight:700;margin-bottom:4px;color:var(--text2)">${isAr ? 'الترم الدراسي:' : 'Academic Term:'}</div>
+    <select id="cur-un-term" style="width:100%;padding:8px;border-radius:6px;background:var(--bg2);color:var(--text);border:1px solid var(--border);margin-bottom:12px;font-family:inherit">
+      <option value="1">${isAr ? 'الترم الأول (Part 1 - 1st Term)' : '1st Term (Part 1)'}</option>
+      <option value="2">${isAr ? 'الترم الثاني (Part 2 - 2nd Term)' : '2nd Term (Part 2)'}</option>
+    </select>
+    <div class="pop-actions" style="display:flex;gap:6px">
       <button class="p-btn p-save" id="cur-u-save" style="flex:1">${t('addBtn')}</button>
       <button class="p-btn p-del" onclick="closeAnyPop()" style="flex:1">${t('flCancel')}</button>
     </div>
   `;
       pop.querySelector('#cur-u-save').onclick = () => {
         const title = pop.querySelector('#cur-un-in').value.trim();
+        const term = parseInt(pop.querySelector('#cur-un-term').value) || 1;
         if (!title) return;
         const sub = sCurricData.subjects.find(s => s.id === subId);
         if (sub) {
           if (!sub.units) sub.units = [];
-          sub.units.push({ id: genId(), title, lessons: [] });
+          sub.units.push({ id: genId(), title, term, lessons: [] });
           saveJ('curriculum', sCurricData); closeAnyPop(); curRenderAll();
         }
       };
@@ -7421,10 +7472,16 @@
     window.curEditUnitPrompt = function (anchor, subId, unitId) {
       const sub = sCurricData.subjects.find(s => s.id === subId); if (!sub || !sub.units) return;
       const unit = sub.units.find(u => u.id === unitId); if (!unit) return;
-      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(300);
+      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(320);
+      const isAr = lang === 'ar';
       pop.innerHTML = `
-    <div style="font-weight:800;font-size:14px;margin-bottom:8px">${lang === 'ar' ? 'تعديل الباب / الوحدة' : 'Edit Unit'}</div>
-    <input type="text" id="cur-eun-in" value="${esc(unit.title)}" style="width:100%;margin-bottom:12px">
+    <div style="font-weight:800;font-size:14px;margin-bottom:8px">${isAr ? 'تعديل الباب / الوحدة' : 'Edit Unit'}</div>
+    <input type="text" id="cur-eun-in" value="${esc(unit.title)}" style="width:100%;margin-bottom:10px">
+    <div style="font-size:11px;font-weight:700;margin-bottom:4px;color:var(--text2)">${isAr ? 'الترم الدراسي:' : 'Academic Term:'}</div>
+    <select id="cur-eun-term" style="width:100%;padding:8px;border-radius:6px;background:var(--bg2);color:var(--text);border:1px solid var(--border);margin-bottom:12px;font-family:inherit">
+      <option value="1"${unit.term != 2 ? ' selected' : ''}>${isAr ? 'الترم الأول (Part 1 - 1st Term)' : '1st Term (Part 1)'}</option>
+      <option value="2"${unit.term == 2 ? ' selected' : ''}>${isAr ? 'الترم الثاني (Part 2 - 2nd Term)' : '2nd Term (Part 2)'}</option>
+    </select>
     <div class="pop-actions" style="display:flex;gap:6px">
       <button class="p-btn p-save" id="cur-eu-save" style="flex:1">${t('flSave')}</button>
       <button class="p-btn p-del" onclick="closeAnyPop()" style="flex:1">${t('flCancel')}</button>
@@ -7432,8 +7489,10 @@
   `;
       pop.querySelector('#cur-eu-save').onclick = () => {
         const title = pop.querySelector('#cur-eun-in').value.trim();
+        const term = parseInt(pop.querySelector('#cur-eun-term').value) || 1;
         if (!title) return;
         unit.title = title;
+        unit.term = term;
         saveJ('curriculum', sCurricData); closeAnyPop(); curRenderAll();
       };
       document.body.appendChild(pop); posPop(pop, anchor || document.body);
@@ -8851,6 +8910,7 @@
 
     let shStudentProfile = null;
     let shMasterCurricula = [];
+    let shAllAdminProfiles = [];
     let shForceAssignments = [];
     let shRequiredProgress = {};
     let shParentStudents = [];
@@ -9193,162 +9253,181 @@
 
     /* Main Admin Panel */
     function renderAdminPanel() {
-      const content = document.getElementById('admin-sub-content');
-      if (!content) return;
+      try {
+        const content = document.getElementById('admin-sub-content');
+        if (!content) return;
 
-      document.querySelectorAll('.lt-tab').forEach(t => t.classList.remove('active'));
-      const activeTabBtn = document.getElementById('adm-tab-' + adminSubTab);
-      if (activeTabBtn) activeTabBtn.classList.add('active');
+        document.querySelectorAll('#page-admin .lt-tab').forEach(t => t.classList.remove('active'));
+        const activeTabBtn = document.getElementById('adm-tab-' + (adminSubTab || 'overview'));
+        if (activeTabBtn) activeTabBtn.classList.add('active');
 
-      const isAr = lang === 'ar';
+        const isAr = lang === 'ar';
+        const allProfs = Array.isArray(window.shAllAdminProfiles) ? window.shAllAdminProfiles : [];
 
-      // Dynamic counts from active profiles / state
-      let studentsList = (shAllAdminProfiles || []).filter(p => (p.role || 'USER') === 'USER' || p.role === 'student');
-      if (studentsList.length === 0) {
-        const cu = window._currentUser || {};
-        let localEmail = '';
-        try { localEmail = JSON.parse(localStorage.getItem('bac_local_user') || '{}').email || ''; } catch(e){}
-        const uEmail = cu.email || localEmail || 'marksamer010@gmail.com';
-        studentsList = [
-          {
-            full_name: isAr ? 'مارك سامر (طالب)' : 'Mark Samer (Student)',
-            email: uEmail,
-            track: isAr ? 'البكالوريا - مسار الهندسة وعلوم الحاسب' : 'Baccalaureate - Engineering & CS Track',
-            status: 'ACTIVE'
-          }
-        ];
-      }
+        // Dynamic counts from active profiles / state
+        let studentsList = allProfs.filter(p => (p.role || 'USER') === 'USER' || p.role === 'student');
+        if (studentsList.length === 0) {
+          const cu = window._currentUser || {};
+          let localEmail = '';
+          try { localEmail = JSON.parse(localStorage.getItem('bac_local_user') || '{}').email || ''; } catch(e){}
+          const uEmail = cu.email || localEmail || 'marksamer010@gmail.com';
+          studentsList = [
+            {
+              full_name: isAr ? 'مارك سامر (طالب)' : 'Mark Samer (Student)',
+              email: uEmail,
+              track: isAr ? 'البكالوريا - مسار الهندسة وعلوم الحاسب' : 'Baccalaureate - Engineering & CS Track',
+              status: 'ACTIVE'
+            }
+          ];
+        }
 
-      let parentsList = (shAllAdminProfiles || []).filter(p => p.role === 'PARENT' || p.role === 'parent');
-      if (parentsList.length === 0 && shParentStudents.length > 0) {
-        parentsList = shParentStudents.map(rel => ({
-          full_name: isAr ? 'حساب ولي أمر مرتبط' : 'Linked Parent Account',
-          student_id: rel.student_id,
-          code: rel.code || 'PAR-8X92'
-        }));
-      }
+        let parentsList = allProfs.filter(p => p.role === 'PARENT' || p.role === 'parent');
+        const parRels = Array.isArray(window.shParentStudents) ? window.shParentStudents : [];
+        if (parentsList.length === 0 && parRels.length > 0) {
+          parentsList = parRels.map(rel => ({
+            full_name: isAr ? 'حساب ولي أمر مرتبط' : 'Linked Parent Account',
+            student_id: rel.student_id,
+            code: rel.code || 'PAR-8X92'
+          }));
+        }
+        if (parentsList.length === 0) {
+          parentsList = [
+            {
+              full_name: isAr ? 'حساب ولي أمر' : 'Parent Account',
+              code: 'PAR-8X92',
+              status: 'ACTIVE LINK'
+            }
+          ];
+        }
 
-      if (adminSubTab === 'overview') {
-        content.innerHTML = `
-          <div class="an-kpi-grid" style="margin-bottom:20px">
-            <div class="an-kpi-card blue">
-              <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-user-graduate"></i></span><span class="an-kpi-lbl">${t('admTotalStudents')}</span></div>
-              <div class="an-kpi-val">${studentsList.length}</div>
-              <div class="an-kpi-sub">${isAr ? 'عبر كافة الأنظمة التعليمية' : 'Across all education systems'}</div>
+        const sysList = Array.isArray(window.shEducationSystems) ? window.shEducationSystems : [];
+        const mcList = Array.isArray(window.shMasterCurricula) ? window.shMasterCurricula : [];
+        const lvlList = Array.isArray(window.shAcademicLevels) ? window.shAcademicLevels : [];
+
+        if (!adminSubTab || adminSubTab === 'overview') {
+          content.innerHTML = `
+            <div class="an-kpi-grid" style="margin-bottom:20px">
+              <div class="an-kpi-card blue">
+                <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-user-graduate"></i></span><span class="an-kpi-lbl">${t('admTotalStudents')}</span></div>
+                <div class="an-kpi-val">${studentsList.length}</div>
+                <div class="an-kpi-sub">${isAr ? 'عبر كافة الأنظمة التعليمية' : 'Across all education systems'}</div>
+              </div>
+              <div class="an-kpi-card purple">
+                <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-people-roof"></i></span><span class="an-kpi-lbl">${t('admParentAccounts')}</span></div>
+                <div class="an-kpi-val">${parentsList.length}</div>
+                <div class="an-kpi-sub">${isAr ? 'علاقات ربط نشطة مع الطلاب' : 'Active parent-student links'}</div>
+              </div>
+              <div class="an-kpi-card green">
+                <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-network-wired"></i></span><span class="an-kpi-lbl">${t('admEduSystems')}</span></div>
+                <div class="an-kpi-val">${sysList.length} ${isAr ? 'أنظمة' : 'Systems'}</div>
+                <div class="an-kpi-sub">${lvlList.length} ${isAr ? 'مراحل دراسية' : 'Academic levels'}</div>
+              </div>
+              <div class="an-kpi-card gold">
+                <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-book-bookmark"></i></span><span class="an-kpi-lbl">${t('admMasterCurric')}</span></div>
+                <div class="an-kpi-val">${mcList.length} ${isAr ? 'منهج' : 'Curricula'}</div>
+                <div class="an-kpi-sub">${isAr ? 'تصل للطلاب المستهدفين تلقائياً' : 'Available for stage import'}</div>
+              </div>
             </div>
-            <div class="an-kpi-card purple">
-              <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-people-roof"></i></span><span class="an-kpi-lbl">${t('admParentAccounts')}</span></div>
-              <div class="an-kpi-val">${parentsList.length}</div>
-              <div class="an-kpi-sub">${isAr ? 'علاقات ربط نشطة مع الطلاب' : 'Active parent-student links'}</div>
-            </div>
-            <div class="an-kpi-card green">
-              <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-network-wired"></i></span><span class="an-kpi-lbl">${t('admEduSystems')}</span></div>
-              <div class="an-kpi-val">${shEducationSystems.length} ${isAr ? 'أنظمة' : 'Systems'}</div>
-              <div class="an-kpi-sub">${shAcademicLevels.length} ${isAr ? 'مراحل دراسية' : 'Academic levels'}</div>
-            </div>
-            <div class="an-kpi-card gold">
-              <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-book-bookmark"></i></span><span class="an-kpi-lbl">${t('admMasterCurric')}</span></div>
-              <div class="an-kpi-val">${shMasterCurricula.length} ${isAr ? 'منهج' : 'Curricula'}</div>
-              <div class="an-kpi-sub">${isAr ? 'تصل للطلاب المستهدفين تلقائياً' : 'Available for stage import'}</div>
-            </div>
-          </div>
-        `;
-      } else if (adminSubTab === 'systems') {
-        content.innerHTML = `
-          <div class="rep-card" style="margin-bottom:16px">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-              <div style="font-weight:800;font-size:14px">${isAr ? 'إدارة الأنظمة التعليمية' : 'Education Systems Management'}</div>
-              <button class="s-btn accent" onclick="promptAddEducationSystem()"><i class="fa-solid fa-plus"></i> ${t('admAddSysBtn')}</button>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:8px">
-              ${shEducationSystems.map(s => `
-                <div style="background:var(--bg2);padding:10px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
-                  <div>
-                    <div style="font-weight:800;font-size:13px">${esc(s.name)} <span class="week-tag">${esc(s.code)}</span></div>
-                    <div style="font-size:11px;color:var(--text3);margin-top:2px">${esc(s.description || (isAr ? 'نظام مفعل بالمنصة' : 'Active education system'))}</div>
+          `;
+        } else if (adminSubTab === 'systems') {
+          content.innerHTML = `
+            <div class="rep-card" style="margin-bottom:16px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                <div style="font-weight:800;font-size:14px">${isAr ? 'إدارة الأنظمة التعليمية' : 'Education Systems Management'}</div>
+                <button class="s-btn accent" onclick="promptAddEducationSystem()"><i class="fa-solid fa-plus"></i> ${t('admAddSysBtn')}</button>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                ${sysList.map(s => `
+                  <div style="background:var(--bg2);padding:10px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
+                    <div>
+                      <div style="font-weight:800;font-size:13px">${esc(s.name)} <span class="week-tag">${esc(s.code)}</span></div>
+                      <div style="font-size:11px;color:var(--text3);margin-top:2px">${esc(s.description || (isAr ? 'نظام مفعل بالمنصة' : 'Active education system'))}</div>
+                    </div>
+                    <span class="lec-badge ok">${s.status === 'ACTIVE' ? (isAr ? 'نشط' : 'ACTIVE') : (s.status || 'ACTIVE')}</span>
                   </div>
-                  <span class="lec-badge ok">${s.status === 'ACTIVE' ? (isAr ? 'نشط' : 'ACTIVE') : s.status}</span>
-                </div>
-              `).join('')}
+                `).join('')}
+              </div>
             </div>
-          </div>
-        `;
-      } else if (adminSubTab === 'students') {
-        content.innerHTML = `
-          <div class="rep-card">
-            <div style="font-weight:800;font-size:14px;margin-bottom:6px">${isAr ? 'إدارة حسابات الطلاب المسجلين' : 'Registered Student Accounts'}</div>
-            <div style="font-size:12px;color:var(--text3);margin-bottom:14px">${isAr ? 'قائمة الطلاب المسجلين بالمنصة وإدارة بياناتهم الأكاديمية' : 'Registered students directory and academic profile management'}</div>
-            <div style="display:flex;flex-direction:column;gap:8px">
-              ${studentsList.length === 0 ? `<div style="font-size:12px;color:var(--text3);text-align:center;padding:16px">${isAr ? 'لا يوجد طلاب مسجلون حالياً' : 'No registered students found'}</div>` : studentsList.map(st => `
-                <div style="background:var(--bg2);padding:10px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
-                  <div>
-                    <div style="font-weight:800;font-size:13px">${esc(st.full_name || st.name || (isAr ? 'طالب مسجل' : 'Registered Student'))}</div>
-                    <div style="font-size:11px;color:var(--text3);margin-top:2px">${esc(st.email || '')} ${st.email ? '•' : ''} ${esc(st.track || (isAr ? 'البكالوريا - مسار هندسة' : 'Baccalaureate - Engineering Track'))}</div>
+          `;
+        } else if (adminSubTab === 'students') {
+          content.innerHTML = `
+            <div class="rep-card">
+              <div style="font-weight:800;font-size:14px;margin-bottom:6px">${isAr ? 'إدارة حسابات الطلاب المسجلين' : 'Registered Student Accounts'}</div>
+              <div style="font-size:12px;color:var(--text3);margin-bottom:14px">${isAr ? 'قائمة الطلاب المسجلين بالمنصة وإدارة بياناتهم الأكاديمية' : 'Registered students directory and academic profile management'}</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                ${studentsList.length === 0 ? `<div style="font-size:12px;color:var(--text3);text-align:center;padding:16px">${isAr ? 'لا يوجد طلاب مسجلون حالياً' : 'No registered students found'}</div>` : studentsList.map(st => `
+                  <div style="background:var(--bg2);padding:10px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
+                    <div>
+                      <div style="font-weight:800;font-size:13px">${esc(st.full_name || st.name || (isAr ? 'طالب مسجل' : 'Registered Student'))}</div>
+                      <div style="font-size:11px;color:var(--text3);margin-top:2px">${esc(st.email || '')} ${st.email ? '•' : ''} ${esc(st.track || (isAr ? 'البكالوريا - مسار هندسة' : 'Baccalaureate - Engineering Track'))}</div>
+                    </div>
+                    <span class="lec-badge ok">${isAr ? 'نشط' : 'ACTIVE'}</span>
                   </div>
-                  <span class="lec-badge ok">${isAr ? 'نشط' : 'ACTIVE'}</span>
-                </div>
-              `).join('')}
+                `).join('')}
+              </div>
             </div>
-          </div>
-        `;
-      } else if (adminSubTab === 'parents') {
-        content.innerHTML = `
-          <div class="rep-card">
-            <div style="font-weight:800;font-size:14px;margin-bottom:6px">${isAr ? 'إدارة حسابات أولياء الأمور والعلاقات' : 'Parent Accounts & Student Relationships'}</div>
-            <div style="font-size:12px;color:var(--text3);margin-bottom:14px">${isAr ? 'عرض روابط المتابعة النشطة بين الأبناء وأولياء الأمور' : 'View active monitoring relationships between students and parents'}</div>
-            <div style="display:flex;flex-direction:column;gap:8px">
-              ${parentsList.length === 0 ? `<div style="font-size:12px;color:var(--text3);text-align:center;padding:16px">${isAr ? 'لا توجد حسابات أولياء أمور مربوطة حالياً' : 'No parent accounts linked yet'}</div>` : parentsList.map(pr => `
-                <div style="background:var(--bg2);padding:10px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
-                  <div>
-                    <div style="font-weight:800;font-size:13px">${esc(pr.full_name || pr.name || (isAr ? 'حساب ولي أمر' : 'Parent Account'))}</div>
-                    <div style="font-size:11px;color:var(--text3);margin-top:2px">${isAr ? 'مربوط برمز متابعة الطالب:' : 'Linked with student code:'} ${esc(pr.code || 'PAR-8X92')}</div>
+          `;
+        } else if (adminSubTab === 'parents') {
+          content.innerHTML = `
+            <div class="rep-card">
+              <div style="font-weight:800;font-size:14px;margin-bottom:6px">${isAr ? 'إدارة حسابات أولياء الأمور والعلاقات' : 'Parent Accounts & Student Relationships'}</div>
+              <div style="font-size:12px;color:var(--text3);margin-bottom:14px">${isAr ? 'عرض روابط المتابعة النشطة بين الأبناء وأولياء الأمور' : 'View active monitoring relationships between students and parents'}</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                ${parentsList.length === 0 ? `<div style="font-size:12px;color:var(--text3);text-align:center;padding:16px">${isAr ? 'لا توجد حسابات أولياء أمور مربوطة حالياً' : 'No parent accounts linked yet'}</div>` : parentsList.map(pr => `
+                  <div style="background:var(--bg2);padding:10px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
+                    <div>
+                      <div style="font-weight:800;font-size:13px">${esc(pr.full_name || pr.name || (isAr ? 'حساب ولي أمر' : 'Parent Account'))}</div>
+                      <div style="font-size:11px;color:var(--text3);margin-top:2px">${isAr ? 'مربوط برمز متابعة الطالب:' : 'Linked with student code:'} ${esc(pr.code || 'PAR-8X92')}</div>
+                    </div>
+                    <span class="lec-badge ok">${isAr ? 'ربط نشط' : 'ACTIVE LINK'}</span>
                   </div>
-                  <span class="lec-badge ok">${isAr ? 'ربط نشط' : 'ACTIVE LINK'}</span>
-                </div>
-              `).join('')}
+                `).join('')}
+              </div>
             </div>
-          </div>
-        `;
-      } else if (adminSubTab === 'curric') {
-        content.innerHTML = `
-          <div class="rep-card">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-              <div style="font-weight:800;font-size:14px">${isAr ? 'المناهج المرجعية للمراحل الدراسية' : 'Master Curricula by Academic Stage'}</div>
-              <button class="s-btn accent" onclick="promptCreateMasterCurriculum()"><i class="fa-solid fa-plus"></i> ${t('admCreateMcBtn')}</button>
-            </div>
-            <div style="font-size:12px;color:var(--text3);margin-bottom:14px">${isAr ? 'المناهج الجاهزة المنشورة من المدير العام، يمكن للطلاب استيرادها والتعديل عليها لملفهم الشخصي' : 'Ready master curricula published by Head Admin. Students can import and customize them for their own profile.'}</div>
-            <div style="display:flex;flex-direction:column;gap:8px">
-              ${shMasterCurricula.length === 0 ? `<div style="font-size:12px;color:var(--text3);text-align:center;padding:16px">${isAr ? 'لا توجد مناهج مرجعية منشورة حالياً' : 'No master curricula published yet'}</div>` : shMasterCurricula.map(mc => `
-                <div style="background:var(--bg2);padding:10px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
-                  <div>
-                    <div style="font-weight:800;font-size:13px">${esc(mc.title)}</div>
-                    <div style="font-size:11px;color:var(--text3);margin-top:2px">${esc(mc.targetStage || (isAr ? 'عامة لكافة المراحل' : 'All Stages'))} • ${(mc.subjects || []).length} ${isAr ? 'مواد' : 'Subjects'}</div>
+          `;
+        } else if (adminSubTab === 'curric') {
+          content.innerHTML = `
+            <div class="rep-card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                <div style="font-weight:800;font-size:14px">${isAr ? 'المناهج المرجعية للمراحل الدراسية' : 'Master Curricula by Academic Stage'}</div>
+                <button class="s-btn accent" onclick="promptCreateMasterCurriculum()"><i class="fa-solid fa-plus"></i> ${t('admCreateMcBtn')}</button>
+              </div>
+              <div style="font-size:12px;color:var(--text3);margin-bottom:14px">${isAr ? 'المناهج الجاهزة المنشورة من المدير العام، يمكن للطلاب استيرادها والتعديل عليها لملفهم الشخصي' : 'Ready master curricula published by Head Admin. Students can import and customize them for their own profile.'}</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                ${mcList.length === 0 ? `<div style="font-size:12px;color:var(--text3);text-align:center;padding:16px">${isAr ? 'لا توجد مناهج مرجعية منشورة حالياً' : 'No master curricula published yet'}</div>` : mcList.map(mc => `
+                  <div style="background:var(--bg2);padding:10px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
+                    <div>
+                      <div style="font-weight:800;font-size:13px">${esc(mc.title)}</div>
+                      <div style="font-size:11px;color:var(--text3);margin-top:2px">${esc(mc.targetStage || (isAr ? 'عامة لكافة المراحل' : 'All Stages'))} • ${(mc.subjects || []).length} ${isAr ? 'مواد' : 'Subjects'}</div>
+                    </div>
+                    <span class="lec-badge ok">${mc.status === 'PUBLISHED' ? (isAr ? 'منشور' : 'PUBLISHED') : (mc.status || 'PUBLISHED')}</span>
                   </div>
-                  <span class="lec-badge ok">${mc.status === 'PUBLISHED' ? (isAr ? 'منشور' : 'PUBLISHED') : mc.status}</span>
-                </div>
-              `).join('')}
+                `).join('')}
+              </div>
             </div>
-          </div>
-        `;
-      } else if (adminSubTab === 'audit') {
-        const auditLogLines = isAr ? [
-          '[2026-09-19 12:00] HEAD_ADMIN (marksamer010@gmail.com) تم نشر منهج مرجعي: مسار الهندسة - البكالوريا',
-          '[2026-09-19 11:30] SYSTEM تم توليد كود ربط ولي الأمر للطالب: PAR-8X92K تلقائياً',
-          '[2026-09-19 11:00] SYSTEM تم تهيئة قاعدة بيانات الأنظمة التعليمية والمراحل الدراسية بنجاح.'
-        ] : [
-          '[2026-09-19 12:00] HEAD_ADMIN (marksamer010@gmail.com) Published Master Curriculum: Baccalaureate Engineering Track',
-          '[2026-09-19 11:30] SYSTEM Auto-generated student parent connection code: PAR-8X92K',
-          '[2026-09-19 11:00] SYSTEM Initialized Education Systems & Academic Levels database.'
-        ];
-        content.innerHTML = `
-          <div class="rep-card">
-            <div style="font-weight:800;font-size:14px;margin-bottom:12px"><i class="fa-solid fa-shield-halved" style="color:var(--gold)"></i> ${isAr ? 'سجل العمليات الأمني' : 'Audit Security Log'}</div>
-            <div style="font-size:12px;color:var(--text3);margin-bottom:14px">${isAr ? 'تسجيل كامل للعمليات الإدارية، نشر المناهج، وتغيير العلاقات وتراخيص الوصول' : 'Complete logging of admin operations, curriculum publications, and access control.'}</div>
-            <div style="font-size:11px;color:var(--text3);font-family:monospace;background:var(--bg2);padding:12px;border-radius:6px;line-height:1.6">
-              ${auditLogLines.join('<br>')}
+          `;
+        } else if (adminSubTab === 'audit') {
+          const auditLogLines = isAr ? [
+            '[2026-09-19 12:00] HEAD_ADMIN (marksamer010@gmail.com) تم نشر منهج مرجعي: مسار الهندسة - البكالوريا',
+            '[2026-09-19 11:30] SYSTEM تم توليد كود ربط ولي الأمر للطالب: PAR-8X92K تلقائياً',
+            '[2026-09-19 11:00] SYSTEM تم تهيئة قاعدة بيانات الأنظمة التعليمية والمراحل الدراسية بنجاح.'
+          ] : [
+            '[2026-09-19 12:00] HEAD_ADMIN (marksamer010@gmail.com) Published Master Curriculum: Baccalaureate Engineering Track',
+            '[2026-09-19 11:30] SYSTEM Auto-generated student parent connection code: PAR-8X92K',
+            '[2026-09-19 11:00] SYSTEM Initialized Education Systems & Academic Levels database.'
+          ];
+          content.innerHTML = `
+            <div class="rep-card">
+              <div style="font-weight:800;font-size:14px;margin-bottom:12px"><i class="fa-solid fa-shield-halved" style="color:var(--gold)"></i> ${isAr ? 'سجل العمليات الأمني' : 'Audit Security Log'}</div>
+              <div style="font-size:12px;color:var(--text3);margin-bottom:14px">${isAr ? 'تسجيل كامل للعمليات الإدارية، نشر المناهج، وتغيير العلاقات وتراخيص الوصول' : 'Complete logging of admin operations, curriculum publications, and access control.'}</div>
+              <div style="font-size:11px;color:var(--text3);font-family:monospace;background:var(--bg2);padding:12px;border-radius:6px;line-height:1.6">
+                ${auditLogLines.join('<br>')}
+              </div>
             </div>
-          </div>
-        `;
+          `;
+        }
+      } catch(e) {
+        console.error('Error rendering admin panel:', e);
       }
     }
 
