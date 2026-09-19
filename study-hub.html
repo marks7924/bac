@@ -9055,7 +9055,7 @@
     ];
 
     let shStudentProfile = null;
-    let shMasterCurricula = defaultMasterCurricula;
+    let shMasterCurricula = loadJ('master_curricula', defaultMasterCurricula);
     let shAllAdminProfiles = [];
     let shForceAssignments = [];
     let shRequiredProgress = {};
@@ -9089,6 +9089,15 @@
             else document.body.classList.add('role-student');
           }
 
+          // Fetch master curricula from schedule_data
+          try {
+            const { data: mcRow } = await _sb.from('schedule_data').select('data').eq('id', 'master_curricula').maybeSingle();
+            if (mcRow && mcRow.data && Array.isArray(mcRow.data) && mcRow.data.length) {
+              shMasterCurricula = mcRow.data;
+              try { localStorage.setItem('bac_master_curricula', JSON.stringify(shMasterCurricula)); } catch(e){}
+            }
+          } catch(e) {}
+
           // Fetch student academic profile if student
           if (currentUserRole === 'USER') {
             const { data: sp } = await _sb.from('student_academic_profiles').select('*').eq('student_id', _sbUid).maybeSingle();
@@ -9097,8 +9106,6 @@
             // Fetch required curriculum assignments
             const { data: fa } = await _sb.from('force_curriculum_assignments').select('*').eq('is_active', true);
             if (fa) shForceAssignments = fa;
-            const { data: mc } = await _sb.from('master_curricula').select('*');
-            if (mc && mc.length) shMasterCurricula = mc;
             const { data: rp } = await _sb.from('student_required_curriculum_progress').select('*').eq('student_id', _sbUid);
             if (rp) {
               rp.forEach(r => { shRequiredProgress[r.master_lesson_id] = r; });
@@ -9989,7 +9996,7 @@
         if (!name) return;
         if (!mc.subjects) mc.subjects = [];
         mc.subjects.push({ id: 'mcs_' + Date.now(), name, emoji: '📖', color: '#3b82f6', units: [] });
-        if (_sb) _sb.from('master_curricula').upsert(mc).then(() => {});
+        saveJ('master_curricula', shMasterCurricula);
         closeAnyPop(); renderAdminPanel();
       };
       document.body.appendChild(pop); posPop(pop, document.body);
@@ -10021,7 +10028,7 @@
         sub.name = name;
         sub.emoji = emoji || '📚';
         sub.color = color || '#3b82f6';
-        if (_sb) _sb.from('master_curricula').upsert(mc).then(() => {});
+        saveJ('master_curricula', shMasterCurricula);
         closeAnyPop(); renderAdminPanel();
       };
       document.body.appendChild(pop); posPop(pop, document.body);
@@ -10033,7 +10040,7 @@
       const sub = mc.subjects.find(s => s.id === subId); if (!sub) return;
       mkConfirmPop(lang === 'ar' ? `حذف المادة "${sub.name}" من المنهج المرجعي؟` : `Delete subject "${sub.name}"?`, () => {
         mc.subjects = mc.subjects.filter(s => s.id !== subId);
-        if (_sb) _sb.from('master_curricula').upsert(mc).then(() => {});
+        saveJ('master_curricula', shMasterCurricula);
         renderAdminPanel();
       });
     };
@@ -10062,7 +10069,7 @@
         if (!title) return;
         if (!sub.units) sub.units = [];
         sub.units.push({ id: 'mcu_' + Date.now(), title, term, lessons: [] });
-        if (_sb) _sb.from('master_curricula').upsert(mc).then(() => {});
+        saveJ('master_curricula', shMasterCurricula);
         closeAnyPop(); renderAdminPanel();
       };
       document.body.appendChild(pop); posPop(pop, document.body);
@@ -10094,7 +10101,7 @@
         if (!title) return;
         unit.title = title;
         unit.term = term;
-        if (_sb) _sb.from('master_curricula').upsert(mc).then(() => {});
+        saveJ('master_curricula', shMasterCurricula);
         closeAnyPop(); renderAdminPanel();
       };
       document.body.appendChild(pop); posPop(pop, document.body);
@@ -10107,7 +10114,7 @@
       const unit = sub.units.find(u => u.id === unitId); if (!unit) return;
       mkConfirmPop(lang === 'ar' ? `حذف الباب "${unit.title}" من المنهج المرجعي؟` : `Delete unit "${unit.title}"?`, () => {
         sub.units = sub.units.filter(u => u.id !== unitId);
-        if (_sb) _sb.from('master_curricula').upsert(mc).then(() => {});
+        saveJ('master_curricula', shMasterCurricula);
         renderAdminPanel();
       });
     };
@@ -10131,7 +10138,7 @@
         if (!title) return;
         if (!unit.lessons) unit.lessons = [];
         unit.lessons.push({ id: 'mcl_' + Date.now(), title, stages: { explain: false, practice: false, rev: false, test: false } });
-        if (_sb) _sb.from('master_curricula').upsert(mc).then(() => {});
+        saveJ('master_curricula', shMasterCurricula);
         closeAnyPop(); renderAdminPanel();
       };
       document.body.appendChild(pop); posPop(pop, document.body);
@@ -10157,7 +10164,7 @@
         const title = pop.querySelector('#admin-mc-eln-in').value.trim();
         if (!title) return;
         les.title = title;
-        if (_sb) _sb.from('master_curricula').upsert(mc).then(() => {});
+        saveJ('master_curricula', shMasterCurricula);
         closeAnyPop(); renderAdminPanel();
       };
       document.body.appendChild(pop); posPop(pop, document.body);
@@ -10170,7 +10177,7 @@
       const unit = sub.units.find(u => u.id === unitId); if (!unit || !unit.lessons) return;
       mkConfirmPop(lang === 'ar' ? `حذف الدرس من المنهج المرجعي؟` : `Delete lesson?`, () => {
         unit.lessons = unit.lessons.filter(l => l.id !== lesId);
-        if (_sb) _sb.from('master_curricula').upsert(mc).then(() => {});
+        saveJ('master_curricula', shMasterCurricula);
         renderAdminPanel();
       });
     };
@@ -10179,7 +10186,7 @@
       const mc = shMasterCurricula.find(m => m.id === mcId); if (!mc) return;
       mkConfirmPop(lang === 'ar' ? `حذف المنهج المرجعي بالكامل "${mc.title}"؟` : `Delete master curriculum "${mc.title}"?`, () => {
         shMasterCurricula = shMasterCurricula.filter(m => m.id !== mcId);
-        if (_sb) _sb.from('master_curricula').delete().eq('id', mcId).then(() => {});
+        saveJ('master_curricula', shMasterCurricula);
         if (activeAdminMasterCurricId === mcId) activeAdminMasterCurricId = null;
         renderAdminPanel();
         showToast('info', lang === 'ar' ? 'تم حذف المنهج المرجعي' : 'Master curriculum deleted');
@@ -10356,7 +10363,7 @@
         };
 
         shMasterCurricula.push(newMc);
-        if (_sb) _sb.from('master_curricula').insert(newMc).then(() => {});
+        saveJ('master_curricula', shMasterCurricula);
         closeAnyPop();
 
         activeAdminMasterCurricId = newMc.id;
