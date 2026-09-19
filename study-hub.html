@@ -9863,8 +9863,10 @@
                       <span class="week-tag" style="background:var(--bg2);color:var(--gold);font-size:11px">${esc(mc.targetStage || (isAr ? 'عامة لكافة المراحل' : 'All Stages'))}</span>
                     </div>
                   </div>
-                  <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  <div style="display:flex;gap:6px;flex-wrap:wrap">
                     <button class="s-btn accent" style="background:linear-gradient(135deg,var(--blue),var(--indigo))" onclick="adminMcBulkAssignPrompt('${mc.id}')"><i class="fa-solid fa-bullhorn"></i> ${isAr ? 'تعميم وإسناد لطلاب المرحلة 🚀' : 'Bulk Push to Stage X 🚀'}</button>
+                    <button class="s-btn" style="background:rgba(239,68,68,0.15);color:var(--red);border:1px solid rgba(239,68,68,0.3)" onclick="adminMcUndoBulkAssignPrompt('${mc.id}')"><i class="fa-solid fa-rotate-left"></i> ${isAr ? 'إلغاء التعميم ↩️' : 'Undo Bulk Push ↩️'}</button>
+                    <button class="s-btn" style="background:var(--bg2);color:var(--text);border:1px solid var(--border)" onclick="adminMcDuplicateCurric('${mc.id}')"><i class="fa-solid fa-copy"></i> ${isAr ? 'نسخ المنهج 📋' : 'Duplicate 📋'}</button>
                     <button class="s-btn accent" onclick="adminMcAddSubject('${mc.id}')"><i class="fa-solid fa-plus"></i> ${isAr ? 'إضافة مادة جديدة' : 'Add Subject'}</button>
                   </div>
                 </div>
@@ -9946,9 +9948,11 @@
                           ${isAr ? 'المرحلة المستهدفة:' : 'Stage:'} <strong style="color:var(--gold)">${esc(mc.targetStage || (isAr ? 'عامة لكافة المراحل' : 'All Stages'))}</strong> • ${(mc.subjects || []).length} ${isAr ? 'مواد دراسية' : 'Subjects'}
                         </div>
                       </div>
-                      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
                         <button class="s-btn accent" style="padding:6px 12px;font-size:11px" onclick="activeAdminMasterCurricId='${mc.id}';renderAdminPanel()"><i class="fa-solid fa-network-wired"></i> ${isAr ? 'بناء وتعديل مواد المنهج' : 'Build & Edit Tree'}</button>
-                        <button class="s-btn accent" style="padding:6px 12px;font-size:11px;background:linear-gradient(135deg,var(--blue),var(--indigo))" onclick="adminMcBulkAssignPrompt('${mc.id}')"><i class="fa-solid fa-bullhorn"></i> ${isAr ? 'تعميم وإسناد لطلاب المرحلة 🚀' : 'Bulk Push to Stage X 🚀'}</button>
+                        <button class="s-btn accent" style="padding:6px 12px;font-size:11px;background:linear-gradient(135deg,var(--blue),var(--indigo))" onclick="adminMcBulkAssignPrompt('${mc.id}')"><i class="fa-solid fa-bullhorn"></i> ${isAr ? 'تعميم وإسناد 🚀' : 'Bulk Push 🚀'}</button>
+                        <button class="s-btn" style="padding:6px 10px;font-size:11px;background:rgba(239,68,68,0.15);color:var(--red);border:1px solid rgba(239,68,68,0.3)" onclick="adminMcUndoBulkAssignPrompt('${mc.id}')" title="Undo Bulk Push"><i class="fa-solid fa-rotate-left"></i> ${isAr ? 'إلغاء ↩️' : 'Undo ↩️'}</button>
+                        <button class="s-btn" style="padding:6px 10px;font-size:11px;background:var(--bg2);color:var(--text);border:1px solid var(--border)" onclick="adminMcDuplicateCurric('${mc.id}')" title="Duplicate Curriculum"><i class="fa-solid fa-copy"></i> ${isAr ? 'نسخ 📋' : 'Duplicate 📋'}</button>
                         <button style="border:none;background:none;color:var(--red);font-size:14px;cursor:pointer;padding:4px" onclick="adminMcDeleteCurric('${mc.id}')" title="Delete Curriculum">✕</button>
                       </div>
                     </div>
@@ -10196,21 +10200,76 @@
       });
     };
 
+    function buildStageSelectOptions(selectedVal) {
+      const isAr = lang === 'ar';
+      const sel = selectedVal || '';
+      return `
+        <option value="ALL"${sel === 'ALL' || sel === 'عامة لكافة المراحل والصفوف' || !sel ? ' selected' : ''}>🌐 ${isAr ? 'عامة لكافة المراحل والصفوف (All Stages)' : 'All Stages & Grades'}</option>
+        
+        <optgroup label="${isAr ? '📚 المرحلة الإعدادية (Preparatory)' : 'Preparatory Grades'}">
+          <option value="الصف الأول الإعدادي"${sel === 'الصف الأول الإعدادي' ? ' selected' : ''}>1️⃣ ${isAr ? 'الصف الأول الإعدادي (1st Prep)' : '1st Prep'}</option>
+          <option value="الصف الثاني الإعدادي"${sel === 'الصف الثاني الإعدادي' ? ' selected' : ''}>2️⃣ ${isAr ? 'الصف الثاني الإعدادي (2nd Prep)' : '2nd Prep'}</option>
+          <option value="الصف الثالث الإعدادي"${sel === 'الصف الثالث الإعدادي' ? ' selected' : ''}>3️⃣ ${isAr ? 'الصف الثالث الإعدادي (3rd Prep)' : '3rd Prep'}</option>
+          <option value="كافة مراحل الإعدادية"${sel === 'كافة مراحل الإعدادية' ? ' selected' : ''}>🏫 ${isAr ? 'كافة مراحل الإعدادية (All Prep)' : 'All Prep Grades'}</option>
+        </optgroup>
+
+        <optgroup label="${isAr ? '🎓 الثانوية العامة (General Secondary)' : 'General Secondary Grades'}">
+          <option value="الصف الأول الثانوي"${sel === 'الصف الأول الثانوي' ? ' selected' : ''}>1️⃣ ${isAr ? 'الصف الأول الثانوي (1st Sec)' : '1st Secondary'}</option>
+          <option value="الصف الثاني الثانوي - علمي"${sel === 'الصف الثاني الثانوي - علمي' ? ' selected' : ''}>2️⃣ ${isAr ? 'الصف الثاني الثانوي - علمي (2nd Sec Scientific)' : '2nd Sec - Scientific'}</option>
+          <option value="الصف الثاني الثانوي - أدبي"${sel === 'الصف الثاني الثانوي - أدبي' ? ' selected' : ''}>2️⃣ ${isAr ? 'الصف الثاني الثانوي - أدبي (2nd Sec Literary)' : '2nd Sec - Literary'}</option>
+          <option value="الصف الثالث الثانوي - علمي علوم"${sel === 'الصف الثالث الثانوي - علمي علوم' ? ' selected' : ''}>3️⃣ ${isAr ? 'الصف الثالث الثانوي - علمي علوم (3rd Sec Sci Bio)' : '3rd Sec - Sci Bio'}</option>
+          <option value="الصف الثالث الثانوي - علمي رياضة"${sel === 'الصف الثالث الثانوي - علمي رياضة' ? ' selected' : ''}>3️⃣ ${isAr ? 'الصف الثالث الثانوي - علمي رياضة (3rd Sec Sci Math)' : '3rd Sec - Sci Math'}</option>
+          <option value="الصف الثالث الثانوي - أدبي"${sel === 'الصف الثالث الثانوي - أدبي' ? ' selected' : ''}>3️⃣ ${isAr ? 'الصف الثالث الثانوي - أدبي (3rd Sec Literary)' : '3rd Sec - Literary'}</option>
+          <option value="كافة مراحل الثانوية العامة"${sel === 'كافة مراحل الثانوية العامة' ? ' selected' : ''}>🏫 ${isAr ? 'كافة مراحل الثانوية العامة (All General Sec)' : 'All General Secondary'}</option>
+        </optgroup>
+
+        <optgroup label="${isAr ? '🎖️ مسارات البكالوريا (Baccalaureate Tracks)' : 'Baccalaureate Tracks'}">
+          <option value="البكالوريا - مسار العلوم والتكنولوجيا"${sel === 'البكالوريا - مسار العلوم والتكنولوجيا' ? ' selected' : ''}>🔬 ${isAr ? 'البكالوريا - مسار العلوم والتكنولوجيا' : 'Bac - Science & Technology'}</option>
+          <option value="البكالوريا - مسار الهندسة وعلوم الحاسب"${sel === 'البكالوريا - مسار الهندسة وعلوم الحاسب' ? ' selected' : ''}>💻 ${isAr ? 'البكالوريا - مسار الهندسة وعلوم الحاسب' : 'Bac - Engineering & CS'}</option>
+          <option value="البكالوريا - مسار الطب والعلوم الحيوية"${sel === 'البكالوريا - مسار الطب والعلوم الحيوية' ? ' selected' : ''}>🩺 ${isAr ? 'البكالوريا - مسار الطب والعلوم الحيوية' : 'Bac - Medicine & Bio'}</option>
+          <option value="البكالوريا - مسار الإدارة والأعمال"${sel === 'البكالوريا - مسار الإدارة والأعمال' ? ' selected' : ''}>📊 ${isAr ? 'البكالوريا - مسار الإدارة والأعمال' : 'Bac - Business & Admin'}</option>
+          <option value="كافة مسارات البكالوريا"${sel === 'كافة مسارات البكالوريا' ? ' selected' : ''}>🏛️ ${isAr ? 'كافة مسارات البكالوريا (All Bac Tracks)' : 'All Baccalaureate Tracks'}</option>
+        </optgroup>
+      `;
+    }
+
+    window.adminMcDuplicateCurric = function(mcId) {
+      const mc = shMasterCurricula.find(m => m.id === mcId); if (!mc) return;
+      const isAr = lang === 'ar';
+      const cloned = JSON.parse(JSON.stringify(mc));
+      cloned.id = 'mc-' + Date.now();
+      cloned.title = cloned.title + (isAr ? ' (نسخة)' : ' (Copy)');
+      
+      const time = Date.now();
+      let subCounter = 0, unitCounter = 0, lesCounter = 0;
+      (cloned.subjects || []).forEach(sub => {
+        sub.id = 'mcs_' + time + '_' + (++subCounter);
+        (sub.units || []).forEach(u => {
+          u.id = 'mcu_' + time + '_' + (++unitCounter);
+          (u.lessons || []).forEach(l => {
+            l.id = 'mcl_' + time + '_' + (++lesCounter);
+          });
+        });
+      });
+
+      shMasterCurricula.push(cloned);
+      saveJ('master_curricula', shMasterCurricula);
+      window.shMasterCurricula = shMasterCurricula;
+      renderAdminPanel();
+      showToast('success', isAr ? `تم نسخ المنهج المرجعي بنجاح: "${cloned.title}"` : `Curriculum duplicated: "${cloned.title}"`);
+    };
+
     window.adminMcBulkAssignPrompt = function(mcId) {
       const mc = shMasterCurricula.find(m => m.id === mcId); if (!mc) return;
       const isAr = lang === 'ar';
-      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(380);
+      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(400);
       pop.innerHTML = `
         <div style="font-weight:900;font-size:15px;margin-bottom:10px;color:var(--text)"><i class="fa-solid fa-bullhorn" style="color:var(--gold);margin-inline-end:6px"></i>${isAr ? 'تعميم وإسناد المنهج المرجعي لطلاب المرحلة' : 'Bulk Assign Master Curriculum'}</div>
         <div style="font-size:12px;color:var(--text3);margin-bottom:12px">${isAr ? `سيتم تعيين وإسناد كافة مواد وأبواب المنهج المرجعي "${mc.title}" تلقائياً في حسابات جميع الطلاب المستهدفين:` : `Assign all subjects & units of "${mc.title}" to student profiles:`}</div>
 
         <div style="font-size:11px;font-weight:800;color:var(--text2);margin-bottom:4px">${isAr ? 'المرحلة الدراسية المستهدفة:' : 'Target Stage:'}</div>
         <select id="admin-bulk-stage-select" style="width:100%;padding:8px;border-radius:6px;background:var(--bg2);color:var(--text);border:1px solid var(--border);margin-bottom:14px;font-family:inherit;font-weight:700">
-          <option value="${mc.targetStage || 'ALL'}">🎓 ${esc(mc.targetStage || (isAr ? 'كافة الطلاب' : 'All Students'))}</option>
-          <option value="ALL">🌐 ${isAr ? 'جميع الطلاب المسجلين بالمنصة (All Students)' : 'All Registered Students'}</option>
-          <option value="الصف الثالث الثانوي">3️⃣ ${isAr ? 'الصف الثالث الثانوي (3 Sec)' : '3rd Secondary'}</option>
-          <option value="الصف الثاني الثانوي">2️⃣ ${isAr ? 'الصف الثاني الثانوي (2 Sec)' : '2nd Secondary'}</option>
-          <option value="الصف الأول الثانوي">1️⃣ ${isAr ? 'الصف الأول الثانوي (1 Sec)' : '1st Secondary'}</option>
+          ${buildStageSelectOptions(mc.targetStage)}
         </select>
 
         <div class="pop-actions" style="display:flex;gap:8px">
@@ -10228,6 +10287,85 @@
       document.body.appendChild(pop); posPop(pop, document.body);
       pop.addEventListener('click', e => e.stopPropagation()); _popEl = pop;
     };
+
+    window.adminMcUndoBulkAssignPrompt = function(mcId) {
+      const mc = shMasterCurricula.find(m => m.id === mcId); if (!mc) return;
+      const isAr = lang === 'ar';
+      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(400);
+      pop.innerHTML = `
+        <div style="font-weight:900;font-size:15px;margin-bottom:10px;color:var(--red)"><i class="fa-solid fa-rotate-left" style="margin-inline-end:6px"></i>${isAr ? 'إلغاء تعميم المنهج المرجعي (Undo Bulk Push)' : 'Undo Bulk Push'}</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:12px">${isAr ? `سيتم إزالة واسترجاع مواد وأبواب المنهج المرجعي "${mc.title}" من حسابات الطلاب المستهدفين:` : `Remove subjects & units of "${mc.title}" from student profiles:`}</div>
+
+        <div style="font-size:11px;font-weight:800;color:var(--text2);margin-bottom:4px">${isAr ? 'المرحلة المستهدفة لإلغاء التعميم:' : 'Target Stage to Undo:'}</div>
+        <select id="admin-undo-stage-select" style="width:100%;padding:8px;border-radius:6px;background:var(--bg2);color:var(--text);border:1px solid var(--border);margin-bottom:14px;font-family:inherit;font-weight:700">
+          ${buildStageSelectOptions(mc.targetStage)}
+        </select>
+
+        <div class="pop-actions" style="display:flex;gap:8px">
+          <button class="p-btn p-del" id="admin-undo-confirm-btn" style="flex:1;background:var(--red);color:#fff">${isAr ? '↩️ إلغاء التعميم واسترجاع البيانات' : '↩️ Confirm Undo Bulk Push'}</button>
+          <button class="p-btn p-del" onclick="closeAnyPop()" style="flex:1">${t('flCancel')}</button>
+        </div>
+      `;
+
+      pop.querySelector('#admin-undo-confirm-btn').onclick = async () => {
+        const stage = pop.querySelector('#admin-undo-stage-select').value;
+        closeAnyPop();
+        await executeUndoBulkAssign(mc, stage);
+      };
+
+      document.body.appendChild(pop); posPop(pop, document.body);
+      pop.addEventListener('click', e => e.stopPropagation()); _popEl = pop;
+    };
+
+    async function executeUndoBulkAssign(mc, stage) {
+      const isAr = lang === 'ar';
+      if (!mc || !mc.subjects || !mc.subjects.length) {
+        showToast('error', isAr ? 'لا توجد مواد في المنهج المرجعي لإلغائها!' : 'Master Curriculum has no subjects!');
+        return;
+      }
+
+      const removeMcFromCurric = (curric) => {
+        if (!curric || !curric.subjects) return;
+        mc.subjects.forEach(mcSub => {
+          const subIdx = curric.subjects.findIndex(s => s.name.trim().toLowerCase() === mcSub.name.trim().toLowerCase());
+          if (subIdx !== -1) {
+            const targetSub = curric.subjects[subIdx];
+            if (targetSub.units && mcSub.units) {
+              mcSub.units.forEach(mcUnit => {
+                targetSub.units = targetSub.units.filter(u => u.title.trim().toLowerCase() !== mcUnit.title.trim().toLowerCase());
+              });
+            }
+            if (!targetSub.units || targetSub.units.length === 0) {
+              curric.subjects.splice(subIdx, 1);
+            }
+          }
+        });
+      };
+
+      removeMcFromCurric(sCurricData);
+      saveJ('curriculum', sCurricData);
+      if (typeof curRenderAll === 'function') curRenderAll();
+
+      if (_sb) {
+        try {
+          const { data: students } = await _sb.from('profiles').select('id, role').or('role.eq.USER,role.eq.student');
+          if (students && students.length) {
+            for (const st of students) {
+              const { data: curRow } = await _sb.from('schedule_data').select('data').eq('id', 'curriculum').eq('user_id', st.id).maybeSingle();
+              if (curRow && curRow.data) {
+                let studentCurric = curRow.data;
+                removeMcFromCurric(studentCurric);
+                await _sb.from('schedule_data').upsert({ id: 'curriculum', user_id: st.id, data: studentCurric, updated_at: new Date().toISOString() }, { onConflict: 'id,user_id' });
+              }
+            }
+          }
+        } catch (e) {
+          console.warn('Undo bulk push cloud sync error:', e);
+        }
+      }
+
+      showToast('info', isAr ? `↩️ تم إلغاء تعميم المنهج المرجعي بنجاح واسترجاع بيانات الطلاب!` : `↩️ Bulk Push undone successfully!`);
+    }
 
     async function executeBulkAssign(mc, stage) {
       const isAr = lang === 'ar';
@@ -10307,7 +10445,7 @@
 
     window.promptCreateMasterCurriculum = function () {
       const isAr = lang === 'ar';
-      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(400);
+      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(420);
       pop.innerHTML = `
         <div style="font-weight:900;font-size:15px;margin-bottom:10px;color:var(--text)"><i class="fa-solid fa-layer-group" style="color:var(--gold);margin-inline-end:6px"></i>${isAr ? 'إنشاء منهج مرجعي جديد (Master Curriculum)' : 'Create New Master Curriculum'}</div>
         <div style="font-size:12px;color:var(--text3);margin-bottom:12px">${isAr ? 'أنشئ منهجاً دراسياً للمرحلة لبنائه وإضافة مواده وأبوابه بنفسك وتعميمه على الطلاب:' : 'Create a master curriculum for a target grade to build from scratch:'}</div>
@@ -10315,13 +10453,15 @@
         <div style="font-size:11px;font-weight:800;color:var(--text2);margin-bottom:4px">${isAr ? 'عنوان المنهج المرجعي:' : 'Curriculum Title:'}</div>
         <input type="text" id="mc-title-in" placeholder="${isAr ? 'مثال: منهج 3 ثانوي - شعبة علمي 2026' : 'e.g. 3rd Sec Science 2026'}" style="width:100%;margin-bottom:10px">
 
-        <div style="font-size:11px;font-weight:800;color:var(--text2);margin-bottom:4px">${isAr ? 'المرحلة المستهدفة:' : 'Target Stage:'}</div>
-        <input type="text" id="mc-stage-in" placeholder="${isAr ? 'مثال: الصف الثالث الثانوي' : 'e.g. 3rd Secondary Grade'}" style="width:100%;margin-bottom:12px">
+        <div style="font-size:11px;font-weight:800;color:var(--text2);margin-bottom:4px">${isAr ? 'المرحلة / التخصص المستهدف:' : 'Target Stage / Track:'}</div>
+        <select id="mc-stage-in" style="width:100%;padding:8px;border-radius:6px;background:var(--bg2);color:var(--text);border:1px solid var(--border);margin-bottom:12px;font-family:inherit;font-weight:700">
+          ${buildStageSelectOptions('')}
+        </select>
 
         <div style="font-size:11px;font-weight:800;color:var(--text2);margin-bottom:6px">${isAr ? 'خيارات الهيكل الأولي:' : 'Initial Setup Option:'}</div>
         <select id="mc-start-mode" style="width:100%;padding:8px;border-radius:6px;background:var(--bg2);color:var(--text);border:1px solid var(--border);margin-bottom:16px;font-family:inherit;font-weight:700">
           <option value="empty">🔨 ${isAr ? 'منهج فارغ تماماً (لبنائه وإضافة المواد بنفسك من الصفر)' : 'Empty (Build from scratch)'}</option>
-          <option value="template">⚡ ${isAr ? 'تضمين هيكل نموذجي جاهز (الرياضيات، الفيزياء، الكيمياء)' : 'Standard Template'}</option>
+          <option value="template">⚡ ${isAr ? 'تضمين هيكل نموذجي جاهز (الرياضيات، الفيزياء)' : 'Standard Template'}</option>
         </select>
 
         <div class="pop-actions" style="display:flex;gap:8px">
@@ -10332,7 +10472,7 @@
 
       pop.querySelector('#mc-btn-save').onclick = () => {
         const title = pop.querySelector('#mc-title-in').value.trim();
-        const targetStage = pop.querySelector('#mc-stage-in').value.trim() || (isAr ? 'عامة' : 'General');
+        const targetStage = pop.querySelector('#mc-stage-in').value || (isAr ? 'عامة لكافة المراحل والصفوف' : 'All Stages & Grades');
         const startMode = pop.querySelector('#mc-start-mode').value;
 
         if (!title) {
