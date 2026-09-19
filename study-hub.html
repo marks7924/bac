@@ -4381,6 +4381,7 @@
             id="lt-btn-addteacher">إضافة أستاذ</span></button>
         <button class="lt-btn primary" onclick="ltGenWeek()"><i class="fa-solid fa-rotate"></i> <span
             id="lt-btn-update">تحديث الأسبوع</span></button>
+        <button class="lt-btn" onclick="ltRestoreAllLectures()"><i class="fa-solid fa-wand-magic-sparkles"></i> <span>استرجاع المحاضرات</span></button>
       </div>
 
       <!-- Backlog banner -->
@@ -6034,8 +6035,21 @@
           document.removeEventListener('pointermove', onMove);
           card.style.cssText = ''; container.insertBefore(card, ph); ph.remove();
           const ids = [...container.children].filter(c => c.classList.contains(cls)).map(c => c.dataset.id);
-          const arr = getArr(); const ror = ids.map(id => arr.find(x => x.id === id)).filter(Boolean);
-          arr.length = 0; ror.forEach(x => arr.push(x)); onDone();
+          const arr = getArr();
+          const containerIdSet = new Set(ids);
+          const subsetItems = ids.map(id => arr.find(x => x.id === id)).filter(Boolean);
+          if (subsetItems.length === arr.length) {
+            arr.length = 0;
+            subsetItems.forEach(x => arr.push(x));
+          } else {
+            let idx = 0;
+            for (let i = 0; i < arr.length; i++) {
+              if (containerIdSet.has(arr[i].id)) {
+                arr[i] = subsetItems[idx++];
+              }
+            }
+          }
+          onDone();
         };
         document.addEventListener('pointermove', onMove);
         document.addEventListener('pointerup', onUp, { once: true });
@@ -6531,7 +6545,7 @@
     function ltTodayStr() { return dStr(new Date()); }
     function ltDaysBetween(a, b) { return Math.round((parseD(b) - parseD(a)) / 864e5); }
     function ltStatus(lec) { if (lec.watched) return 'watched'; return ltDaysBetween(lec.date, ltTodayStr()) > 7 ? 'overdue' : 'unwatched'; }
-    function ltLecsFor(tid) { return ltLectures.filter(l => l.teacherId === tid).sort((a, b) => new Date(b.date) - new Date(a.date)); }
+    function ltLecsFor(tid) { return ltLectures.filter(l => l.teacherId === tid); }
     function ltStatsFor(tid) {
       const lecs = ltLecsFor(tid);
       return { total: lecs.length, watched: lecs.filter(l => l.watched).length, overdue: lecs.filter(l => ltStatus(l) === 'overdue').length, unwatched: lecs.filter(l => !l.watched).length };
@@ -6556,6 +6570,11 @@
     }
 
     function ltRenderAll() {
+      // Auto-recover lectures if some teachers have 0 lectures but have scheduled days
+      const missingTeacherLecs = ltTeachers.some(tc => (tc.days && tc.days.length > 0) && ltLectures.filter(l => l.teacherId === tc.id).length === 0);
+      if (missingTeacherLecs) {
+        ltRestoreAllLecturesSilently();
+      }
       ltRenderStats();
       ltRenderBacklog();
       ltRenderGrid();
@@ -6686,14 +6705,58 @@
     }
 
     window.ltMoveLec = function(lecId, dir) {
-      const idx = ltLectures.findIndex(l => l.id === lecId);
-      if (idx === -1) return;
-      const targetIdx = idx + dir;
-      if (targetIdx < 0 || targetIdx >= ltLectures.length) return;
-      const item = ltLectures.splice(idx, 1)[0];
-      ltLectures.splice(targetIdx, 0, item);
-      ltSave();
-      ltRenderAll();
+      const lec = ltLectures.find(l => l.id === lecId);
+      if (!lec) return;
+      const tcLecs = ltLectures.filter(l => l.teacherId === lec.teacherId);
+      const idxInTc = tcLecs.findIndex(l => l.id === lecId);
+      if (idxInTc === -1) return;
+      const targetIdxInTc = idxInTc + dir;
+      if (targetIdxInTc < 0 || targetIdxInTc >= tcLecs.length) return;
+      const otherLec = tcLecs[targetIdxInTc];
+      const mainIdx1 = ltLectures.indexOf(lec);
+      const mainIdx2 = ltLectures.indexOf(otherLec);
+      if (mainIdx1 !== -1 && mainIdx2 !== -1) {
+        ltLectures[mainIdx1] = otherLec;
+        ltLectures[mainIdx2] = lec;
+        ltSave();
+        ltRenderAll();
+      }
+    };
+
+    function ltRestoreAllLecturesSilently() {
+      const DOW = { Sat: 6, Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5 };
+      let added = 0;
+      ltTeachers.forEach(tc => {
+        if (!tc.days || !tc.days.length) return;
+        tc.days.forEach(dk => {
+          const target = DOW[dk]; const now = new Date(); const cur = now.getDay();
+          const diff = (target - cur + 7) % 7;
+          for (let w = 0; w < 4; w++) {
+            const ld = new Date(now);
+            ld.setDate(now.getDate() - (diff === 0 ? 0 : 7 - diff) - (w * 7));
+            if (ld > now) continue;
+            const ldStr = dStr(ld);
+            const exists = ltLectures.some(l => l.teacherId === tc.id && l.date === ldStr);
+            if (!exists) {
+              const wn = ltLectures.filter(l => l.teacherId === tc.id).length + 1;
+              ltLectures.push({
+                id: genId(), teacherId: tc.id,
+                title: `${lang === 'ar' ? 'محاضرة أسبوع' : 'Week Lecture'} ${wn}`,
+                date: ldStr, weekNum: wn, link: tc.link || '', notes: '',
+                watched: false, watchedAt: null, createdAt: ltTodayStr()
+              });
+              added++;
+            }
+          }
+        });
+      });
+      if (added > 0) ltSave();
+    }
+
+    window.ltRestoreAllLectures = function() {
+      ltRestoreAllLecturesSilently();
+      ltSave(); ltRenderAll();
+      showToast('success', lang === 'ar' ? 'تم استرجاع وتوليد كافة المحاضرات للمعلمين بنجاح!' : 'Restored all teacher lectures successfully!');
     };
 
     function ltToggle(tid) {
