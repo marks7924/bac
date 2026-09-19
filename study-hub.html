@@ -9126,9 +9126,6 @@
             if (!shStudentProfile) {
               shStudentProfile = loadJ('student_profile', null);
             }
-            if (shStudentProfile && (shStudentProfile.academic_stage || shStudentProfile.stage_name)) {
-              autoSyncMasterCurriculumForStudentStage(shStudentProfile.academic_stage || shStudentProfile.stage_name);
-            }
             checkStudentStageBanner();
 
             // Fetch required curriculum assignments
@@ -9325,45 +9322,12 @@
 
         closeAnyPop();
         checkStudentStageBanner();
-        autoSyncMasterCurriculumForStudentStage(selectedStage);
-        showToast('success', isAr ? `🎉 تم حفظ مرحلتك الدراسية (${selectedStage}) وتخصيص المنهج المرجعي بنجاح!` : `🎉 Stage saved & curricula customized!`);
+        showToast('success', isAr ? `🎉 تم حفظ مرحلتك الدراسية (${selectedStage}) بنجاح!` : `🎉 Stage saved (${selectedStage})!`);
       };
 
       document.body.appendChild(pop); posPop(pop, document.body);
       pop.addEventListener('click', e => e.stopPropagation()); _popEl = pop;
     };
-
-    function autoSyncMasterCurriculumForStudentStage(stageName) {
-      if (!stageName) return;
-      const isAr = lang === 'ar';
-      
-      const matchesStage = (mcStage, targetStage) => {
-        if (!mcStage || !targetStage) return false;
-        if (mcStage === targetStage) return true;
-        if (targetStage.includes('الإعدادية') && mcStage.includes('الإعدادي')) return true;
-        if (targetStage.includes('الثانوية العامة') && mcStage.includes('الثانوي')) return true;
-        if (targetStage.includes('البكالوريا') && mcStage.includes('البكالوريا')) return true;
-        return mcStage.toLowerCase().includes(targetStage.toLowerCase()) || targetStage.toLowerCase().includes(mcStage.toLowerCase());
-      };
-
-      const matchingMcs = (shMasterCurricula || []).filter(mc => {
-        return matchesStage(mc.targetStage, stageName);
-      });
-
-      // Clear previous mismatched stage subjects so only stage-specific curriculum is displayed
-      sCurricData.subjects = [];
-
-      if (matchingMcs.length > 0) {
-        matchingMcs.forEach(mc => {
-          (mc.subjects || []).forEach(srcSub => {
-            sCurricData.subjects.push(JSON.parse(JSON.stringify(srcSub)));
-          });
-        });
-      }
-
-      saveJ('curriculum', sCurricData);
-      if (typeof curRenderAll === 'function') curRenderAll();
-    }
 
     /* Parent Connection Flow */
     function openParentAccessModal() {
@@ -10333,17 +10297,14 @@
       });
     };
 
-    function buildStageSelectOptions(selectedVal, hideAllOption = false) {
+    function buildStageSelectOptions(selectedVal) {
       const isAr = lang === 'ar';
       const sel = selectedVal || '';
       return `
-        ${!hideAllOption ? `<option value="ALL"${sel === 'ALL' || sel === 'عامة لكافة المراحل والصفوف' || !sel ? ' selected' : ''}>🌐 ${isAr ? 'عامة لكافة المراحل والصفوف (All Stages)' : 'All Stages & Grades'}</option>` : ''}
-        
         <optgroup label="${isAr ? '📚 المرحلة الإعدادية (Preparatory)' : 'Preparatory Grades'}">
-          <option value="الصف الأول الإعدادي"${sel === 'الصف الأول الإعدادي' ? ' selected' : ''}>1️⃣ ${isAr ? 'الصف الأول الإعدادي (1st Prep)' : '1st Prep'}</option>
+          <option value="الصف الأول الإعدادي"${sel === 'الصف الأول الإعدادي' || !sel ? ' selected' : ''}>1️⃣ ${isAr ? 'الصف الأول الإعدادي (1st Prep)' : '1st Prep'}</option>
           <option value="الصف الثاني الإعدادي"${sel === 'الصف الثاني الإعدادي' ? ' selected' : ''}>2️⃣ ${isAr ? 'الصف الثاني الإعدادي (2nd Prep)' : '2nd Prep'}</option>
           <option value="الصف الثالث الإعدادي"${sel === 'الصف الثالث الإعدادي' ? ' selected' : ''}>3️⃣ ${isAr ? 'الصف الثالث الإعدادي (3rd Prep)' : '3rd Prep'}</option>
-          <option value="كافة مراحل الإعدادية"${sel === 'كافة مراحل الإعدادية' ? ' selected' : ''}>🏫 ${isAr ? 'كافة مراحل الإعدادية (All Prep)' : 'All Prep Grades'}</option>
         </optgroup>
 
         <optgroup label="${isAr ? '🎓 الثانوية العامة (General Secondary)' : 'General Secondary Grades'}">
@@ -10353,7 +10314,6 @@
           <option value="الصف الثالث الثانوي - علمي علوم"${sel === 'الصف الثالث الثانوي - علمي علوم' ? ' selected' : ''}>3️⃣ ${isAr ? 'الصف الثالث الثانوي - علمي علوم (3rd Sec Sci Bio)' : '3rd Sec - Sci Bio'}</option>
           <option value="الصف الثالث الثانوي - علمي رياضة"${sel === 'الصف الثالث الثانوي - علمي رياضة' ? ' selected' : ''}>3️⃣ ${isAr ? 'الصف الثالث الثانوي - علمي رياضة (3rd Sec Sci Math)' : '3rd Sec - Sci Math'}</option>
           <option value="الصف الثالث الثانوي - أدبي"${sel === 'الصف الثالث الثانوي - أدبي' ? ' selected' : ''}>3️⃣ ${isAr ? 'الصف الثالث الثانوي - أدبي (3rd Sec Literary)' : '3rd Sec - Literary'}</option>
-          <option value="كافة مراحل الثانوية العامة"${sel === 'كافة مراحل الثانوية العامة' ? ' selected' : ''}>🏫 ${isAr ? 'كافة مراحل الثانوية العامة (All General Sec)' : 'All General Secondary'}</option>
         </optgroup>
 
         <optgroup label="${isAr ? '🎖️ مسارات البكالوريا (Baccalaureate Tracks)' : 'Baccalaureate Tracks'}">
@@ -10361,7 +10321,6 @@
           <option value="البكالوريا - مسار الهندسة وعلوم الحاسب"${sel === 'البكالوريا - مسار الهندسة وعلوم الحاسب' ? ' selected' : ''}>💻 ${isAr ? 'البكالوريا - مسار الهندسة وعلوم الحاسب' : 'Bac - Engineering & CS'}</option>
           <option value="البكالوريا - مسار الطب والعلوم الحيوية"${sel === 'البكالوريا - مسار الطب والعلوم الحيوية' ? ' selected' : ''}>🩺 ${isAr ? 'البكالوريا - مسار الطب والعلوم الحيوية' : 'Bac - Medicine & Bio'}</option>
           <option value="البكالوريا - مسار الإدارة والأعمال"${sel === 'البكالوريا - مسار الإدارة والأعمال' ? ' selected' : ''}>📊 ${isAr ? 'البكالوريا - مسار الإدارة والأعمال' : 'Bac - Business & Admin'}</option>
-          <option value="كافة مسارات البكالوريا"${sel === 'كافة مسارات البكالوريا' ? ' selected' : ''}>🏛️ ${isAr ? 'كافة مسارات البكالوريا (All Bac Tracks)' : 'All Baccalaureate Tracks'}</option>
         </optgroup>
       `;
     }
@@ -10509,36 +10468,18 @@
 
       const matchesTargetStage = (stStage, targetStage) => {
         if (!stStage || !targetStage) return false;
-        if (targetStage === 'ALL' || targetStage === 'عامة لكافة المراحل والصفوف') return true;
-        if (stStage === targetStage) return true;
-        if (targetStage.includes('الإعدادية') && stStage.includes('الإعدادي')) return true;
-        if (targetStage.includes('الثانوية العامة') && stStage.includes('الثانوي')) return true;
-        if (targetStage.includes('البكالوريا') && stStage.includes('البكالوريا')) return true;
-        return stStage.toLowerCase().includes(targetStage.toLowerCase()) || targetStage.toLowerCase().includes(stStage.toLowerCase());
+        return stStage.trim().toLowerCase() === targetStage.trim().toLowerCase();
       };
 
-      // 1. Merge into current user's personal curriculum profile ONLY if their stage matches
+      // 1. Replace current user's personal curriculum ONLY if their stage strictly matches target stage
       const currentStStage = shStudentProfile?.academic_stage || shStudentProfile?.stage_name || '';
       if (matchesTargetStage(currentStStage, stage)) {
-        mc.subjects.forEach(srcSub => {
-          const existingSub = sCurricData.subjects.find(s => s.name.trim().toLowerCase() === srcSub.name.trim().toLowerCase());
-          if (!existingSub) {
-            sCurricData.subjects.push(JSON.parse(JSON.stringify(srcSub)));
-          } else {
-            (srcSub.units || []).forEach(srcUnit => {
-              const hasUnit = (existingSub.units || []).some(u => u.title.trim().toLowerCase() === srcUnit.title.trim().toLowerCase());
-              if (!hasUnit) {
-                if (!existingSub.units) existingSub.units = [];
-                existingSub.units.push(JSON.parse(JSON.stringify(srcUnit)));
-              }
-            });
-          }
-        });
+        sCurricData.subjects = JSON.parse(JSON.stringify(mc.subjects));
         saveJ('curriculum', sCurricData);
         if (typeof curRenderAll === 'function') curRenderAll();
       }
 
-      // 2. Push ONLY to DB student accounts whose assigned academic stage matches
+      // 2. Push ONLY to DB student accounts whose assigned academic stage strictly matches
       let pushedCount = 0;
       if (_sb) {
         try {
@@ -10550,22 +10491,7 @@
 
               if (matchesTargetStage(stStage, stage)) {
                 pushedCount++;
-                const { data: curRow } = await _sb.from('schedule_data').select('data').eq('id', 'curriculum').eq('user_id', st.id).maybeSingle();
-                let studentCurric = curRow?.data || { subjects: [] };
-                mc.subjects.forEach(srcSub => {
-                  const existingSub = studentCurric.subjects.find(s => s.name.trim().toLowerCase() === srcSub.name.trim().toLowerCase());
-                  if (!existingSub) {
-                    studentCurric.subjects.push(JSON.parse(JSON.stringify(srcSub)));
-                  } else {
-                    (srcSub.units || []).forEach(srcUnit => {
-                      const hasUnit = (existingSub.units || []).some(u => u.title.trim().toLowerCase() === srcUnit.title.trim().toLowerCase());
-                      if (!hasUnit) {
-                        if (!existingSub.units) existingSub.units = [];
-                        existingSub.units.push(JSON.parse(JSON.stringify(srcUnit)));
-                      }
-                    });
-                  }
-                });
+                const studentCurric = { subjects: JSON.parse(JSON.stringify(mc.subjects)) };
                 await _sb.from('schedule_data').upsert({ id: 'curriculum', user_id: st.id, data: studentCurric, updated_at: new Date().toISOString() }, { onConflict: 'id,user_id' });
               }
             }
