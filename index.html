@@ -4210,22 +4210,6 @@
             <i class="fa-solid fa-graduation-cap"></i>
             <span id="ud-acad-txt">الإعدادات الأكاديمية</span>
           </button>
-          <button class="user-dropdown-item student-only" onclick="openParentAccessModal();closeUserDropdown()">
-            <i class="fa-solid fa-link"></i>
-            <span id="ud-pcode-txt">ربط ولي الأمر (Parent Code)</span>
-          </button>
-          <button class="user-dropdown-item parent-only" onclick="openParentConnectModal();closeUserDropdown()">
-            <i class="fa-solid fa-user-plus"></i>
-            <span id="ud-pconn-txt">ربط طالب جديد</span>
-          </button>
-          <button class="user-dropdown-item main-admin-only" onclick="switchPage('admin');closeUserDropdown()">
-            <i class="fa-solid fa-sliders"></i>
-            <span id="ud-admin-txt">لوحة التحكم الرئيسية (Admin)</span>
-          </button>
-          <button class="user-dropdown-item" onclick="syncAllToSupabase();closeUserDropdown()">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span id="ud-sync-txt">مزامنة البيانات سحابياً</span>
-          </button>
           <button class="user-dropdown-item" onclick="startTour();closeUserDropdown()">
             <i class="fa-solid fa-map"></i>
             <span id="ud-tour-txt">الجولة التعريفية</span>
@@ -4682,14 +4666,15 @@
     <div class="an-wrap">
       <div class="ex-top-bar">
         <div>
-          <h2 style="font-size:18px;font-weight:900;color:var(--text)"><i class="fa-solid fa-people-roof" style="color:var(--indigo);margin-inline-end:8px"></i>لوحة متابعة أولياء الأمور</h2>
-          <div style="font-size:12px;color:var(--text3);margin-top:2px">متابعة دقيقة لمستوى الأبناء والإنجاز الدراسي والجدول والمحاضرات</div>
+          <h2 style="font-size:18px;font-weight:900;color:var(--text)"><i class="fa-solid fa-people-roof" style="color:var(--indigo);margin-inline-end:8px"></i><span id="par-h-title">لوحة متابعة أولياء الأمور</span></h2>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px" id="par-h-sub">متابعة دقيقة لمستوى الأبناء والإنجاز الدراسي والجدول والمحاضرات</div>
         </div>
-        <div style="display:flex;gap:10px;align-items:center">
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
           <select id="parent-student-picker" onchange="selectParentStudent(this.value)" class="f-inp" style="max-width:240px;padding:6px 12px;font-weight:800;background:var(--bg2)">
             <option value="">-- اختر الطالب --</option>
           </select>
-          <button class="s-btn accent" onclick="openParentConnectModal()"><i class="fa-solid fa-plus"></i> ربط طالب جديد</button>
+          <button class="s-btn accent" onclick="openParentAccessModal()"><i class="fa-solid fa-key"></i> <span id="par-btn-mycode">كود ولي الأمر 🔑</span></button>
+          <button class="s-btn accent" onclick="openParentConnectModal()"><i class="fa-solid fa-link"></i> <span id="par-btn-link">ربط طالب جديد 🔗</span></button>
         </div>
       </div>
 
@@ -5482,17 +5467,19 @@
       si('an-c3-title', t('anC3Title'));
       si('an-ai-title', t('anAiTitle'));
 
-      // Top navbar i18n
+      // Parent View i18n
       si('s-parent', isAr ? 'متابعة الأبناء' : 'Parent View');
+      si('par-h-title', isAr ? 'لوحة متابعة أولياء الأمور' : 'Parent Monitoring Dashboard');
+      si('par-h-sub', isAr ? 'متابعة دقيقة لمستوى الأبناء والإنجاز الدراسي والجدول والمحاضرات' : 'Comprehensive parent monitoring of student progress, schedule, and lectures');
+      si('par-btn-mycode', isAr ? 'كود ولي الأمر 🔑' : 'Parent Access Code 🔑');
+      si('par-btn-link', isAr ? 'ربط طالب جديد 🔗' : 'Link New Student 🔗');
+
+      // Top navbar i18n
       si('s-admin', isAr ? 'لوحة الأدمن' : 'Admin Panel');
       si('tab-admin-txt', isAr ? 'لوحة الأدمن' : 'Admin Panel');
 
       // User Profile Dropdown i18n
       si('ud-acad-txt', isAr ? 'الإعدادات الأكاديمية' : 'Academic Settings');
-      si('ud-pcode-txt', isAr ? 'ربط ولي الأمر (Parent Code)' : 'Link Parent Account');
-      si('ud-pconn-txt', isAr ? 'ربط طالب جديد' : 'Link New Student');
-      si('ud-admin-txt', isAr ? 'لوحة التحكم الرئيسية (Admin)' : 'Head Admin Panel');
-      si('ud-sync-txt', isAr ? 'مزامنة البيانات سحابياً' : 'Sync Data to Cloud');
       si('ud-tour-txt', isAr ? 'الجولة التعريفية' : 'Guided Tour');
       si('ud-logout-txt', isAr ? 'تسجيل الخروج' : 'Log Out');
       si('ud-delete-txt', isAr ? 'حذف الحساب نهائياً' : 'Delete Account');
@@ -8201,22 +8188,86 @@
       toggleStudentCodeInput();
     }
 
+    async function quickRegisterParentWithCode(name, code) {
+      const autoEmail = 'parent_' + Date.now().toString().slice(-6) + '@studyhub.edu';
+      const autoPass = 'parent_' + Date.now();
+
+      const userObj = {
+        email: autoEmail,
+        name: name,
+        role: 'PARENT',
+        student_code: code
+      };
+      localStorage.setItem('bac_local_user', JSON.stringify(userObj));
+      window._currentUser = { email: autoEmail, user_metadata: { full_name: name, role: 'PARENT' } };
+
+      currentUserRole = 'PARENT';
+      document.body.classList.remove('is-main-admin', 'role-admin', 'role-student');
+      document.body.classList.add('role-parent');
+
+      let client = getSbClient();
+      if (client) {
+        try {
+          const { data } = await client.auth.signUp({
+            email: autoEmail,
+            password: autoPass,
+            options: { data: { full_name: name, role: 'PARENT', student_code: code } }
+          });
+          if (data?.user) {
+            await client.from('profiles').upsert({
+              id: data.user.id,
+              email: autoEmail,
+              full_name: name,
+              role: 'PARENT'
+            });
+            await client.from('parent_student_relationships').upsert({
+              parent_id: data.user.id,
+              student_id: code,
+              status: 'ACTIVE'
+            });
+          }
+        } catch(e) {
+          console.warn('Quick parent signup fallback:', e);
+        }
+      }
+
+      if (!shParentStudents) shParentStudents = [];
+      shParentStudents.push({
+        student_id: code,
+        code: code,
+        status: 'ACTIVE'
+      });
+
+      closeModal('mod-auth');
+      updateUserUI(window._currentUser);
+      showToast(lang === 'ar' ? 'تم إنشاء حساب ولي الأمر وربطه بالطالب بنجاح! 👨‍👩‍👧' : 'Parent account created & linked to student successfully! 👨‍👩‍👧');
+      switchPage('parent');
+    }
+
     function gotoRegStep(step) {
       if (step === 2) {
         const name = document.getElementById('reg-name').value.trim();
         if (!name) { showAuthErr('اكتب اسمك الكامل أولاً!'); return; }
 
         const role = document.getElementById('reg-role')?.value || 'USER';
+        const sCode = document.getElementById('reg-student-code-input')?.value?.trim();
+        const pCode = document.getElementById('reg-parent-code-input')?.value?.trim();
+        const code = sCode || pCode;
+
+        // Auto-create Parent account without Slide 2/3 if code is entered!
+        if (code) {
+          quickRegisterParentWithCode(name, code);
+          return;
+        }
+
         if (role === 'USER') {
           const hasParent = document.getElementById('reg-has-parent-account')?.value;
-          const pCode = document.getElementById('reg-parent-code-input')?.value?.trim();
           if (hasParent === 'yes' && !pCode) {
             showAuthErr('أدخل كود ولي الأمر لربط حسابك معه!');
             return;
           }
         } else {
           const hasStudent = document.getElementById('reg-has-student-account')?.value;
-          const sCode = document.getElementById('reg-student-code-input')?.value?.trim();
           if (hasStudent === 'yes' && !sCode) {
             showAuthErr('أدخل كود ربط الطالب أولاً!');
             return;
