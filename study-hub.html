@@ -4507,7 +4507,7 @@
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="s-btn" onclick="toggleAllCurricSubjects()"><i class="fa-solid fa-up-down"></i> <span id="cur-btn-toggle-all">طَي / إظهار الكل</span></button>
-          <button class="s-btn accent" onclick="curAddSubjPrompt(this)"><i class="fa-solid fa-plus"></i> <span id="cur-btn-add-txt">إضافة مادة جديدة</span></button>
+          <button class="s-btn accent admin-only" onclick="curAddSubjPrompt(this)"><i class="fa-solid fa-plus"></i> <span id="cur-btn-add-txt">إضافة مادة جديدة</span></button>
         </div>
       </div>
 
@@ -6126,7 +6126,7 @@
 
     /* Drag to reorder */
     function enableDrag(card, handle, cls, getArr, onDone) {
-      if (!handle) return;
+      if (!handle || !isAdminMode) return;
       handle.addEventListener('pointerdown', e => {
         if (card.classList.contains('pinned')) return;
         e.preventDefault();
@@ -7321,7 +7321,7 @@
         card.innerHTML = `
       <div class="cur-subj-hdr">
         <div class="cur-subj-title" style="cursor:pointer" onclick="toggleSubjUnits(this.querySelector('.subj-toggle-btn'), '${sub.id}')">
-          <span class="s-handle cur-subj-drag-handle" style="cursor:grab;color:var(--text3);font-size:15px;margin-inline-end:4px" onclick="event.stopPropagation()"><i class="fa-solid fa-grip-vertical"></i></span>
+          <span class="s-handle admin-only cur-subj-drag-handle" style="cursor:grab;color:var(--text3);font-size:15px;margin-inline-end:4px" onclick="event.stopPropagation()"><i class="fa-solid fa-grip-vertical"></i></span>
           <span style="font-size:22px">${sub.emoji || '📚'}</span>
           <span>${esc(sub.name)}</span>
           <span style="font-size:11px;font-weight:800;padding:2px 8px;border-radius:20px;background:${pacing[1]};color:${pacing[2]}">${pacing[0]}</span>
@@ -7332,11 +7332,11 @@
             <div style="font-size:10px;color:var(--text3)">${t('syllabusProgress')}</div>
           </div>
           <button class="s-btn subj-toggle-btn" onclick="toggleSubjUnits(this, '${sub.id}')" style="padding:4px 8px;font-size:11px" title="${isAr ? 'طَي أو إظهار وحدات المادة' : 'Collapse/Expand units'}"><i class="fa-solid fa-chevron-up subj-toggle-icon"></i> <span class="subj-toggle-lbl">${isAr ? 'طَي' : 'Collapse'}</span></button>
-          <button class="icon-reorder-btn" style="border:none;background:none;color:var(--text3);font-size:12px;cursor:pointer;padding:3px 6px" onclick="curMoveSubj('${sub.id}',-1)" title="Move Up"><i class="fa-solid fa-chevron-up"></i></button>
-          <button class="icon-reorder-btn" style="border:none;background:none;color:var(--text3);font-size:12px;cursor:pointer;padding:3px 6px" onclick="curMoveSubj('${sub.id}',1)" title="Move Down"><i class="fa-solid fa-chevron-down"></i></button>
-          <button style="border:none;background:none;color:var(--blue2);font-size:13px;cursor:pointer" onclick="curEditSubjPrompt(this, '${sub.id}')" title="Edit Subject"><i class="fa-solid fa-pen"></i></button>
-          <button class="s-btn accent" onclick="curAddUnitPrompt(this, '${sub.id}')"><i class="fa-solid fa-plus"></i> ${t('addUnitBtn')}</button>
-          <button style="border:none;background:none;color:var(--red);font-size:12px;cursor:pointer" onclick="curDelSubj('${sub.id}', this)">✕</button>
+          <button class="admin-only icon-reorder-btn" style="border:none;background:none;color:var(--text3);font-size:12px;cursor:pointer;padding:3px 6px" onclick="curMoveSubj('${sub.id}',-1)" title="Move Up"><i class="fa-solid fa-chevron-up"></i></button>
+          <button class="admin-only icon-reorder-btn" style="border:none;background:none;color:var(--text3);font-size:12px;cursor:pointer;padding:3px 6px" onclick="curMoveSubj('${sub.id}',1)" title="Move Down"><i class="fa-solid fa-chevron-down"></i></button>
+          <button class="admin-only" style="border:none;background:none;color:var(--blue2);font-size:13px;cursor:pointer" onclick="curEditSubjPrompt(this, '${sub.id}')" title="Edit Subject"><i class="fa-solid fa-pen"></i></button>
+          <button class="s-btn accent admin-only" onclick="curAddUnitPrompt(this, '${sub.id}')"><i class="fa-solid fa-plus"></i> ${t('addUnitBtn')}</button>
+          <button class="admin-only" style="border:none;background:none;color:var(--red);font-size:12px;cursor:pointer" onclick="curDelSubj('${sub.id}', this)">✕</button>
         </div>
       </div>
       <div class="tc-prog-track"><div class="tc-prog-fill" style="width:${pct}%;background:${sub.color || 'var(--blue)'}"></div></div>
@@ -10048,6 +10048,8 @@
                             <span style="font-size:11px;font-weight:800;padding:2px 8px;border-radius:20px;background:rgba(59,130,246,0.15);color:var(--blue2)">${units.length} ${isAr ? 'أبواب' : 'units'}</span>
                           </div>
                           <div style="display:flex;align-items:center;gap:6px">
+                            <button class="icon-reorder-btn" style="border:none;background:none;color:var(--text3);font-size:12px;cursor:pointer;padding:3px 6px" onclick="adminMcMoveSubject('${mc.id}', '${sub.id}', -1)" title="Move Up"><i class="fa-solid fa-chevron-up"></i></button>
+                            <button class="icon-reorder-btn" style="border:none;background:none;color:var(--text3);font-size:12px;cursor:pointer;padding:3px 6px" onclick="adminMcMoveSubject('${mc.id}', '${sub.id}', 1)" title="Move Down"><i class="fa-solid fa-chevron-down"></i></button>
                             <button style="border:none;background:none;color:var(--blue2);font-size:13px;cursor:pointer" onclick="adminMcEditSubject('${mc.id}', '${sub.id}')" title="Edit Subject"><i class="fa-solid fa-pen"></i></button>
                             <button class="s-btn accent" style="padding:4px 8px;font-size:11px" onclick="adminMcAddUnit('${mc.id}', '${sub.id}')"><i class="fa-solid fa-plus"></i> ${isAr ? 'إضافة باب' : 'Add Unit'}</button>
                             <button style="border:none;background:none;color:var(--red);font-size:12px;cursor:pointer" onclick="adminMcDelSubject('${mc.id}', '${sub.id}')">✕</button>
@@ -10066,6 +10068,8 @@
                                 <div class="cur-unit-title">
                                   <span><i class="fa-solid fa-folder-open"></i> ${esc(u.title)} ${termBadge}</span>
                                   <div style="display:flex;align-items:center;gap:6px">
+                                    <button class="icon-reorder-btn" style="border:none;background:none;color:var(--text3);font-size:11px;cursor:pointer;padding:2px 4px" onclick="adminMcMoveUnit('${mc.id}', '${sub.id}', '${u.id}', -1)" title="Move Up"><i class="fa-solid fa-chevron-up"></i></button>
+                                    <button class="icon-reorder-btn" style="border:none;background:none;color:var(--text3);font-size:11px;cursor:pointer;padding:2px 4px" onclick="adminMcMoveUnit('${mc.id}', '${sub.id}', '${u.id}', 1)" title="Move Down"><i class="fa-solid fa-chevron-down"></i></button>
                                     <button style="border:none;background:none;color:var(--blue2);font-size:12px;cursor:pointer;padding:2px 4px" onclick="adminMcEditUnit('${mc.id}', '${sub.id}', '${u.id}')" title="Edit Unit"><i class="fa-solid fa-pen"></i></button>
                                     <button style="border:none;background:none;color:var(--blue2);font-size:11px;cursor:pointer" onclick="adminMcAddLesson('${mc.id}', '${sub.id}', '${u.id}')">+ ${isAr ? 'إضافة درس' : 'Add Lesson'}</button>
                                     <button style="border:none;background:none;color:var(--red);font-size:12px;cursor:pointer" onclick="adminMcDelUnit('${mc.id}', '${sub.id}', '${u.id}')">✕</button>
@@ -10076,6 +10080,8 @@
                                   <div class="cur-lesson-row" style="padding:6px 10px;display:flex;justify-content:space-between;align-items:center">
                                     <span style="font-size:13px;font-weight:700;color:var(--text)"><i class="fa-solid fa-book-open" style="color:var(--text3);margin-inline-end:6px"></i>${esc(l.title)}</span>
                                     <div style="display:flex;align-items:center;gap:4px">
+                                      <button class="icon-reorder-btn" style="border:none;background:none;color:var(--text3);font-size:10px;cursor:pointer;padding:2px 4px" onclick="adminMcMoveLesson('${mc.id}', '${sub.id}', '${u.id}', '${l.id}', -1)" title="Move Up"><i class="fa-solid fa-chevron-up"></i></button>
+                                      <button class="icon-reorder-btn" style="border:none;background:none;color:var(--text3);font-size:10px;cursor:pointer;padding:2px 4px" onclick="adminMcMoveLesson('${mc.id}', '${sub.id}', '${u.id}', '${l.id}', 1)" title="Move Down"><i class="fa-solid fa-chevron-down"></i></button>
                                       <button style="border:none;background:none;color:var(--blue2);font-size:11px;cursor:pointer" onclick="adminMcEditLesson('${mc.id}', '${sub.id}', '${u.id}', '${l.id}')" title="Edit Lesson"><i class="fa-solid fa-pen"></i></button>
                                       <button style="border:none;background:none;color:var(--red);font-size:12px;cursor:pointer" onclick="adminMcDelLesson('${mc.id}', '${sub.id}', '${u.id}', '${l.id}')">✕</button>
                                     </div>
@@ -10148,6 +10154,51 @@
         console.error('Error rendering admin panel:', e);
       }
     }
+
+    window.adminMcMoveSubject = function (mcId, subId, dir) {
+      const mc = shMasterCurricula.find(m => m.id === mcId);
+      if (!mc || !mc.subjects) return;
+      const idx = mc.subjects.findIndex(s => s.id === subId);
+      if (idx === -1) return;
+      const targetIdx = idx + dir;
+      if (targetIdx < 0 || targetIdx >= mc.subjects.length) return;
+      const item = mc.subjects.splice(idx, 1)[0];
+      mc.subjects.splice(targetIdx, 0, item);
+      saveJ('master_curricula', shMasterCurricula);
+      renderAdminPanel();
+    };
+
+    window.adminMcMoveUnit = function (mcId, subId, unitId, dir) {
+      const mc = shMasterCurricula.find(m => m.id === mcId);
+      if (!mc || !mc.subjects) return;
+      const sub = mc.subjects.find(s => s.id === subId);
+      if (!sub || !sub.units) return;
+      const idx = sub.units.findIndex(u => u.id === unitId);
+      if (idx === -1) return;
+      const targetIdx = idx + dir;
+      if (targetIdx < 0 || targetIdx >= sub.units.length) return;
+      const item = sub.units.splice(idx, 1)[0];
+      sub.units.splice(targetIdx, 0, item);
+      saveJ('master_curricula', shMasterCurricula);
+      renderAdminPanel();
+    };
+
+    window.adminMcMoveLesson = function (mcId, subId, unitId, lesId, dir) {
+      const mc = shMasterCurricula.find(m => m.id === mcId);
+      if (!mc || !mc.subjects) return;
+      const sub = mc.subjects.find(s => s.id === subId);
+      if (!sub || !sub.units) return;
+      const unit = sub.units.find(u => u.id === unitId);
+      if (!unit || !unit.lessons) return;
+      const idx = unit.lessons.findIndex(l => l.id === lesId);
+      if (idx === -1) return;
+      const targetIdx = idx + dir;
+      if (targetIdx < 0 || targetIdx >= unit.lessons.length) return;
+      const item = unit.lessons.splice(idx, 1)[0];
+      unit.lessons.splice(targetIdx, 0, item);
+      saveJ('master_curricula', shMasterCurricula);
+      renderAdminPanel();
+    };
 
     window.adminMcAddSubject = function(mcId) {
       const mc = shMasterCurricula.find(m => m.id === mcId); if (!mc) return;
