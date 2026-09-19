@@ -4488,6 +4488,18 @@
 ══════════════════════════════════════════ -->
   <div class="page" id="page-curric">
     <div class="cur-wrap">
+      <!-- Student Stage Selection Banner -->
+      <div id="student-stage-notice-banner" style="display:none;background:linear-gradient(135deg,rgba(59,130,246,0.12),rgba(147,51,234,0.12));border:1px solid var(--blue2);padding:12px 16px;border-radius:12px;margin-bottom:16px;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:22px">📢</span>
+          <div>
+            <div style="font-weight:900;font-size:14px;color:var(--text)" id="stu-banner-title">تنبيه هام من الإدارة: تحديد المرحلة الدراسية</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px" id="stu-banner-sub">يرجى تحديد مرحلتك وتخصصك الدراسي ليصلك المنهج المرجعي المعتمد الخاص بمرحلتك تلقائياً.</div>
+          </div>
+        </div>
+        <button class="s-btn accent" onclick="promptStudentStageSelection(false)"><i class="fa-solid fa-graduation-cap"></i> <span id="stu-banner-btn">تحديد مرحلتي الآن 🎓</span></button>
+      </div>
+
       <div class="ex-top-bar">
         <div>
           <h2 style="font-size:18px;font-weight:900;color:var(--text)"><i class="fa-solid fa-book-bookmark" style="color:var(--gold);margin-inline-end:8px"></i><span id="cur-title-txt">شجرة المنهج والمواد</span></h2>
@@ -7210,6 +7222,7 @@
     }
 
     function curRenderAll() {
+      checkStudentStageBanner();
       const ct = document.getElementById('cur-subj-grid');
       if (!ct) return;
 
@@ -9105,6 +9118,13 @@
           if (currentUserRole === 'USER') {
             const { data: sp } = await _sb.from('student_academic_profiles').select('*').eq('student_id', _sbUid).maybeSingle();
             if (sp) shStudentProfile = sp;
+            if (!shStudentProfile) {
+              shStudentProfile = loadJ('student_profile', null);
+            }
+            if (shStudentProfile && (shStudentProfile.academic_stage || shStudentProfile.stage_name)) {
+              autoSyncMasterCurriculumForStudentStage(shStudentProfile.academic_stage || shStudentProfile.stage_name);
+            }
+            checkStudentStageBanner();
 
             // Fetch required curriculum assignments
             const { data: fa } = await _sb.from('force_curriculum_assignments').select('*').eq('is_active', true);
@@ -9229,6 +9249,115 @@
       saveJ('student_academic_profile_' + _sbUid, shStudentProfile);
       closeModal('mod-academic-onboarding');
       showToast('تم حفظ التخصص الأكاديمي بنجاح! 🎓');
+      if (typeof curRenderAll === 'function') curRenderAll();
+    }
+
+    function checkStudentStageBanner() {
+      const banner = document.getElementById('student-stage-notice-banner');
+      if (!banner) return;
+      const isAr = lang === 'ar';
+      const stage = shStudentProfile?.academic_stage || shStudentProfile?.stage_name;
+      if (!stage) {
+        banner.style.display = 'flex';
+        banner.style.background = 'linear-gradient(135deg,rgba(59,130,246,0.12),rgba(147,51,234,0.12))';
+        banner.style.borderColor = 'var(--blue2)';
+        const title = document.getElementById('stu-banner-title');
+        if (title) title.textContent = isAr ? 'تنبيه هام من الإدارة: تحديد المرحلة الدراسية' : 'Important Notice: Select Academic Stage';
+        const sub = document.getElementById('stu-banner-sub');
+        if (sub) sub.textContent = isAr ? 'يرجى تحديد مرحلتك وتخصصك الدراسي ليصلك المنهج المرجعي الخاص بمرحلتك تلقائياً.' : 'Please select your grade/stage to receive target curricula automatically.';
+        const btn = document.getElementById('stu-banner-btn');
+        if (btn) btn.textContent = isAr ? 'تحديد مرحلتي الآن 🎓' : 'Select Stage Now 🎓';
+      } else {
+        banner.style.display = 'flex';
+        banner.style.background = 'rgba(34,197,94,0.1)';
+        banner.style.borderColor = 'rgba(34,197,94,0.3)';
+        const title = document.getElementById('stu-banner-title');
+        if (title) title.innerHTML = `🎓 ${isAr ? 'مرحلتك الدراسية الحالية:' : 'Current Stage:'} <strong style="color:var(--green)">${esc(stage)}</strong>`;
+        const sub = document.getElementById('stu-banner-sub');
+        if (sub) sub.textContent = isAr ? 'تصلك المناهج والدروس المعتمدة الخاصة بمرحلتك تلقائياً.' : 'You receive curricula for your stage automatically.';
+        const btn = document.getElementById('stu-banner-btn');
+        if (btn) btn.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> ${isAr ? 'تغيير المرحلة' : 'Change Stage'}`;
+      }
+    }
+
+    window.promptStudentStageSelection = function(isForced) {
+      const isAr = lang === 'ar';
+      const currentStage = shStudentProfile?.academic_stage || shStudentProfile?.stage_name || '';
+      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(420);
+      pop.innerHTML = `
+        <div style="font-weight:900;font-size:15px;margin-bottom:10px;color:var(--text)"><i class="fa-solid fa-graduation-cap" style="color:var(--gold);margin-inline-end:6px"></i>${isAr ? 'تحديد المرحلة والتخصص الدراسي' : 'Select Academic Stage & Track'}</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:14px">${isAr ? 'اختر مرحلتك الدراسية بدقة ليتسنّى للمنصة إرسال وتخصيص المناهج المرجعية والدروس المناسبة لمرحلتك تلقائياً:' : 'Select your grade/stage to receive customized stage curricula automatically:'}</div>
+
+        <div style="font-size:11px;font-weight:800;color:var(--text2);margin-bottom:4px">${isAr ? 'اختر المرحلة / التخصص:' : 'Select Grade / Track:'}</div>
+        <select id="stu-stage-select-in" style="width:100%;padding:10px;border-radius:8px;background:var(--bg2);color:var(--text);border:1px solid var(--border);margin-bottom:16px;font-family:inherit;font-weight:700">
+          ${buildStageSelectOptions(currentStage)}
+        </select>
+
+        <div class="pop-actions" style="display:flex;gap:8px">
+          <button class="p-btn p-save" id="stu-stage-save-btn" style="flex:1">${isAr ? '🎓 حفظ وتخصيص المناهج تلقائياً' : '🎓 Save & Sync Stage Curricula'}</button>
+          ${!isForced ? `<button class="p-btn p-del" onclick="closeAnyPop()" style="flex:1">${t('flCancel')}</button>` : ''}
+        </div>
+      `;
+
+      pop.querySelector('#stu-stage-save-btn').onclick = async () => {
+        const selectedStage = pop.querySelector('#stu-stage-select-in').value;
+        if (!selectedStage || selectedStage === 'ALL') {
+          showToast('error', isAr ? 'يرجى تحديد مرحلة دراسية محددة' : 'Please select a specific grade stage');
+          return;
+        }
+
+        if (!shStudentProfile) shStudentProfile = {};
+        shStudentProfile.student_id = _sbUid;
+        shStudentProfile.academic_stage = selectedStage;
+        shStudentProfile.stage_name = selectedStage;
+
+        saveJ('student_profile', shStudentProfile);
+        if (_sb && _sbUid) {
+          try {
+            await _sb.from('student_academic_profiles').upsert(shStudentProfile, { onConflict: 'student_id' });
+          } catch(e) {}
+        }
+
+        closeAnyPop();
+        checkStudentStageBanner();
+        autoSyncMasterCurriculumForStudentStage(selectedStage);
+        showToast('success', isAr ? `🎉 تم حفظ مرحلتك الدراسية (${selectedStage}) وتخصيص المنهج المرجعي بنجاح!` : `🎉 Stage saved & curricula customized!`);
+      };
+
+      document.body.appendChild(pop); posPop(pop, document.body);
+      pop.addEventListener('click', e => e.stopPropagation()); _popEl = pop;
+    };
+
+    function autoSyncMasterCurriculumForStudentStage(stageName) {
+      if (!shMasterCurricula || !shMasterCurricula.length) return;
+      const isAr = lang === 'ar';
+      
+      const matchingMcs = shMasterCurricula.filter(mc => {
+        if (!mc.targetStage || mc.targetStage === 'ALL' || mc.targetStage === 'عامة لكافة المراحل والصفوف') return true;
+        if (stageName && (mc.targetStage === stageName || stageName.includes(mc.targetStage) || mc.targetStage.includes(stageName))) return true;
+        return false;
+      });
+
+      if (!matchingMcs.length) return;
+
+      matchingMcs.forEach(mc => {
+        (mc.subjects || []).forEach(srcSub => {
+          const existingSub = sCurricData.subjects.find(s => s.name.trim().toLowerCase() === srcSub.name.trim().toLowerCase());
+          if (!existingSub) {
+            sCurricData.subjects.push(JSON.parse(JSON.stringify(srcSub)));
+          } else {
+            (srcSub.units || []).forEach(srcUnit => {
+              const hasUnit = (existingSub.units || []).some(u => u.title.trim().toLowerCase() === srcUnit.title.trim().toLowerCase());
+              if (!hasUnit) {
+                if (!existingSub.units) existingSub.units = [];
+                existingSub.units.push(JSON.parse(JSON.stringify(srcUnit)));
+              }
+            });
+          }
+        });
+      });
+
+      saveJ('curriculum', sCurricData);
       if (typeof curRenderAll === 'function') curRenderAll();
     }
 
