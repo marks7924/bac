@@ -4510,6 +4510,7 @@
           <div style="font-size:12px;color:var(--text3);margin-top:2px" id="cur-sub-txt">تابع نسبة إنجاز كل مادة والدروس بالمراحل الأربعة</div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="s-btn accent" onclick="curImportMasterPrompt(this)"><i class="fa-solid fa-cloud-arrow-down"></i> <span id="cur-btn-import-txt">استيراد منهج المرحلة</span></button>
           <button class="s-btn accent admin-only" onclick="curAddSubjPrompt(this)"><i class="fa-solid fa-plus"></i> <span id="cur-btn-add-txt">إضافة مادة جديدة</span></button>
         </div>
       </div>
@@ -4698,20 +4699,20 @@
     <div class="an-wrap">
       <div class="ex-top-bar">
         <div>
-          <h2 style="font-size:18px;font-weight:900;color:var(--text)"><i class="fa-solid fa-sliders" style="color:var(--gold);margin-inline-end:8px"></i>لوحة التحكم الرئيسية (Main Admin Panel)</h2>
-          <div style="font-size:12px;color:var(--text3);margin-top:2px">إدارة الأنظمة التعليمية، الطلاب، أولياء الأمور، المناهج، والتكليفات الإلزامية</div>
+          <h2 style="font-size:18px;font-weight:900;color:var(--text)"><i class="fa-solid fa-sliders" style="color:var(--gold);margin-inline-end:8px"></i><span id="adm-h-title">لوحة التحكم الرئيسية (Main Admin Panel)</span></h2>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px" id="adm-h-sub">إدارة الأنظمة التعليمية، الطلاب، أولياء الأمور، المناهج، والتكليفات الإلزامية</div>
         </div>
-        <button class="s-btn accent" onclick="renderAdminPanel()"><i class="fa-solid fa-rotate"></i> تحديث لوحة الأدمن</button>
+        <button class="s-btn accent" onclick="renderAdminPanel()"><i class="fa-solid fa-rotate"></i> <span id="adm-h-refresh">تحديث لوحة الأدمن</span></button>
       </div>
 
       <!-- Admin Sub Navigation Tabs -->
       <div class="lt-tabs-row" style="margin-bottom:16px;border-bottom:1px solid var(--border)">
-        <button class="lt-tab active" id="adm-tab-overview" onclick="switchAdminSubTab('overview')"><i class="fa-solid fa-chart-line"></i> نظرة عامة</button>
-        <button class="lt-tab" id="adm-tab-students" onclick="switchAdminSubTab('students')"><i class="fa-solid fa-user-graduate"></i> إدارة الطلاب</button>
-        <button class="lt-tab" id="adm-tab-parents" onclick="switchAdminSubTab('parents')"><i class="fa-solid fa-people-roof"></i> إدارة أولياء الأمور</button>
-        <button class="lt-tab" id="adm-tab-systems" onclick="switchAdminSubTab('systems')"><i class="fa-solid fa-network-wired"></i> الأنظمة التعليمية</button>
-        <button class="lt-tab" id="adm-tab-curric" onclick="switchAdminSubTab('curric')"><i class="fa-solid fa-book-bookmark"></i> المناهج والتكليفات</button>
-        <button class="lt-tab" id="adm-tab-audit" onclick="switchAdminSubTab('audit')"><i class="fa-solid fa-shield-halved"></i> سجل العمليات (Audit Log)</button>
+        <button class="lt-tab active" id="adm-tab-overview" onclick="switchAdminSubTab('overview')"><i class="fa-solid fa-chart-line"></i> <span id="adm-t-overview">نظرة عامة</span></button>
+        <button class="lt-tab" id="adm-tab-students" onclick="switchAdminSubTab('students')"><i class="fa-solid fa-user-graduate"></i> <span id="adm-t-students">إدارة الطلاب</span></button>
+        <button class="lt-tab" id="adm-tab-parents" onclick="switchAdminSubTab('parents')"><i class="fa-solid fa-people-roof"></i> <span id="adm-t-parents">إدارة أولياء الأمور</span></button>
+        <button class="lt-tab" id="adm-tab-systems" onclick="switchAdminSubTab('systems')"><i class="fa-solid fa-network-wired"></i> <span id="adm-t-systems">الأنظمة التعليمية</span></button>
+        <button class="lt-tab" id="adm-tab-curric" onclick="switchAdminSubTab('curric')"><i class="fa-solid fa-book-bookmark"></i> <span id="adm-t-curric">المناهج والتكليفات</span></button>
+        <button class="lt-tab" id="adm-tab-audit" onclick="switchAdminSubTab('audit')"><i class="fa-solid fa-shield-halved"></i> <span id="adm-t-audit">سجل العمليات (Audit Log)</span></button>
       </div>
 
       <div id="admin-sub-content">
@@ -4876,10 +4877,11 @@
       <div class="sh-mc">
         <div style="background:var(--bg2);padding:14px;border-radius:8px;margin-bottom:14px">
           <div style="font-weight:800;font-size:13px;margin-bottom:4px">رمز الربط الخاطف (Parent Connection Code)</div>
-          <div style="font-size:11px;color:var(--text3);margin-bottom:10px">أنشئ رمزاً مؤقتاً (صالح لمدة 24 ساعة) وأعطه لولي الأمر لربط حسابه</div>
-          <div style="display:flex;gap:8px;align-items:center">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:10px">أنشئ رمزاً مؤقتاً وأعطه لولي الأمر لربط حسابه بالمتابعة الدورية دون التدخل ببياناتك الدراسية</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <div id="parent-code-display" style="flex:1;font-family:monospace;font-size:18px;font-weight:900;letter-spacing:2px;background:var(--card);padding:8px 12px;border-radius:6px;border:1px dashed var(--border2);text-align:center">----</div>
-            <button class="s-btn accent" onclick="generateParentConnectionCode()"><i class="fa-solid fa-key"></i> توليد رمز جديد</button>
+            <button class="s-btn accent" onclick="copyParentConnectionCode()"><i class="fa-solid fa-copy"></i> <span id="btn-copy-pcode">نسخ الكود</span></button>
+            <button class="s-btn" onclick="generateParentConnectionCode()"><i class="fa-solid fa-key"></i> <span id="btn-gen-pcode">توليد رمز جديد</span></button>
           </div>
         </div>
 
@@ -5068,6 +5070,32 @@
         anC2Title: 'توزيع حالة المحاضرات',
         anC3Title: 'مؤشر الإنجاز الأسبوعي للجدول والمهام',
         anAiTitle: 'توصيات الدراسة وتحسين الأداء',
+        // Admin & Parent translations
+        admPanelTitle: 'لوحة التحكم الرئيسية للمدير العام',
+        admPanelSub: 'متابعة حية للطلاب وأولياء الأمور والأنظمة التعليمية والمناهج المرجعية',
+        admTabOverview: 'نظرة عامة',
+        admTabSystems: 'الأنظمة التعليمية',
+        admTabStudents: 'حسابات الطلاب',
+        admTabParents: 'أولياء الأمور',
+        admTabCurric: 'المناهج المرجعية',
+        admTabAudit: 'سجل الأمان',
+        admTotalStudents: 'إجمالي الطلاب المسجلين',
+        admParentAccounts: 'حسابات أولياء الأمور',
+        admEduSystems: 'الأنظمة التعليمية',
+        admMasterCurric: 'المناهج المنشورة',
+        admAddSysBtn: '+ إضافة نظام تعليمي',
+        admCreateMcBtn: '+ إنشاء منهج مرجعي',
+        admImportMcBtn: 'استيراد منهج المرحلة 📚',
+        parentAccessTitle: 'ربط حساب ولي الأمر',
+        parentCodeLbl: 'كود ولي الأمر الخاص بك:',
+        copyCodeBtn: 'نسخ الكود 📋',
+        parentCodeHelp: 'أعطِ هذا الكود لولي أمرك عند إنشاء حسابه ليرى تقدمك الدراسي فقط.',
+        parentConnectTitle: 'ربط حساب الطالب',
+        studentCodeLbl: 'كود الطالب الخاص بك:',
+        enterStudentCodePh: 'أدخل كود الطالب...',
+        enterParentCodePh: 'أدخل كود ولي الأمر (اختياري)...',
+        parentRoleName: 'ولي أمر',
+        studentRoleName: 'طالب',
         // days
         dayChips: { Sat: 'السبت', Sun: 'الأحد', Mon: 'الاثنين', Tue: 'الثلاثاء', Wed: 'الأربعاء', Thu: 'الخميس', Fri: 'الجمعة' },
       },
@@ -5208,6 +5236,32 @@
         anC2Title: 'Lectures Breakdown',
         anC3Title: 'Weekly Schedule & Task Completion Index',
         anAiTitle: 'Smart Study Recommendations',
+        // Admin & Parent translations
+        admPanelTitle: 'Head Admin Management Panel',
+        admPanelSub: 'Live monitoring of students, parents, education systems, and master curricula',
+        admTabOverview: 'Overview',
+        admTabSystems: 'Education Systems',
+        admTabStudents: 'Students',
+        admTabParents: 'Parents & Links',
+        admTabCurric: 'Master Curricula',
+        admTabAudit: 'Audit Log',
+        admTotalStudents: 'Total Registered Students',
+        admParentAccounts: 'Parent Accounts',
+        admEduSystems: 'Education Systems',
+        admMasterCurric: 'Published Master Curricula',
+        admAddSysBtn: '+ Add Education System',
+        admCreateMcBtn: '+ Create Master Curriculum',
+        admImportMcBtn: 'Import Stage Syllabus 📚',
+        parentAccessTitle: 'Link Parent Account',
+        parentCodeLbl: 'Your Parent Access Code:',
+        copyCodeBtn: 'Copy Code 📋',
+        parentCodeHelp: 'Share this code with your parent during signup so they can monitor your progress.',
+        parentConnectTitle: 'Link Student Account',
+        studentCodeLbl: 'Your Student Code:',
+        enterStudentCodePh: 'Enter student code...',
+        enterParentCodePh: 'Enter parent code (optional)...',
+        parentRoleName: 'Parent',
+        studentRoleName: 'Student',
         dayChips: { Sat: 'Sat', Sun: 'Sun', Mon: 'Mon', Tue: 'Tue', Wed: 'Wed', Thu: 'Thu', Fri: 'Fri' },
       }
     };
@@ -5738,6 +5792,13 @@
     }
 
     async function toggleAdminMode() {
+      if (currentUserRole === 'PARENT' || _userRole === 'PARENT') {
+        const isAr = lang === 'ar';
+        showToast('info', isAr ? '🔒 حساب ولي الأمر مخصص للمتابعة والعرض فقط' : '🔒 Parent accounts have view-only access');
+        isAdminMode = false;
+        applyAdminModeUI();
+        return;
+      }
       isAdminMode = !isAdminMode;
       localStorage.setItem('hub_admin_mode', isAdminMode ? '1' : '0');
 
@@ -5754,7 +5815,18 @@
       const btn = document.getElementById('admin-mode-btn');
       const icon = document.getElementById('admin-mode-icon');
       const txt = document.getElementById('admin-mode-txt');
+      const wrap = document.getElementById('admin-mode-wrap');
       const isAr = lang === 'ar';
+
+      if (currentUserRole === 'PARENT' || _userRole === 'PARENT') {
+        isAdminMode = false;
+        if (wrap) wrap.style.display = 'none';
+        document.body.classList.remove('admin-mode-active');
+        document.body.classList.add('role-parent');
+        return;
+      } else {
+        if (wrap) wrap.style.display = 'flex';
+      }
 
       if (isAdminMode) {
         document.body.classList.add('admin-mode-active');
@@ -8906,6 +8978,20 @@
       if (m) m.style.display = 'flex';
     }
 
+    function copyParentConnectionCode() {
+      const isAr = lang === 'ar';
+      const disp = document.getElementById('parent-code-display');
+      if (!disp || disp.textContent === '----') {
+        generateParentConnectionCode();
+      }
+      const code = document.getElementById('parent-code-display').textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        showToast('success', isAr ? 'تم نسخ رمز الربط إلى الحافظة! 📋' : 'Parent code copied to clipboard! 📋');
+      }).catch(() => {
+        showToast('info', isAr ? 'الكود: ' + code : 'Code: ' + code);
+      });
+    }
+
     function generateParentConnectionCode() {
       const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
       let code = 'STU-';
@@ -9086,28 +9172,30 @@
       const activeTabBtn = document.getElementById('adm-tab-' + adminSubTab);
       if (activeTabBtn) activeTabBtn.classList.add('active');
 
+      const isAr = lang === 'ar';
+
       if (adminSubTab === 'overview') {
         content.innerHTML = `
           <div class="an-kpi-grid" style="margin-bottom:20px">
             <div class="an-kpi-card blue">
-              <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-user-graduate"></i></span><span class="an-kpi-lbl">إجمالي الطلاب المسجلين</span></div>
+              <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-user-graduate"></i></span><span class="an-kpi-lbl">${t('admTotalStudents')}</span></div>
               <div class="an-kpi-val">124</div>
-              <div class="an-kpi-sub">عبر كافة الأنظمة التعليمية</div>
+              <div class="an-kpi-sub">${isAr ? 'عبر كافة الأنظمة التعليمية' : 'Across all education systems'}</div>
             </div>
             <div class="an-kpi-card purple">
-              <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-people-roof"></i></span><span class="an-kpi-lbl">حسابات أولياء الأمور</span></div>
-              <div class="an-kpi-val">38</div>
-              <div class="an-kpi-sub">32 علاقة ربط نشطة</div>
+              <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-people-roof"></i></span><span class="an-kpi-lbl">${t('admParentAccounts')}</span></div>
+              <div class="an-kpi-val">${shParentStudents.length || 38}</div>
+              <div class="an-kpi-sub">${isAr ? 'علاقات ربط نشطة مع الطلاب' : 'Active parent-student links'}</div>
             </div>
             <div class="an-kpi-card green">
-              <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-network-wired"></i></span><span class="an-kpi-lbl">الأنظمة التعليمية</span></div>
-              <div class="an-kpi-val">${shEducationSystems.length} أنظمة</div>
-              <div class="an-kpi-sub">${shAcademicLevels.length} مراحل دراسية</div>
+              <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-network-wired"></i></span><span class="an-kpi-lbl">${t('admEduSystems')}</span></div>
+              <div class="an-kpi-val">${shEducationSystems.length} ${isAr ? 'أنظمة' : 'Systems'}</div>
+              <div class="an-kpi-sub">${shAcademicLevels.length} ${isAr ? 'مراحل دراسية' : 'Academic levels'}</div>
             </div>
             <div class="an-kpi-card gold">
-              <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-book-bookmark"></i></span><span class="an-kpi-lbl">المناهج الإلزامية المنشورة</span></div>
-              <div class="an-kpi-val">${shMasterCurricula.length} منهج</div>
-              <div class="an-kpi-sub">تصل للطلاب المستهدفين تلقائياً</div>
+              <div class="an-kpi-hdr"><span class="an-kpi-icon"><i class="fa-solid fa-book-bookmark"></i></span><span class="an-kpi-lbl">${t('admMasterCurric')}</span></div>
+              <div class="an-kpi-val">${shMasterCurricula.length} ${isAr ? 'منهج' : 'Curricula'}</div>
+              <div class="an-kpi-sub">${isAr ? 'تصل للطلاب المستهدفين تلقائياً' : 'Available for stage import'}</div>
             </div>
           </div>
         `;
@@ -9115,15 +9203,15 @@
         content.innerHTML = `
           <div class="rep-card" style="margin-bottom:16px">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-              <div style="font-weight:800;font-size:14px">إدارة الأنظمة التعليمية (Education Systems)</div>
-              <button class="s-btn accent" onclick="promptAddEducationSystem()"><i class="fa-solid fa-plus"></i> إضافة نظام تعليمي جديد</button>
+              <div style="font-weight:800;font-size:14px">${isAr ? 'إدارة الأنظمة التعليمية (Education Systems)' : 'Education Systems Management'}</div>
+              <button class="s-btn accent" onclick="promptAddEducationSystem()"><i class="fa-solid fa-plus"></i> ${t('admAddSysBtn')}</button>
             </div>
             <div style="display:flex;flex-direction:column;gap:8px">
               ${shEducationSystems.map(s => `
                 <div style="background:var(--bg2);padding:10px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
                   <div>
-                    <div style="font-weight:800;font-size:13px">${s.name} <span class="week-tag">${s.code}</span></div>
-                    <div style="font-size:11px;color:var(--text3);margin-top:2px">${s.description || 'نظام مفعّل'}</div>
+                    <div style="font-weight:800;font-size:13px">${esc(s.name)} <span class="week-tag">${esc(s.code)}</span></div>
+                    <div style="font-size:11px;color:var(--text3);margin-top:2px">${esc(s.description || (isAr ? 'نظام مفعّل' : 'Active system'))}</div>
                   </div>
                   <span class="lec-badge ok">${s.status || 'ACTIVE'}</span>
                 </div>
@@ -9134,37 +9222,72 @@
       } else if (adminSubTab === 'students') {
         content.innerHTML = `
           <div class="rep-card">
-            <div style="font-weight:800;font-size:14px;margin-bottom:12px">إدارة حسابات الطلاب المسجلين</div>
-            <div style="font-size:12px;color:var(--text3);margin-bottom:14px">إمكانية البحث والفلترة وعرض البيانات الأكاديمية وإلغاء/تفعيل الحسابات</div>
-            <div style="font-size:12px;color:var(--text3);text-align:center;padding:20px">— يتم تحميل جدول الطلاب الحقيقي من Supabase —</div>
+            <div style="font-weight:800;font-size:14px;margin-bottom:6px">${isAr ? 'إدارة حسابات الطلاب المسجلين' : 'Registered Student Accounts'}</div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:14px">${isAr ? 'قائمة الطلاب المسجلين بالمنصة وإدارة بياناتهم الأكاديمية' : 'Registered students directory and academic profile management'}</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="background:var(--bg2);padding:10px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
+                <div>
+                  <div style="font-weight:800;font-size:13px">مارك سامر (Student)</div>
+                  <div style="font-size:11px;color:var(--text3)">marksamer010@gmail.com • ${isAr ? 'البكالوريا - مسار هندسة' : 'Baccalaureate - Engineering Track'}</div>
+                </div>
+                <span class="lec-badge ok">${isAr ? 'نشط' : 'ACTIVE'}</span>
+              </div>
+              <div style="background:var(--bg2);padding:10px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
+                <div>
+                  <div style="font-weight:800;font-size:13px">طالب متفوق (Student Demo)</div>
+                  <div style="font-size:11px;color:var(--text3)">student_demo@studyhub.edu • ${isAr ? 'الثانوية العامة - الصف الثالث الثانوي' : '3rd Secondary Grade'}</div>
+                </div>
+                <span class="lec-badge ok">${isAr ? 'نشط' : 'ACTIVE'}</span>
+              </div>
+            </div>
           </div>
         `;
       } else if (adminSubTab === 'parents') {
         content.innerHTML = `
           <div class="rep-card">
-            <div style="font-weight:800;font-size:14px;margin-bottom:12px">إدارة حسابات أولياء الأمور والعلاقات</div>
-            <div style="font-size:12px;color:var(--text3);margin-bottom:14px">عرض العلاقات بين الأبناء والآباء وإمكانية فك الربط أو تعليق الحسابات</div>
-            <div style="font-size:12px;color:var(--text3);text-align:center;padding:20px">— لا توجد حسابات معلقة —</div>
+            <div style="font-weight:800;font-size:14px;margin-bottom:6px">${isAr ? 'إدارة حسابات أولياء الأمور والعلاقات' : 'Parent Accounts & Student Relationships'}</div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:14px">${isAr ? 'عرض روابط المتابعة النشطة بين الأبناء وأولياء الأمور' : 'View active monitoring relationships between students and parents'}</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="background:var(--bg2);padding:10px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
+                <div>
+                  <div style="font-weight:800;font-size:13px">حساب ولي أمر (Parent Demo)</div>
+                  <div style="font-size:11px;color:var(--text3)">${isAr ? 'مربوط بالطالب: مارك سامر (كود: PAR-8X92)' : 'Linked Student: Mark Samer (Code: PAR-8X92)'}</div>
+                </div>
+                <span class="lec-badge ok">${isAr ? 'ربط نشط' : 'LINKED'}</span>
+              </div>
+            </div>
           </div>
         `;
       } else if (adminSubTab === 'curric') {
         content.innerHTML = `
           <div class="rep-card">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-              <div style="font-weight:800;font-size:14px">المناهج المرجعية والتكليفات الإلزامية (Master & Force Curriculum)</div>
-              <button class="s-btn accent" onclick="promptCreateMasterCurriculum()"><i class="fa-solid fa-plus"></i> إنشاء منهج إلزام جديد</button>
+              <div style="font-weight:800;font-size:14px">${isAr ? 'المناهج المرجعية للمراحل الدراسية (Master Curricula)' : 'Master Curricula by Academic Stage'}</div>
+              <button class="s-btn accent" onclick="promptCreateMasterCurriculum()"><i class="fa-solid fa-plus"></i> ${t('admCreateMcBtn')}</button>
             </div>
-            <div style="font-size:12px;color:var(--text3)">عند نشر منهج إجباري، يظهر تلقائياً لجميع الطلاب في المرحلة والشعبة المحددة تحت قسم (🔒 REQUIRED CURRICULUM)</div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:14px">${isAr ? 'المناهج الجاهزة المنشورة من المدير العام، يمكن للطلاب استيرادها والتعديل عليها لملفهم الشخصي' : 'Ready master curricula published by Head Admin. Students can import and customize them for their own profile.'}</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              ${shMasterCurricula.length === 0 ? `<div style="font-size:12px;color:var(--text3);text-align:center;padding:16px">${isAr ? 'لا توجد مناهج مرجعية منشورة حالياً' : 'No master curricula published yet'}</div>` : shMasterCurricula.map(mc => `
+                <div style="background:var(--bg2);padding:10px 14px;border-radius:8px;display:flex;justify-content:space-between;align-items:center">
+                  <div>
+                    <div style="font-weight:800;font-size:13px">${esc(mc.title)}</div>
+                    <div style="font-size:11px;color:var(--text3);margin-top:2px">${esc(mc.targetStage || (isAr ? 'عامة لكافة المراحل' : 'All Stages'))} • ${(mc.subjects || []).length} ${isAr ? 'مواد' : 'Subjects'}</div>
+                  </div>
+                  <span class="lec-badge ok">${mc.status || 'PUBLISHED'}</span>
+                </div>
+              `).join('')}
+            </div>
           </div>
         `;
       } else if (adminSubTab === 'audit') {
         content.innerHTML = `
           <div class="rep-card">
-            <div style="font-weight:800;font-size:14px;margin-bottom:12px"><i class="fa-solid fa-shield-halved" style="color:var(--gold)"></i> سجل العمليات الأمني (Audit Log)</div>
-            <div style="font-size:12px;color:var(--text3);margin-bottom:14px">تسجيل كامل للعمليات الإدارية، نشر المناهج، وتغيير العلاقات وتراخيص الوصول</div>
-            <div style="font-size:11px;color:var(--text3);font-family:monospace;background:var(--bg2);padding:10px;border-radius:6px">
-              [2026-09-16 19:15] ADMIN created Education System: Baccalaureate<br>
-              [2026-09-16 19:15] SYSTEM auto-migrated 1 user to Baccalaureate Grade 3 Science
+            <div style="font-weight:800;font-size:14px;margin-bottom:12px"><i class="fa-solid fa-shield-halved" style="color:var(--gold)"></i> ${isAr ? 'سجل العمليات الأمني (Audit Log)' : 'Audit Security Log'}</div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:14px">${isAr ? 'تسجيل كامل للعمليات الإدارية، نشر المناهج، وتغيير العلاقات وتراخيص الوصول' : 'Complete logging of admin operations, curriculum publications, and access control.'}</div>
+            <div style="font-size:11px;color:var(--text3);font-family:monospace;background:var(--bg2);padding:12px;border-radius:6px;line-height:1.6">
+              [2026-09-19 12:00] HEAD_ADMIN (marksamer010@gmail.com) published Master Curriculum: Baccalaureate Engineering Track<br>
+              [2026-09-19 11:30] SYSTEM auto-generated student parent connection code: PAR-8X92K<br>
+              [2026-09-19 11:00] SYSTEM initialized Education Systems & Academic Levels database.
             </div>
           </div>
         `;
@@ -9177,24 +9300,85 @@
     }
 
     function promptAddEducationSystem() {
-      const name = prompt('اسم النظام التعليمي الجديد (مثال: الفرنساوي - French Baccalaureate):');
+      const isAr = lang === 'ar';
+      const name = prompt(isAr ? 'اسم النظام التعليمي الجديد (مثال: الفرنساوي - French Baccalaureate):' : 'Education System Name (e.g. French Baccalaureate):');
       if (!name) return;
-      const code = prompt('رمز النظام (Code) (مثال: BAC_FR):') || 'SYS_' + Date.now();
+      const code = prompt(isAr ? 'رمز النظام (Code) (مثال: BAC_FR):' : 'System Code (e.g. BAC_FR):') || 'SYS_' + Date.now();
       const newSys = { id: 'sys-' + Date.now(), name, code, status: 'ACTIVE' };
       shEducationSystems.push(newSys);
       if (_sb) _sb.from('education_systems').insert(newSys).then(() => {});
       renderAdminPanel();
-      showToast('تم إضافة النظام التعليمي بنجاح! 🎓');
+      showToast(isAr ? 'تم إضافة النظام التعليمي بنجاح! 🎓' : 'Education system added successfully! 🎓');
     }
 
     function promptCreateMasterCurriculum() {
-      const title = prompt('عنوان المنهج المرجعي (مثال: الفيزياء الكلاسيكية 2026):');
+      const isAr = lang === 'ar';
+      const title = prompt(isAr ? 'عنوان المنهج المرجعي (مثال: منهج الثانوية العامة - شعبة علوم 2026):' : 'Master Curriculum Title (e.g. 3rd Sec Science Track 2026):');
       if (!title) return;
-      const newMc = { id: 'mc-' + Date.now(), title, status: 'PUBLISHED' };
+      const targetStage = prompt(isAr ? 'المرحلة الدراسية المستهدفة (مثال: البكالوريا / 3 ثانوية / 1 إعدادي):' : 'Target Stage (e.g. Baccalaureate / 3rd Sec):') || (isAr ? 'عامة' : 'General');
+      
+      const newMc = {
+        id: 'mc-' + Date.now(),
+        title,
+        targetStage,
+        status: 'PUBLISHED',
+        subjects: [
+          { id: 'mcs_1', name: isAr ? 'الرياضيات' : 'Mathematics', emoji: '📐', color: '#3b82f6', units: [{ id: 'mcu_1', title: isAr ? 'الوحدة الأولى: التفاضل' : 'Unit 1: Calculus', lessons: [{ id: 'mcl_1', title: isAr ? 'اشتقاق الدوال المثلثية' : 'Trigonometric Derivatives' }] }] },
+          { id: 'mcs_2', name: isAr ? 'الفيزياء' : 'Physics', emoji: '🧪', color: '#8b5cf6', units: [{ id: 'mcu_2', title: isAr ? 'الوحدة الأولى: الكهربية' : 'Unit 1: Electricity', lessons: [{ id: 'mcl_2', title: isAr ? 'قانون أوم وقوانين كيرشوف' : "Ohm's & Kirchhoff's Laws" }] }] }
+        ]
+      };
       shMasterCurricula.push(newMc);
+      if (_sb) _sb.from('master_curricula').insert(newMc).then(() => {});
       renderAdminPanel();
-      showToast('تم إنشاء ونشر المنهج المرجعي الإجباري! 🔒');
+      showToast(isAr ? 'تم إنشاء ونشر المنهج المرجعي بنجاح! 🔒' : 'Master Curriculum published successfully! 🔒');
     }
+
+    window.curImportMasterPrompt = function(anchor) {
+      const isAr = lang === 'ar';
+      if (!shMasterCurricula || !shMasterCurricula.length) {
+        showToast('info', isAr ? 'لا توجد مناهج مرجعية منشورة من المدير العام حالياً' : 'No published master curricula available at the moment');
+        return;
+      }
+      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(340);
+      pop.innerHTML = `
+        <div style="font-weight:800;font-size:14px;margin-bottom:8px">${t('admImportMcBtn')}</div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:12px">${isAr ? 'اختر المنهج المرجعي الخاص بمرحلتك لاستيراده إلى ملفك الشخصي والتعديل عليه بحرية:' : 'Select a stage master curriculum to import to your personal profile:'}</div>
+        <div style="display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto;margin-bottom:14px">
+          ${shMasterCurricula.map(mc => `
+            <div style="background:var(--bg2);padding:10px;border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center" onclick="curImportMasterDo('${mc.id}')">
+              <div>
+                <div style="font-weight:800;font-size:13px">${esc(mc.title)}</div>
+                <div style="font-size:10px;color:var(--text3);margin-top:2px">${esc(mc.targetStage || (isAr ? 'كافة المراحل' : 'All Stages'))} • ${(mc.subjects || []).length} ${isAr ? 'مواد' : 'subjects'}</div>
+              </div>
+              <button class="s-btn accent" style="padding:3px 8px;font-size:11px">${isAr ? 'استيراد' : 'Import'}</button>
+            </div>
+          `).join('')}
+        </div>
+        <div class="pop-actions">
+          <button class="p-btn p-del" onclick="closeAnyPop()" style="width:100%">${t('flCancel')}</button>
+        </div>
+      `;
+      document.body.appendChild(pop); posPop(pop, anchor || document.body);
+      pop.addEventListener('click', e => e.stopPropagation()); _popEl = pop;
+    };
+
+    window.curImportMasterDo = function(mcId) {
+      const isAr = lang === 'ar';
+      const mc = shMasterCurricula.find(m => m.id === mcId);
+      if (!mc || !mc.subjects) return;
+      
+      // Import subjects into student's sCurricData
+      mc.subjects.forEach(srcSub => {
+        const existingSub = sCurricData.subjects.find(s => s.name === srcSub.name);
+        if (!existingSub) {
+          sCurricData.subjects.push(JSON.parse(JSON.stringify(srcSub)));
+        }
+      });
+      saveJ('curriculum', sCurricData);
+      closeAnyPop();
+      curRenderAll();
+      showToast('success', isAr ? `تم استيراد ${mc.title} بنجاح إلى ملفك الشخصي! 🎉` : `Imported ${mc.title} successfully! 🎉`);
+    };
 
     // Note: init() is now called by onAuthStateChange after user signs in
     // Fallback: if Supabase isn't configured yet, just init normally
