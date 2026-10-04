@@ -21,6 +21,7 @@ const Store = (() => {
   };
 
   const listeners = [];
+  let _isImporting = false;
 
   function load() {
     try {
@@ -41,14 +42,19 @@ const Store = (() => {
   function save() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      // Cloud sync to Supabase if logged in with real UUID
-      if (window._sb && window.isRealUuid && window._sbUid && window.isRealUuid(window._sbUid)) {
-        window._sb.from('schedule_data').upsert({
-          id: 'planner_v1',
-          user_id: window._sbUid,
-          data: state,
-          updated_at: new Date().toISOString()
-        }, { onConflict: 'id,user_id' }).then(() => {}).catch(e => console.warn('Planner cloud sync error:', e));
+      // Cloud sync to Supabase if logged in with real UUID and not currently importing remote payload
+      if (!_isImporting) {
+        const client = window._supabase || window._sb || (typeof window.getSbClient === 'function' ? window.getSbClient() : null);
+        const uid = window._sbUid || (typeof window.getActiveSyncUid === 'function' ? window.getActiveSyncUid() : null);
+        const isReal = window.isRealUuid ? window.isRealUuid(uid) : (uid && uid.length > 20 && !uid.startsWith('local-'));
+        if (client && isReal) {
+          client.from('schedule_data').upsert({
+            id: 'planner_v1',
+            user_id: uid,
+            data: state,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'id,user_id' }).then(() => {}).catch(e => console.warn('Planner cloud sync error:', e));
+        }
       }
     } catch (e) {
       console.warn('Planner: Failed to save state', e);
@@ -563,8 +569,9 @@ const Store = (() => {
 
   function importData(json) {
     try {
-      const data = JSON.parse(json);
-      if (!data.version) throw new Error('Invalid format');
+      const data = typeof json === 'object' ? json : JSON.parse(json);
+      if (!data) return false;
+      _isImporting = true;
       if (data.tasks)       state.tasks = data.tasks;
       if (data.projects)    state.projects = data.projects;
       if (data.recurrences) state.recurrences = data.recurrences;
@@ -572,8 +579,10 @@ const Store = (() => {
       if (data.drawMarks)   state.drawMarks = data.drawMarks;
       if (data.settings)    state.settings = { ...state.settings, ...data.settings };
       save();
+      _isImporting = false;
       return true;
     } catch (e) {
+      _isImporting = false;
       console.error('Import failed:', e);
       return false;
     }

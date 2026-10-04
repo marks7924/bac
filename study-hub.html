@@ -10247,6 +10247,12 @@
             data.forEach(row => {
               localStorage.setItem(uid + ':' + row.id, JSON.stringify(row.data));
               localStorage.setItem(row.id, JSON.stringify(row.data));
+              if (row.id === 'planner_v1' && window.Store && typeof window.Store.importData === 'function') {
+                window.Store.importData(row.data);
+                if (window.App && typeof window.App.refresh === 'function') {
+                  window.App.refresh();
+                }
+              }
             });
           }
         } catch (e) {
@@ -10289,6 +10295,13 @@
                 ltLectures = ltLectures.filter(l => !ltDeleted.includes(`${l.teacherId}_${l.date}`) && !ltDeleted.includes(l.id));
                 if (typeof ltRenderAll === 'function') ltRenderAll();
                 if (typeof anRenderAll === 'function') anRenderAll();
+              } else if (id === 'planner_v1') {
+                if (window.Store && typeof window.Store.importData === 'function') {
+                  window.Store.importData(val);
+                }
+                if (window.App && typeof window.App.refresh === 'function') {
+                  window.App.refresh();
+                }
               } else if (id === 'lt-lectures' || id === 'lt_l' || id === 'lt_lectures_v2') {
                 let rawLecs = Array.isArray(val) ? val : [];
                 ltLectures = rawLecs.filter(l => !ltDeleted.includes(`${l.teacherId}_${l.date}`) && !ltDeleted.includes(l.id));

@@ -6387,6 +6387,9 @@
       document.documentElement.lang = lang;
       document.documentElement.dir = isAr ? 'rtl' : 'ltr';
 
+      // Update Theme button text according to selected language
+      applyTheme();
+
       // Rebuild day chips in teacher modal
       buildDayChips();
 
@@ -8722,7 +8725,10 @@
       curRenderAll();
     }
 
+    const curCollapsedSubjs = new Set();
+
     function curRenderAll() {
+      const savedScroll = window.scrollY;
       checkStudentStageBanner();
       if (typeof anRenderAll === 'function') anRenderAll();
       const ct = document.getElementById('cur-subj-grid');
@@ -8754,6 +8760,7 @@
         });
         const pct = totStages === 0 ? 0 : Math.round((doneStages / totStages) * 100);
         const pacing = pct >= 50 ? [t('pacingAhead'), 'rgba(34,197,94,0.2)', 'var(--green)'] : pct >= 25 ? [t('pacingOnTrack'), 'rgba(59,130,246,0.2)', 'var(--blue2)'] : [t('pacingBehind'), 'rgba(239,68,68,0.2)', 'var(--red)'];
+        const isCollapsed = curCollapsedSubjs.has(sub.id);
 
         const renderUnitBox = (u) => {
           let lessonsHTML = (u.lessons || []).map(l => {
@@ -8768,10 +8775,10 @@
             <button class="admin-only" style="border:none;background:none;color:var(--red);font-size:12px;cursor:pointer;opacity:0.6;padding:2px 4px" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6" onclick="curDelLesson('${sub.id}','${u.id}','${l.id}', this)" title="${t('deleteLessonTitle')}">✕</button>
           </div>
           <div class="cur-stage-chips">
-            <span class="cur-stage-chip ${st.explain ? 'on' : ''}" onclick="curToggleStage('${sub.id}','${u.id}','${l.id}','explain')"><i class="fa-solid fa-video"></i> ${t('stageExplain')}</span>
-            <span class="cur-stage-chip ${st.practice ? 'on' : ''}" onclick="curToggleStage('${sub.id}','${u.id}','${l.id}','practice')"><i class="fa-solid fa-pen-to-square"></i> ${t('stagePractice')}</span>
-            <span class="cur-stage-chip ${st.rev ? 'on' : ''}" onclick="curToggleStage('${sub.id}','${u.id}','${l.id}','rev')"><i class="fa-solid fa-rotate"></i> ${t('stageRev')}</span>
-            <span class="cur-stage-chip ${st.test ? 'on' : ''}" onclick="curToggleStage('${sub.id}','${u.id}','${l.id}','test')"><i class="fa-solid fa-bullseye"></i> ${t('stageTest')}</span>
+            <span class="cur-stage-chip ${st.explain ? 'on' : ''}" onclick="curToggleStage('${sub.id}','${u.id}','${l.id}','explain', this)"><i class="fa-solid fa-video"></i> ${t('stageExplain')}</span>
+            <span class="cur-stage-chip ${st.practice ? 'on' : ''}" onclick="curToggleStage('${sub.id}','${u.id}','${l.id}','practice', this)"><i class="fa-solid fa-pen-to-square"></i> ${t('stagePractice')}</span>
+            <span class="cur-stage-chip ${st.rev ? 'on' : ''}" onclick="curToggleStage('${sub.id}','${u.id}','${l.id}','rev', this)"><i class="fa-solid fa-rotate"></i> ${t('stageRev')}</span>
+            <span class="cur-stage-chip ${st.test ? 'on' : ''}" onclick="curToggleStage('${sub.id}','${u.id}','${l.id}','test', this)"><i class="fa-solid fa-bullseye"></i> ${t('stageTest')}</span>
           </div>
         </div>`;
           }).join('');
@@ -8826,14 +8833,14 @@
           <span class="s-handle admin-only cur-subj-drag-handle" style="cursor:grab;color:var(--text3);font-size:15px;margin-inline-end:4px" onclick="event.stopPropagation()"><i class="fa-solid fa-grip-vertical"></i></span>
           <span style="font-size:22px">${sub.emoji || '📚'}</span>
           <span>${esc(sub.name)}</span>
-          <span style="font-size:11px;font-weight:800;padding:2px 8px;border-radius:20px;background:${pacing[1]};color:${pacing[2]}">${pacing[0]}</span>
+          <span class="cur-pacing-badge" style="font-size:11px;font-weight:800;padding:2px 8px;border-radius:20px;background:${pacing[1]};color:${pacing[2]}">${pacing[0]}</span>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
           <div style="text-align:end">
-            <div style="font-size:15px;font-weight:900;color:var(--gold)">${pct}%</div>
+            <div class="cur-subj-pct" style="font-size:15px;font-weight:900;color:var(--gold)">${pct}%</div>
             <div style="font-size:10px;color:var(--text3)">${t('syllabusProgress')}</div>
           </div>
-          <button class="s-btn subj-toggle-btn" onclick="toggleSubjUnits(this, '${sub.id}')" style="padding:4px 8px;font-size:11px" title="${isAr ? 'طَي أو إظهار وحدات المادة' : 'Collapse/Expand units'}"><i class="fa-solid fa-chevron-up subj-toggle-icon"></i> <span class="subj-toggle-lbl">${isAr ? 'طَي' : 'Collapse'}</span></button>
+          <button class="s-btn subj-toggle-btn" onclick="toggleSubjUnits(this, '${sub.id}')" style="padding:4px 8px;font-size:11px" title="${isAr ? 'طَي أو إظهار وحدات المادة' : 'Collapse/Expand units'}"><i class="fa-solid ${isCollapsed ? 'fa-chevron-down' : 'fa-chevron-up'} subj-toggle-icon"></i> <span class="subj-toggle-lbl">${isCollapsed ? (isAr ? 'إظهار' : 'Expand') : (isAr ? 'طَي' : 'Collapse')}</span></button>
           <button class="admin-only icon-reorder-btn" style="border:none;background:none;color:var(--text3);font-size:12px;cursor:pointer;padding:3px 6px" onclick="curMoveSubj('${sub.id}',-1)" title="Move Up"><i class="fa-solid fa-chevron-up"></i></button>
           <button class="admin-only icon-reorder-btn" style="border:none;background:none;color:var(--text3);font-size:12px;cursor:pointer;padding:3px 6px" onclick="curMoveSubj('${sub.id}',1)" title="Move Down"><i class="fa-solid fa-chevron-down"></i></button>
           <button class="admin-only" style="border:none;background:none;color:var(--blue2);font-size:13px;cursor:pointer" onclick="curEditSubjPrompt(this, '${sub.id}')" title="Edit Subject"><i class="fa-solid fa-pen"></i></button>
@@ -8842,7 +8849,7 @@
         </div>
       </div>
       <div class="tc-prog-track"><div class="tc-prog-fill" style="width:${pct}%;background:${sub.color || 'var(--blue)'}"></div></div>
-      <div class="cur-units-body">${unitsHTML}</div>
+      <div class="cur-units-body" style="display:${isCollapsed ? 'none' : 'block'}">${unitsHTML}</div>
     `;
 
         // Enable unit dragging inside card
@@ -8879,6 +8886,10 @@
           });
         }
       });
+
+      if (savedScroll > 0) {
+        requestAnimationFrame(() => window.scrollTo(0, savedScroll));
+      }
     }
 
     window.toggleSubjUnits = function (btnEl, subId) {
@@ -8890,6 +8901,7 @@
       const isHidden = body.style.display === 'none';
       if (isHidden) {
         body.style.display = 'block';
+        curCollapsedSubjs.delete(subId);
         if (btnEl) {
           const lbl = btnEl.querySelector('.subj-toggle-lbl');
           const icon = btnEl.querySelector('.subj-toggle-icon');
@@ -8898,6 +8910,7 @@
         }
       } else {
         body.style.display = 'none';
+        curCollapsedSubjs.add(subId);
         if (btnEl) {
           const lbl = btnEl.querySelector('.subj-toggle-lbl');
           const icon = btnEl.querySelector('.subj-toggle-icon');
@@ -8919,6 +8932,12 @@
 
       const targetState = anyExpanded ? 'none' : 'block';
       cards.forEach(c => {
+        const subId = c.dataset.id;
+        if (targetState === 'none') {
+          if (subId) curCollapsedSubjs.add(subId);
+        } else {
+          if (subId) curCollapsedSubjs.delete(subId);
+        }
         const body = c.querySelector('.cur-units-body');
         const btn = c.querySelector('.subj-toggle-btn');
         if (body) body.style.display = targetState;
@@ -8936,14 +8955,49 @@
       }
     };
 
-    window.curToggleStage = function (subId, unitId, lesId, stageKey) {
+    window.curToggleStage = function (subId, unitId, lesId, stageKey, targetChipEl) {
       const sub = sCurricData.subjects.find(s => s.id === subId); if (!sub) return;
       const unit = (sub.units || []).find(u => u.id === unitId); if (!unit) return;
       const les = (unit.lessons || []).find(l => l.id === lesId); if (!les) return;
       if (!les.stages) les.stages = { explain: false, practice: false, rev: false, test: false };
       les.stages[stageKey] = !les.stages[stageKey];
       saveJ('curriculum', sCurricData);
-      curRenderAll();
+
+      // Fast in-place DOM update without destroying tree or jumping scroll
+      const chip = targetChipEl || (event ? event.currentTarget : null);
+      if (chip && chip.classList) {
+        chip.classList.toggle('on', les.stages[stageKey]);
+      }
+
+      // Update subject progress UI in-place
+      let totStages = 0, doneStages = 0;
+      (sub.units || []).forEach(u => {
+        (u.lessons || []).forEach(l => {
+          totStages += 4;
+          const st = l.stages || {};
+          if (st.explain) doneStages++;
+          if (st.practice) doneStages++;
+          if (st.rev) doneStages++;
+          if (st.test) doneStages++;
+        });
+      });
+      const pct = totStages === 0 ? 0 : Math.round((doneStages / totStages) * 100);
+      const card = document.querySelector(`.cur-subj-card[data-id="${subId}"]`);
+      if (card) {
+        const pctEl = card.querySelector('.cur-subj-pct');
+        const fillEl = card.querySelector('.tc-prog-fill');
+        const pacingEl = card.querySelector('.cur-pacing-badge');
+        if (pctEl) pctEl.textContent = pct + '%';
+        if (fillEl) fillEl.style.width = pct + '%';
+        if (pacingEl) {
+          const pacing = pct >= 50 ? [t('pacingAhead'), 'rgba(34,197,94,0.2)', 'var(--green)'] : pct >= 25 ? [t('pacingOnTrack'), 'rgba(59,130,246,0.2)', 'var(--blue2)'] : [t('pacingBehind'), 'rgba(239,68,68,0.2)', 'var(--red)'];
+          pacingEl.textContent = pacing[0];
+          pacingEl.style.background = pacing[1];
+          pacingEl.style.color = pacing[2];
+        }
+      }
+
+      if (typeof anRenderAll === 'function') anRenderAll();
     };
 
     window.curAddSubjPrompt = function (anchor) {
@@ -10247,6 +10301,12 @@
             data.forEach(row => {
               localStorage.setItem(uid + ':' + row.id, JSON.stringify(row.data));
               localStorage.setItem(row.id, JSON.stringify(row.data));
+              if (row.id === 'planner_v1' && window.Store && typeof window.Store.importData === 'function') {
+                window.Store.importData(row.data);
+                if (window.App && typeof window.App.refresh === 'function') {
+                  window.App.refresh();
+                }
+              }
             });
           }
         } catch (e) {
@@ -10289,6 +10349,13 @@
                 ltLectures = ltLectures.filter(l => !ltDeleted.includes(`${l.teacherId}_${l.date}`) && !ltDeleted.includes(l.id));
                 if (typeof ltRenderAll === 'function') ltRenderAll();
                 if (typeof anRenderAll === 'function') anRenderAll();
+              } else if (id === 'planner_v1') {
+                if (window.Store && typeof window.Store.importData === 'function') {
+                  window.Store.importData(val);
+                }
+                if (window.App && typeof window.App.refresh === 'function') {
+                  window.App.refresh();
+                }
               } else if (id === 'lt-lectures' || id === 'lt_l' || id === 'lt_lectures_v2') {
                 let rawLecs = Array.isArray(val) ? val : [];
                 ltLectures = rawLecs.filter(l => !ltDeleted.includes(`${l.teacherId}_${l.date}`) && !ltDeleted.includes(l.id));
