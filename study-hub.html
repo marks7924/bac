@@ -6653,18 +6653,23 @@
     function defMeta() { return { streak: 0, perfectStreak: 0, longestStreak: 0, lastCheckDate: null }; }
 
     /* ─── STORAGE: Supabase-backed loadJ / saveJ ─── */
-    // _sbUid is set after auth; empty string = not logged in (fallback to localStorage)
     let _sbUid = '';
 
     function isRealUuid(uid) {
       return typeof uid === 'string' && /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(uid);
     }
 
-    function _lsKey(key) { return _sbUid ? _sbUid + ':' + key : key; }
+    function getActiveSyncUid() {
+      if (isRealUuid(_sbUid)) return _sbUid;
+      return '00000000-0000-0000-0000-000000000001';
+    }
+
+    function _lsKey(key) { return getActiveSyncUid() + ':' + key; }
 
     function loadJ(key, fb) {
       try {
-        const r = localStorage.getItem(_lsKey(key));
+        const uid = getActiveSyncUid();
+        const r = localStorage.getItem(uid + ':' + key) || localStorage.getItem(key);
         if (r) return JSON.parse(r);
       } catch (e) {}
       return JSON.parse(JSON.stringify(fb));
@@ -6672,10 +6677,10 @@
 
     let _timers = {};
     function saveJ(key, obj) {
+      const uid = getActiveSyncUid();
       try {
-        const lk = _lsKey(key);
-        localStorage.setItem(lk, JSON.stringify(obj));
-        if (_sbUid) localStorage.setItem(key, JSON.stringify(obj));
+        localStorage.setItem(uid + ':' + key, JSON.stringify(obj));
+        localStorage.setItem(key, JSON.stringify(obj));
         if (key === 'master_curricula') window.shMasterCurricula = obj;
         if (key === 'education_systems') window.shEducationSystems = obj;
       } catch (e) {}
@@ -6683,13 +6688,14 @@
       clearTimeout(_timers[key]);
       _timers[key] = setTimeout(() => {
         try {
-          if (isRealUuid(_sbUid) && window._supabase) {
-            window._supabase.from('schedule_data')
-              .upsert({ id: key, user_id: _sbUid, data: obj, updated_at: new Date().toISOString() }, { onConflict: 'id,user_id' })
-              .then(() => {});
+          const _sb = getSbClient();
+          if (_sb) {
+            _sb.from('schedule_data')
+              .upsert({ id: key, user_id: uid, data: obj, updated_at: new Date().toISOString() }, { onConflict: 'id,user_id' })
+              .then(() => {}).catch(e => console.warn('saveJ cloud sync error:', e));
           }
         } catch (e) {}
-      }, 400);
+      }, 300);
     }
 
     async function loadFromSupabase(key, fb) {
@@ -7805,26 +7811,27 @@
     function ltSave() {
       const tStr = JSON.stringify(ltTeachers);
       const lStr = JSON.stringify(ltLectures);
+      const uid = getActiveSyncUid();
+
       ['lt_t', 'lt-teachers', 'lt_teachers_v2'].forEach(k => {
-        localStorage.setItem(_lsKey(k), tStr);
+        localStorage.setItem(uid + ':' + k, tStr);
         localStorage.setItem(k, tStr);
       });
       ['lt_l', 'lt-lectures', 'lt_lectures_v2'].forEach(k => {
-        localStorage.setItem(_lsKey(k), lStr);
+        localStorage.setItem(uid + ':' + k, lStr);
         localStorage.setItem(k, lStr);
       });
-      if (window._supabase && isRealUuid(_sbUid)) {
-        const _sb = getSbClient();
-        if (_sb) {
-          _sb.from('schedule_data').upsert([
-            { id: 'lt-teachers', user_id: _sbUid, data: ltTeachers, updated_at: new Date().toISOString() },
-            { id: 'lt_t', user_id: _sbUid, data: ltTeachers, updated_at: new Date().toISOString() },
-            { id: 'lt_teachers_v2', user_id: _sbUid, data: ltTeachers, updated_at: new Date().toISOString() },
-            { id: 'lt-lectures', user_id: _sbUid, data: ltLectures, updated_at: new Date().toISOString() },
-            { id: 'lt_l', user_id: _sbUid, data: ltLectures, updated_at: new Date().toISOString() },
-            { id: 'lt_lectures_v2', user_id: _sbUid, data: ltLectures, updated_at: new Date().toISOString() }
-          ], { onConflict: 'id,user_id' }).then(() => {}).catch(e => console.warn('Supabase ltSave error:', e));
-        }
+
+      const _sb = getSbClient();
+      if (_sb) {
+        _sb.from('schedule_data').upsert([
+          { id: 'lt-teachers', user_id: uid, data: ltTeachers, updated_at: new Date().toISOString() },
+          { id: 'lt_t', user_id: uid, data: ltTeachers, updated_at: new Date().toISOString() },
+          { id: 'lt_teachers_v2', user_id: uid, data: ltTeachers, updated_at: new Date().toISOString() },
+          { id: 'lt-lectures', user_id: uid, data: ltLectures, updated_at: new Date().toISOString() },
+          { id: 'lt_l', user_id: uid, data: ltLectures, updated_at: new Date().toISOString() },
+          { id: 'lt_lectures_v2', user_id: uid, data: ltLectures, updated_at: new Date().toISOString() }
+        ], { onConflict: 'id,user_id' }).then(() => {}).catch(e => console.warn('Supabase ltSave error:', e));
       }
     }
 
@@ -10119,9 +10126,9 @@
       if (wrap) wrap.style.display = 'block';
     }
 
-    /* ── Load all data from Supabase then run init ── */
     async function loadAllDataAndInit() {
       showLoader('جاري تحميل وتزامن بياناتك...');
+      const uid = getActiveSyncUid();
 
       const keys = ['columns','template','subjects','events','revision','meta','curriculum','planner_v1'];
       const weekKeys = [];
@@ -10130,26 +10137,24 @@
         const d = new Date(wsNow); d.setDate(d.getDate() + i * 7);
         weekKeys.push('week-' + dStr(d));
       }
-      const ltKeys = ['lt-teachers','lt-lectures'];
+      const ltKeys = ['lt-teachers','lt-lectures','lt_t','lt_l'];
       const allKeys = [...keys, ...weekKeys, ...ltKeys];
 
-      if (isRealUuid(_sbUid) && window._supabase) {
+      const client = getSbClient();
+      if (client) {
         try {
-          const { data, error } = await _sb
+          const { data, error } = await client
             .from('schedule_data')
             .select('id,data')
-            .eq('user_id', _sbUid)
+            .eq('user_id', uid)
             .in('id', allKeys);
 
           if (data && data.length > 0) {
             // Found existing user data in Supabase -> Cache to localStorage
             data.forEach(row => {
-              localStorage.setItem(_lsKey(row.id), JSON.stringify(row.data));
+              localStorage.setItem(uid + ':' + row.id, JSON.stringify(row.data));
               localStorage.setItem(row.id, JSON.stringify(row.data));
             });
-          } else {
-            // New account with no data in Supabase yet -> Start completely empty
-            console.log(`✨ New account detected for user ${_sbUid}. Starting with a fresh, empty workspace.`);
           }
         } catch (e) {
           console.error('loadAllDataAndInit error:', e);
@@ -10163,7 +10168,7 @@
 
     window._syncChannel = null;
     function setupRealtimeSync() {
-      if (!isRealUuid(_sbUid)) return;
+      const uid = getActiveSyncUid();
       const client = getSbClient();
       if (!client) return;
 
@@ -10172,12 +10177,12 @@
       }
 
       try {
-        window._syncChannel = client.channel('rt_schedule_' + _sbUid)
+        window._syncChannel = client.channel('rt_schedule_' + uid)
           .on('postgres_changes', {
             event: '*',
             schema: 'public',
             table: 'schedule_data',
-            filter: 'user_id=eq.' + _sbUid
+            filter: 'user_id=eq.' + uid
           }, (payload) => {
             if (payload && payload.new && payload.new.id && payload.new.data) {
               const id = payload.new.id;
