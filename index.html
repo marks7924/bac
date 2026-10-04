@@ -5749,8 +5749,14 @@
         <div class="f-grp"><label class="f-lbl" id="fl-tname">اسم الأستاذ</label><input type="text" id="t-name"
             class="f-inp" placeholder="أ. أحمد"></div>
         <div class="f-row">
-          <div class="f-grp"><label class="f-lbl" id="fl-tsubj">المادة</label><input type="text" id="t-subject"
-              class="f-inp" placeholder="الرياضيات"></div>
+          <div class="f-grp"><label class="f-lbl" id="fl-tsubj">المادة</label>
+            <select id="t-subject" class="f-inp">
+              <option value="إنجليزي">إنجليزي (English)</option>
+              <option value="عربي">عربي (Arabic)</option>
+              <option value="تاريخ">تاريخ (History)</option>
+              <option value="برمجة">برمجة (Programming)</option>
+            </select>
+          </div>
           <div class="f-grp"><label class="f-lbl" id="fl-tplatform">المنصة</label><input type="text" id="t-platform"
               class="f-inp" placeholder="يوتيوب"></div>
         </div>
@@ -7784,14 +7790,16 @@
       const getVal = (k) => {
         let v = localStorage.getItem(_lsKey(k));
         if (v) { try { return JSON.parse(v); } catch(e){} }
+        let v2 = localStorage.getItem(k);
+        if (v2) { try { return JSON.parse(v2); } catch(e){} }
         return null;
       };
 
       const savedT = getVal('lt_t') || getVal('lt-teachers') || getVal('lt_teachers_v2');
       const savedL = getVal('lt_l') || getVal('lt-lectures') || getVal('lt_lectures_v2');
 
-      ltTeachers = (savedT && savedT.length >= 4) ? savedT : MARKSAMER_TEACHERS;
-      ltLectures = (savedL && savedL.length >= 15) ? savedL : MARKSAMER_LECTURES;
+      ltTeachers = Array.isArray(savedT) ? savedT : JSON.parse(JSON.stringify(MARKSAMER_TEACHERS));
+      ltLectures = Array.isArray(savedL) ? savedL : JSON.parse(JSON.stringify(MARKSAMER_LECTURES));
     }
 
     function ltSave() {
@@ -7799,9 +7807,11 @@
       const lStr = JSON.stringify(ltLectures);
       ['lt_t', 'lt-teachers', 'lt_teachers_v2'].forEach(k => {
         localStorage.setItem(_lsKey(k), tStr);
+        localStorage.setItem(k, tStr);
       });
       ['lt_l', 'lt-lectures', 'lt_lectures_v2'].forEach(k => {
         localStorage.setItem(_lsKey(k), lStr);
+        localStorage.setItem(k, lStr);
       });
       if (window._supabase && isRealUuid(_sbUid)) {
         const _sb = getSbClient();
@@ -7813,7 +7823,7 @@
             { id: 'lt-lectures', user_id: _sbUid, data: ltLectures, updated_at: new Date().toISOString() },
             { id: 'lt_l', user_id: _sbUid, data: ltLectures, updated_at: new Date().toISOString() },
             { id: 'lt_lectures_v2', user_id: _sbUid, data: ltLectures, updated_at: new Date().toISOString() }
-          ], { onConflict: 'id,user_id' }).then(() => {});
+          ], { onConflict: 'id,user_id' }).then(() => {}).catch(e => console.warn('Supabase ltSave error:', e));
         }
       }
     }
@@ -7846,11 +7856,6 @@
     }
 
     function ltRenderAll() {
-      // Auto-recover lectures if some teachers have 0 lectures but have scheduled days
-      const missingTeacherLecs = ltTeachers.some(tc => (tc.days && tc.days.length > 0) && ltLectures.filter(l => l.teacherId === tc.id).length === 0);
-      if (missingTeacherLecs) {
-        ltRestoreAllLecturesSilently();
-      }
       ltRenderStats();
       ltRenderBacklog();
       ltRenderGrid();
@@ -8303,23 +8308,32 @@
       </div>
       <div>
         ${scoreHTML}
-        <button class="admin-only" style="border:none;background:none;color:var(--red);font-size:11px;cursor:pointer;margin-top:10px;width:100%;text-align:end" onclick="exDel('${ex.id}')">${t('deleteExam')}</button>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+          <button class="admin-only" style="border:none;background:none;color:var(--blue2);font-size:11px;cursor:pointer;font-weight:700" onclick="exEditPrompt('${ex.id}', this)"><i class="fa-solid fa-pen-to-square"></i> ${lang === 'ar' ? 'تعديل' : 'Edit'}</button>
+          <button class="admin-only" style="border:none;background:none;color:var(--red);font-size:11px;cursor:pointer;font-weight:700" onclick="exDel('${ex.id}')">${t('deleteExam')}</button>
+        </div>
       </div>
     </div>`;
       }).join('');
     }
 
     window.exAddPrompt = function (anchor) {
-      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(320);
+      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(340);
+      const isAr = lang === 'ar';
       pop.innerHTML = `
     <div style="font-weight:800;font-size:14px;margin-bottom:8px"><i class="fa-solid fa-plus-circle" style="color:var(--blue2)"></i> ${t('addExamModalTitle')}</div>
-    <label>${t('examTitleLbl')}</label>
-    <input type="text" id="ex-t-in" placeholder="${t('examTitlePh')}">
-    <label style="margin-top:6px">${t('examSubjLbl')}</label>
-    <input type="text" id="ex-s-in" placeholder="${t('examSubjPh')}">
-    <div style="display:flex;gap:6px;margin-top:6px">
-      <div style="flex:1"><label>${t('examDateLbl')}</label><input type="date" id="ex-d-in" value="${sTodayStr}"></div>
-      <div style="width:90px"><label>${t('examMaxGradeLbl')}</label><input type="number" id="ex-m-in" value="50"></div>
+    <label style="font-size:11px;font-weight:700;color:var(--text2)">${t('examTitleLbl')}</label>
+    <input type="text" id="ex-t-in" placeholder="${t('examTitlePh')}" style="width:100%;margin-bottom:6px">
+    <label style="font-size:11px;font-weight:700;color:var(--text2);margin-top:4px">${t('examSubjLbl')}</label>
+    <select id="ex-s-in" style="width:100%;padding:8px;border-radius:6px;background:var(--bg2);color:var(--text);border:1px solid var(--border);margin-bottom:6px;font-family:inherit">
+      <option value="English">${isAr ? 'إنجليزي (English)' : 'English'}</option>
+      <option value="Arabic">${isAr ? 'عربي (Arabic)' : 'Arabic'}</option>
+      <option value="History">${isAr ? 'تاريخ (History)' : 'History'}</option>
+      <option value="Programming">${isAr ? 'برمجة (Programming)' : 'Programming'}</option>
+    </select>
+    <div style="display:flex;gap:6px;margin-top:4px">
+      <div style="flex:1"><label style="font-size:11px;font-weight:700;color:var(--text2)">${t('examDateLbl')}</label><input type="date" id="ex-d-in" value="${sTodayStr}" style="width:100%"></div>
+      <div style="width:90px"><label style="font-size:11px;font-weight:700;color:var(--text2)">${t('examMaxGradeLbl')}</label><input type="number" id="ex-m-in" value="50" style="width:100%"></div>
     </div>
     <div class="pop-actions" style="margin-top:12px;display:flex;gap:6px">
       <button class="p-btn p-save" id="ex-save" style="flex:1">${t('addBtn')}</button>
@@ -8328,11 +8342,83 @@
   `;
       pop.querySelector('#ex-save').onclick = () => {
         const title = pop.querySelector('#ex-t-in').value.trim();
-        const subject = pop.querySelector('#ex-s-in').value.trim() || (lang === 'ar' ? 'عام' : 'General');
+        const subject = pop.querySelector('#ex-s-in').value;
         const date = pop.querySelector('#ex-d-in').value || sTodayStr;
         const maxGrade = parseInt(pop.querySelector('#ex-m-in').value) || 50;
         if (!title) return;
         sEvents.push({ id: genId(), title, subject, date, maxGrade, grade: null, notes: '' });
+        saveJ('events', sEvents); closeAnyPop(); exRenderAll();
+      };
+      document.body.appendChild(pop); posPop(pop, anchor || document.body);
+      pop.addEventListener('click', e => e.stopPropagation()); _popEl = pop;
+    };
+
+    window.exEditPrompt = function (id, anchor) {
+      const ex = sEvents.find(e => e.id === id); if (!ex) return;
+      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(340);
+      const isAr = lang === 'ar';
+      
+      const subjs = [
+        { key: 'English', label: isAr ? 'إنجليزي (English)' : 'English' },
+        { key: 'Arabic', label: isAr ? 'عربي (Arabic)' : 'Arabic' },
+        { key: 'History', label: isAr ? 'تاريخ (History)' : 'History' },
+        { key: 'Programming', label: isAr ? 'برمجة (Programming)' : 'Programming' }
+      ];
+
+      const curSubj = ex.subject || '';
+      const isCustomSubj = curSubj && !subjs.some(s => s.key === curSubj || s.key.toLowerCase() === curSubj.toLowerCase() || (curSubj === 'عربي' && s.key === 'Arabic') || (curSubj === 'تاريخ' && s.key === 'History') || (curSubj === 'برمجة' && s.key === 'Programming') || (curSubj === 'إنجليزي' && s.key === 'English'));
+
+      let optionsHTML = subjs.map(s => {
+        const sel = (curSubj === s.key || curSubj.toLowerCase() === s.key.toLowerCase() || (curSubj === 'عربي' && s.key === 'Arabic') || (curSubj === 'تاريخ' && s.key === 'History') || (curSubj === 'برمجة' && s.key === 'Programming') || (curSubj === 'إنجليزي' && s.key === 'English')) ? 'selected' : '';
+        return `<option value="${s.key}" ${sel}>${s.label}</option>`;
+      }).join('');
+
+      if (isCustomSubj) {
+        optionsHTML = `<option value="${esc(curSubj)}" selected>${esc(curSubj)}</option>` + optionsHTML;
+      }
+
+      pop.innerHTML = `
+    <div style="font-weight:800;font-size:14px;margin-bottom:8px"><i class="fa-solid fa-pen-to-square" style="color:var(--blue2)"></i> ${isAr ? 'تعديل الامتحان' : 'Edit Exam'}</div>
+    <label style="font-size:11px;font-weight:700;color:var(--text2)">${t('examTitleLbl')}</label>
+    <input type="text" id="ex-et-in" value="${esc(ex.title)}" style="width:100%;margin-bottom:6px">
+    <label style="font-size:11px;font-weight:700;color:var(--text2);margin-top:4px">${t('examSubjLbl')}</label>
+    <select id="ex-es-in" style="width:100%;padding:8px;border-radius:6px;background:var(--bg2);color:var(--text);border:1px solid var(--border);margin-bottom:6px;font-family:inherit">
+      ${optionsHTML}
+    </select>
+    <div style="display:flex;gap:6px;margin-top:4px">
+      <div style="flex:1"><label style="font-size:11px;font-weight:700;color:var(--text2)">${t('examDateLbl')}</label><input type="date" id="ex-ed-in" value="${ex.date}" style="width:100%"></div>
+      <div style="width:90px"><label style="font-size:11px;font-weight:700;color:var(--text2)">${t('examMaxGradeLbl')}</label><input type="number" id="ex-em-in" value="${ex.maxGrade || 50}" style="width:100%"></div>
+    </div>
+    <div style="margin-top:6px">
+      <label style="font-size:11px;font-weight:700;color:var(--text2)">${isAr ? 'الدرجة المحققة (اختياري)' : 'Achieved Score (optional)'}</label>
+      <input type="number" id="ex-eg-in" value="${ex.grade != null ? ex.grade : ''}" placeholder="${isAr ? 'لم تسجل بعد' : 'Not recorded'}" style="width:100%">
+    </div>
+    <div style="margin-top:6px">
+      <label style="font-size:11px;font-weight:700;color:var(--text2)">${isAr ? 'ملاحظات' : 'Notes'}</label>
+      <input type="text" id="ex-en-in" value="${esc(ex.notes || '')}" placeholder="${isAr ? 'ملاحظات إضافية...' : 'Optional notes...'}" style="width:100%">
+    </div>
+    <div class="pop-actions" style="margin-top:12px;display:flex;gap:6px">
+      <button class="p-btn p-save" id="ex-edit-save" style="flex:1">${t('flSave')}</button>
+      <button class="p-btn p-del" onclick="closeAnyPop()" style="flex:1">${t('flCancel')}</button>
+    </div>
+  `;
+      pop.querySelector('#ex-edit-save').onclick = () => {
+        const title = pop.querySelector('#ex-et-in').value.trim();
+        const subject = pop.querySelector('#ex-es-in').value;
+        const date = pop.querySelector('#ex-ed-in').value || sTodayStr;
+        const maxGrade = parseInt(pop.querySelector('#ex-em-in').value) || 50;
+        const gVal = pop.querySelector('#ex-eg-in').value;
+        const grade = gVal !== '' && !isNaN(parseFloat(gVal)) ? parseFloat(gVal) : null;
+        const notes = pop.querySelector('#ex-en-in').value.trim();
+
+        if (!title) return;
+        ex.title = title;
+        ex.subject = subject;
+        ex.date = date;
+        ex.maxGrade = maxGrade;
+        ex.grade = grade;
+        ex.notes = notes;
+
         saveJ('events', sEvents); closeAnyPop(); exRenderAll();
       };
       document.body.appendChild(pop); posPop(pop, anchor || document.body);
@@ -8463,10 +8549,17 @@
           ]
         },
         {
+          id: 'mcs_english',
+          name: 'إنجليزي',
+          emoji: '🇬🇧',
+          color: '#06b6d4',
+          units: []
+        },
+        {
           id: 'mcs_1789822982943',
           name: 'عربي',
           emoji: '📖',
-          color: '#3b82f6',
+          color: '#8b5cf6',
           units: [
             {
               id: 'mcu_1789823050915',
@@ -8486,6 +8579,13 @@
               ]
             }
           ]
+        },
+        {
+          id: 'mcs_programming',
+          name: 'برمجة',
+          emoji: '💻',
+          color: '#10b981',
+          units: []
         }
       ]
     };
@@ -8747,19 +8847,27 @@
     };
 
     window.curAddSubjPrompt = function (anchor) {
-      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(300);
+      closeAnyPop(); _ovEl = mkPopOverlay(); const pop = mkPop(320);
+      const isAr = lang === 'ar';
       pop.innerHTML = `
     <div style="font-weight:800;font-size:14px;margin-bottom:8px">${t('addSubjectModalTitle')}</div>
-    <input type="text" id="cur-sn-in" placeholder="${t('subjectNamePh')}">
+    <select id="cur-sn-in" style="width:100%;padding:8px;border-radius:6px;background:var(--bg2);color:var(--text);border:1px solid var(--border);margin-bottom:10px;font-family:inherit">
+      <option value="إنجليزي">${isAr ? 'إنجليزي (English)' : 'English'}</option>
+      <option value="عربي">${isAr ? 'عربي (Arabic)' : 'Arabic'}</option>
+      <option value="تاريخ">${isAr ? 'تاريخ (History)' : 'History'}</option>
+      <option value="برمجة">${isAr ? 'برمجة (Programming)' : 'Programming'}</option>
+    </select>
     <div class="pop-actions" style="margin-top:12px;display:flex;gap:6px">
       <button class="p-btn p-save" id="cur-s-save" style="flex:1">${t('addBtn')}</button>
       <button class="p-btn p-del" onclick="closeAnyPop()" style="flex:1">${t('flCancel')}</button>
     </div>
   `;
       pop.querySelector('#cur-s-save').onclick = () => {
-        const name = pop.querySelector('#cur-sn-in').value.trim();
+        const name = pop.querySelector('#cur-sn-in').value;
         if (!name) return;
-        sCurricData.subjects.push({ id: genId(), name, emoji: '📖', color: '#3b82f6', units: [] });
+        const emojiMap = { 'إنجليزي': '🇬🇧', 'عربي': '📖', 'تاريخ': '🏛️', 'برمجة': '💻' };
+        const colorMap = { 'إنجليزي': '#06b6d4', 'عربي': '#8b5cf6', 'تاريخ': '#f59e0b', 'برمجة': '#10b981' };
+        sCurricData.subjects.push({ id: genId(), name, emoji: emojiMap[name] || '📚', color: colorMap[name] || '#3b82f6', units: [] });
         saveJ('curriculum', sCurricData); closeAnyPop(); curRenderAll();
       };
       document.body.appendChild(pop); posPop(pop, anchor || document.body);
@@ -9245,12 +9353,9 @@
     ════════════════════════════════ */
     function cleanLegacyDemoData() {
       try {
-        const keys = ['template', 'subjects', 'events', 'revision', 'columns', 'lt-teachers', 'lt-lectures', 'curriculum', 'lt_t', 'lt_l'];
+        const keys = ['s-s1', 'sub_chem', 'u_chem_1'];
         keys.forEach(k => {
-          const val = localStorage.getItem(k);
-          if (val && (val.includes('s-s1') || val.includes('Salah') || val.includes('Bassem') || val.includes('Sameh') || val.includes('sub_chem') || val.includes('u_chem_1') || val.includes('xmu42'))) {
-            localStorage.removeItem(k);
-          }
+          localStorage.removeItem(k);
         });
       } catch(e) {}
     }
@@ -10040,9 +10145,7 @@
             // Found existing user data in Supabase -> Cache to localStorage
             data.forEach(row => {
               localStorage.setItem(_lsKey(row.id), JSON.stringify(row.data));
-              if (row.id === 'planner_v1') {
-                localStorage.setItem('planner_v1', JSON.stringify(row.data));
-              }
+              localStorage.setItem(row.id, JSON.stringify(row.data));
             });
           } else {
             // New account with no data in Supabase yet -> Start completely empty
@@ -10055,7 +10158,75 @@
 
       hideLoader();
       init();
+      setupRealtimeSync();
     }
+
+    window._syncChannel = null;
+    function setupRealtimeSync() {
+      if (!isRealUuid(_sbUid)) return;
+      const client = getSbClient();
+      if (!client) return;
+
+      if (window._syncChannel) {
+        try { client.removeChannel(window._syncChannel); } catch(e){}
+      }
+
+      try {
+        window._syncChannel = client.channel('rt_schedule_' + _sbUid)
+          .on('postgres_changes', {
+            event: '*',
+            schema: 'public',
+            table: 'schedule_data',
+            filter: 'user_id=eq.' + _sbUid
+          }, (payload) => {
+            if (payload && payload.new && payload.new.id && payload.new.data) {
+              const id = payload.new.id;
+              const val = payload.new.data;
+
+              localStorage.setItem(_lsKey(id), JSON.stringify(val));
+              localStorage.setItem(id, JSON.stringify(val));
+
+              if (id === 'lt-lectures' || id === 'lt_l' || id === 'lt_lectures_v2') {
+                ltLectures = val;
+                if (typeof ltRenderAll === 'function') ltRenderAll();
+                if (typeof anRenderAll === 'function') anRenderAll();
+                if (typeof repRenderAll === 'function') repRenderAll();
+              } else if (id === 'lt-teachers' || id === 'lt_t' || id === 'lt_teachers_v2') {
+                ltTeachers = val;
+                if (typeof ltRenderAll === 'function') ltRenderAll();
+              } else if (id === 'events') {
+                sEvents = val;
+                if (typeof exRenderAll === 'function') exRenderAll();
+                if (typeof schedRender === 'function') schedRender();
+              } else if (id === 'curriculum' || id === 'bac_curriculum_data') {
+                sCurricData = val;
+                if (typeof curRenderAll === 'function') curRenderAll();
+                if (typeof anRenderAll === 'function') anRenderAll();
+              } else if (id === 'columns') {
+                sCols = val;
+                if (typeof schedRender === 'function') schedRender();
+              } else if (id === 'template') {
+                sTmpl = val;
+                if (typeof schedRender === 'function') schedRender();
+              } else if (id.startsWith('week-')) {
+                if (id === 'week-' + sWeekKey) {
+                  sWeek = val;
+                  if (typeof schedRender === 'function') schedRender();
+                }
+              }
+            }
+          })
+          .subscribe();
+      } catch(e) {
+        console.warn('Realtime sync subscription error:', e);
+      }
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && isRealUuid(_sbUid) && typeof loadAllDataAndInit === 'function') {
+        loadAllDataAndInit();
+      }
+    });
 
     async function syncAllToSupabase() {
       if (!isRealUuid(_sbUid) || !window._supabase) {
