@@ -7792,6 +7792,8 @@
       { id: 'xmutoyjbg9es2', teacherId: 'xmu42u6qlglvj', title: 'Week Lecture 4', date: '2026-10-04', weekNum: 4, watched: false, watchedAt: null, link: 'https://ahmed-tarek.net/userprofile/courses/course/12' }
     ];
 
+    let ltDeleted = [];
+
     function ltLoad() {
       const getVal = (k) => {
         let v = localStorage.getItem(_lsKey(k));
@@ -7801,11 +7803,14 @@
         return null;
       };
 
+      ltDeleted = loadJ('lt_deleted', []);
+
       const savedT = getVal('lt_t') || getVal('lt-teachers') || getVal('lt_teachers_v2');
       const savedL = getVal('lt_l') || getVal('lt-lectures') || getVal('lt_lectures_v2');
 
       ltTeachers = Array.isArray(savedT) ? savedT : JSON.parse(JSON.stringify(MARKSAMER_TEACHERS));
-      ltLectures = Array.isArray(savedL) ? savedL : JSON.parse(JSON.stringify(MARKSAMER_LECTURES));
+      let rawLecs = Array.isArray(savedL) ? savedL : JSON.parse(JSON.stringify(MARKSAMER_LECTURES));
+      ltLectures = rawLecs.filter(l => !ltDeleted.includes(`${l.teacherId}_${l.date}`) && !ltDeleted.includes(l.id));
     }
 
     function ltSave() {
@@ -7866,6 +7871,86 @@
       ltRenderStats();
       ltRenderBacklog();
       ltRenderGrid();
+    }
+
+    function ltRestoreAllLecturesSilently() {
+      const DOW = { Sat: 6, Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5 };
+      let added = 0;
+      ltTeachers.forEach(tc => {
+        if (!tc.days || !tc.days.length) return;
+        tc.days.forEach(dk => {
+          const target = DOW[dk]; const now = new Date(); const cur = now.getDay();
+          const diff = (target - cur + 7) % 7;
+          for (let w = 0; w < 4; w++) {
+            const ld = new Date(now);
+            ld.setDate(now.getDate() - (diff === 0 ? 0 : 7 - diff) - (w * 7));
+            if (ld > now) continue;
+            const ldStr = dStr(ld);
+            const delKey = `${tc.id}_${ldStr}`;
+            const isDeletedByUser = ltDeleted.includes(delKey);
+            const exists = ltLectures.some(l => l.teacherId === tc.id && l.date === ldStr);
+            if (!exists && !isDeletedByUser) {
+              const wn = ltLectures.filter(l => l.teacherId === tc.id).length + 1;
+              ltLectures.push({
+                id: genId(), teacherId: tc.id,
+                title: `${lang === 'ar' ? 'محاضرة أسبوع' : 'Week Lecture'} ${wn}`,
+                date: ldStr, weekNum: wn, link: tc.link || '', notes: '',
+                watched: false, watchedAt: null, createdAt: ltTodayStr()
+              });
+              added++;
+            }
+          }
+        });
+      });
+      if (added > 0) ltSave();
+    }
+
+    window.ltRestoreAllLectures = function() {
+      ltDeleted = [];
+      saveJ('lt_deleted', []);
+      ltRestoreAllLecturesSilently();
+      ltSave(); ltRenderAll();
+      showToast('success', lang === 'ar' ? 'تم استرجاع وتوليد كافة المحاضرات للمعلمين بنجاح!' : 'Restored all teacher lectures successfully!');
+    };
+
+    function ltToggle(tid) {
+      const tog = document.getElementById('ltog-' + tid), list = document.getElementById('llecs-' + tid);
+      if (!list) return;
+      const hidden = list.style.display === 'none';
+      list.style.display = hidden ? 'flex' : 'none';
+      if (tog) tog.classList.toggle('collapsed', !hidden);
+    }
+
+    function ltToggleWatch(lid) {
+      const lec = ltLectures.find(l => l.id === lid); if (!lec) return;
+      lec.watched = !lec.watched; lec.watchedAt = lec.watched ? ltTodayStr() : null;
+      ltSave(); ltRenderAll();
+      showToast(lec.watched ? 'success' : 'info', lec.watched ? t('ltWatchOn') : t('ltWatchOff'));
+    }
+
+    function ltGenWeek(silent = false) {
+      const DOW = { Sat: 6, Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5 };
+      let added = 0;
+      ltTeachers.forEach(tc => {
+        if (!tc.days || !tc.days.length) return;
+        tc.days.forEach(dk => {
+          const target = DOW[dk]; const now = new Date(); const cur = now.getDay();
+          const diff = (target - cur + 7) % 7;
+          const ld = new Date(now); ld.setDate(now.getDate() - (diff === 0 ? 0 : 7 - diff));
+          if (ld > now) ld.setDate(ld.getDate() - 7);
+          const ldStr = dStr(ld);
+          const delKey = `${tc.id}_${ldStr}`;
+          const isDeletedByUser = ltDeleted.includes(delKey);
+          const exists = ltLectures.some(l => l.teacherId === tc.id && l.date === ldStr);
+          if (!exists && !isDeletedByUser) {
+            const wn = ltLecsFor(tc.id).length + 1;
+            ltLectures.push({ id: genId(), teacherId: tc.id, title: `${lang === 'ar' ? 'محاضرة أسبوع' : 'Week Lecture'} ${wn}`, date: ldStr, weekNum: wn, link: tc.link || '', notes: '', watched: false, watchedAt: null, createdAt: ltTodayStr() });
+            added++;
+          }
+        });
+      });
+      if (added > 0) { ltSave(); ltRenderAll(); showToast('success', `${lang === 'ar' ? 'تم تنزيل' : 'Added'} ${added} ${t('ltAdded')}`); }
+      else if (!silent) { showToast('info', t('ltAlreadyUp')); }
     }
 
     function ltRenderStats() {
@@ -8197,6 +8282,14 @@
 
     function delLecture(anchor) {
       if (!ltEditLId) return;
+      const targetLec = ltLectures.find(x => x.id === ltEditLId);
+      if (targetLec) {
+        const key1 = `${targetLec.teacherId}_${targetLec.date}`;
+        const key2 = targetLec.id;
+        if (!ltDeleted.includes(key1)) ltDeleted.push(key1);
+        if (!ltDeleted.includes(key2)) ltDeleted.push(key2);
+        saveJ('lt_deleted', ltDeleted);
+      }
       mkConfirmPop(t('lDelConfirm'), () => {
         ltLectures = ltLectures.filter(x => x.id !== ltEditLId);
         ltSave(); closeModal('mod-lecture'); ltRenderAll();
@@ -10137,7 +10230,7 @@
         const d = new Date(wsNow); d.setDate(d.getDate() + i * 7);
         weekKeys.push('week-' + dStr(d));
       }
-      const ltKeys = ['lt-teachers','lt-lectures','lt_t','lt_l'];
+      const ltKeys = ['lt-teachers','lt-lectures','lt_t','lt_l','lt_deleted'];
       const allKeys = [...keys, ...weekKeys, ...ltKeys];
 
       const client = getSbClient();
@@ -10191,8 +10284,14 @@
               localStorage.setItem(_lsKey(id), JSON.stringify(val));
               localStorage.setItem(id, JSON.stringify(val));
 
-              if (id === 'lt-lectures' || id === 'lt_l' || id === 'lt_lectures_v2') {
-                ltLectures = val;
+              if (id === 'lt_deleted') {
+                ltDeleted = val;
+                ltLectures = ltLectures.filter(l => !ltDeleted.includes(`${l.teacherId}_${l.date}`) && !ltDeleted.includes(l.id));
+                if (typeof ltRenderAll === 'function') ltRenderAll();
+                if (typeof anRenderAll === 'function') anRenderAll();
+              } else if (id === 'lt-lectures' || id === 'lt_l' || id === 'lt_lectures_v2') {
+                let rawLecs = Array.isArray(val) ? val : [];
+                ltLectures = rawLecs.filter(l => !ltDeleted.includes(`${l.teacherId}_${l.date}`) && !ltDeleted.includes(l.id));
                 if (typeof ltRenderAll === 'function') ltRenderAll();
                 if (typeof anRenderAll === 'function') anRenderAll();
                 if (typeof repRenderAll === 'function') repRenderAll();
