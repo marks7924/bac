@@ -12,9 +12,82 @@
     href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&family=Inter:wght@300;400;600;700;800;900&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  <!-- Todolist Stylesheets Integration -->
+  <link rel="stylesheet" href="css/todolist/tokens.css">
+  <link rel="stylesheet" href="css/todolist/reset.css">
+  <link rel="stylesheet" href="css/todolist/base.css">
+  <link rel="stylesheet" href="css/todolist/layout.css">
+  <link rel="stylesheet" href="css/todolist/sidebar.css">
+  <link rel="stylesheet" href="css/todolist/today.css">
+  <link rel="stylesheet" href="css/todolist/tasks.css">
+  <link rel="stylesheet" href="css/todolist/details.css">
+  <link rel="stylesheet" href="css/todolist/modal.css">
+  <link rel="stylesheet" href="css/todolist/calendar.css">
+  <link rel="stylesheet" href="css/todolist/projects.css">
+  <link rel="stylesheet" href="css/todolist/inbox.css">
+  <link rel="stylesheet" href="css/todolist/settings.css">
+  <link rel="stylesheet" href="css/todolist/responsive.css">
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>if(!window.supabase){document.write('<script src="https://unpkg.com/@supabase/supabase-js@2"><\/script>');}</script>
   <style>
+    /* ════════════════════════════════
+       TODOLIST THEME INTEGRATION
+    ════════════════════════════════ */
+    #page-todo {
+      padding: 0;
+      min-height: calc(100vh - 57px);
+      display: none;
+      width: 100% !important;
+      max-width: none !important;
+      flex: 1 1 100%;
+    }
+    #page-todo.active {
+      display: flex;
+      width: 100% !important;
+      max-width: none !important;
+      flex: 1 1 100%;
+    }
+
+    #page-todo, .todo-app {
+      --bg: var(--bg-main, #080d1a);
+      --sidebar-bg: var(--bg2, #0c1225);
+      --surface: var(--card, #111827);
+      --surface-2: var(--card2, #1a2540);
+      --border: var(--border2, rgba(255, 255, 255, 0.11));
+      --border-subtle: var(--border, rgba(255, 255, 255, 0.06));
+
+      --text-primary: var(--text, #e2e8f0);
+      --text-secondary: var(--text2, #94a3b8);
+      --text-muted: var(--text3, #64748b);
+
+      --accent: var(--blue2, #60a5fa);
+      --accent-muted: rgba(96, 165, 250, 0.15);
+      --success: var(--green, #22c55e);
+      --danger: var(--red, #ef4444);
+      --danger-muted: rgba(239, 68, 68, 0.12);
+    }
+
+    html[data-theme="light"] #page-todo,
+    html[data-theme="light"] .todo-app {
+      --bg: #f8fafc;
+      --sidebar-bg: #f1f5f9;
+      --surface: #ffffff;
+      --surface-2: #e2e8f0;
+      --border: rgba(0, 0, 0, 0.12);
+      --border-subtle: rgba(0, 0, 0, 0.06);
+
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+
+      --accent: #2563eb;
+      --accent-muted: rgba(37, 99, 235, 0.12);
+      --success: #16a34a;
+      --danger: #dc2626;
+      --danger-muted: rgba(220, 38, 38, 0.12);
+    }
     /* ════════════════════════════════
    DESIGN TOKENS
 ════════════════════════════════ */
@@ -283,6 +356,140 @@
 
     .g-tab i {
       font-size: 14px;
+    }
+
+    /* SETTINGS ICON BUTTON IN NAVBAR */
+    .settings-btn {
+      width: 38px;
+      height: 38px;
+      min-width: 38px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      font-size: 16px;
+      color: var(--text2);
+      background: var(--card2);
+      border: 1px solid var(--border2);
+      transition: all 0.25s ease;
+      cursor: pointer;
+    }
+
+    .settings-btn:hover {
+      color: var(--blue2);
+      background: rgba(59, 130, 246, 0.12);
+      border-color: var(--blue2);
+      transform: rotate(30deg) translateY(-1px);
+    }
+
+    .settings-btn.active {
+      color: #fff;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      border-color: transparent;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+    }
+
+    /* SETTINGS PAGE & SUB-TABS STYLING */
+    .settings-wrap {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .settings-header-card {
+      background: var(--card);
+      border: 1px solid var(--border2);
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--sh-sm);
+    }
+
+    .settings-title-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .settings-icon-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+    }
+
+    .settings-title {
+      font-size: 19px;
+      font-weight: 900;
+      color: var(--text);
+      margin: 0;
+    }
+
+    .settings-sub {
+      font-size: 12px;
+      color: var(--text3);
+      margin-top: 3px;
+    }
+
+    .settings-subtabs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      scrollbar-width: none;
+    }
+
+    .settings-subtabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .settings-subtab {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text2);
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      cursor: pointer;
+      transition: all .2s ease;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+
+    .settings-subtab:hover {
+      color: var(--text);
+      border-color: var(--blue2);
+      background: var(--card2);
+    }
+
+    .settings-subtab.active {
+      color: #fff;
+      background: linear-gradient(135deg, var(--blue), var(--indigo));
+      border-color: transparent;
+      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+    }
+
+    .settings-pane {
+      display: none;
+    }
+
+    .settings-pane.active {
+      display: block;
+      animation: fadeIn .25s ease-out;
     }
 
     /* RIGHT ACTIONS */
@@ -4163,28 +4370,20 @@
         <i class="fa-solid fa-calendar-check"></i>
         <span id="s-exams">امتحانات</span>
       </button>
-      <button class="g-tab" id="tab-reports" onclick="switchPage('reports')">
-        <i class="fa-solid fa-chart-line"></i>
-        <span id="s-history">سجل</span>
-      </button>
       <button class="g-tab" id="tab-curric" onclick="switchPage('curric')">
         <i class="fa-solid fa-book-bookmark"></i>
         <span id="s-curric">منهج</span>
       </button>
-      <button class="g-tab" id="tab-analytics" onclick="switchPage('analytics')">
-        <i class="fa-solid fa-chart-pie"></i>
-        <span id="s-analytics">تحليلات</span>
-      </button>
-      <button class="g-tab parent-only" id="tab-parent" onclick="switchPage('parent')">
-        <i class="fa-solid fa-people-roof"></i>
-        <span id="s-parent">متابعة الأبناء</span>
-      </button>
-      <button class="g-tab main-admin-only" id="tab-admin" onclick="switchPage('admin')">
-        <i class="fa-solid fa-sliders"></i>
-        <span id="s-admin">لوحة الأدمن</span>
+      <button class="g-tab" id="tab-todo" onclick="switchPage('todo')">
+        <i class="fa-solid fa-list-check"></i>
+        <span id="s-todo">المهام والإنتاجية</span>
       </button>
     </nav>
     <div class="g-actions">
+      <!-- Settings Icon Button in Navbar Right Corner -->
+      <button class="settings-btn" id="tab-settings" onclick="switchPage('settings')" title="الإعدادات (Settings)" aria-label="الإعدادات">
+        <i class="fa-solid fa-gear"></i>
+      </button>
       <button class="g-btn theme-btn" id="theme-btn" onclick="toggleTheme()" title="تغيير المظهر (Alt + T)">
         <i class="fa-solid fa-moon" id="theme-btn-icon"></i>
         <span id="theme-btn-txt">مظهر داكن</span>
@@ -4249,20 +4448,14 @@
       <button class="g-mobile-nav-item" onclick="switchPage('exams')">
         <i class="fa-solid fa-calendar-check"></i> <span id="md-exams-txt">الامتحانات</span>
       </button>
-      <button class="g-mobile-nav-item" onclick="switchPage('reports')">
-        <i class="fa-solid fa-chart-line"></i> <span id="md-history-txt">سجل وتقرير الأداء</span>
-      </button>
       <button class="g-mobile-nav-item" onclick="switchPage('curric')">
         <i class="fa-solid fa-book-bookmark"></i> <span id="md-curric-txt">المنهج والمواد</span>
       </button>
-      <button class="g-mobile-nav-item" onclick="switchPage('analytics')">
-        <i class="fa-solid fa-chart-pie"></i> <span id="md-analytics-txt">التحليلات الذكية</span>
+      <button class="g-mobile-nav-item" onclick="switchPage('todo')">
+        <i class="fa-solid fa-list-check"></i> <span id="md-todo-txt">المهام والإنتاجية</span>
       </button>
-      <button class="g-mobile-nav-item parent-only" onclick="switchPage('parent')">
-        <i class="fa-solid fa-people-roof"></i> <span id="md-parent-txt">متابعة الأبناء</span>
-      </button>
-      <button class="g-mobile-nav-item main-admin-only" onclick="switchPage('admin')">
-        <i class="fa-solid fa-sliders"></i> <span id="md-admin-txt">لوحة التحكم (Admin)</span>
+      <button class="g-mobile-nav-item" onclick="switchPage('settings')">
+        <i class="fa-solid fa-gear"></i> <span id="md-settings-txt">الإعدادات والتحكم</span>
       </button>
     </div>
   </div>
@@ -4525,204 +4718,1013 @@
   <!-- ══════════════════════════════════════════
      PAGE 5: REPORTS & ANALYTICS
 ══════════════════════════════════════════ -->
-  <div class="page" id="page-reports">
-    <div class="rep-wrap">
-      <div class="ex-top-bar">
-        <div>
-          <h2 style="font-size:18px;font-weight:900;color:var(--text)"><i class="fa-solid fa-chart-line" style="color:var(--blue2);margin-inline-end:8px"></i><span id="rep-title-txt">مركز السجل والتقارير</span></h2>
-          <div style="font-size:12px;color:var(--text3);margin-top:2px" id="rep-sub-txt">تحليلات شاملة لأدائك الدراسي ومدى التزامك بالتنفيذ</div>
-        </div>
-        <button class="s-btn accent" onclick="window.print()"><i class="fa-solid fa-print"></i> <span id="rep-btn-print-txt">طباعة التقرير</span></button>
-      </div>
-
-      <div class="rep-grid">
-        <div class="rep-card">
-          <div style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:6px" id="rep-lbl-card1">سلسلة الالتزام الحالية</div>
-          <div style="font-size:26px;font-weight:900;color:var(--orange)" id="rep-val-streak">0 يوم 🔥</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:4px"><span id="rep-lbl-card1-sub-txt">أطول سلسلة وصلت لها:</span> <strong id="rep-val-best">0</strong></div>
-        </div>
-        <div class="rep-card">
-          <div style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:6px" id="rep-lbl-card2">المحاضرات المشاهَدة</div>
-          <div style="font-size:26px;font-weight:900;color:var(--green)" id="rep-val-watched">0 / 0 🎓</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:4px"><span id="rep-lbl-card2-sub-txt">نسبة المشاهدة الإجمالية:</span> <strong id="rep-val-pct">0%</strong></div>
-        </div>
-        <div class="rep-card">
-          <div style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:6px" id="rep-lbl-card3">إنجاز الجدول الأسبوعي</div>
-          <div style="font-size:26px;font-weight:900;color:var(--blue2)" id="rep-val-sched">0% ⚡</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:4px" id="rep-lbl-card3-sub-txt">المهام المنجزة هذا الأسبوع</div>
-        </div>
-      </div>
-
-      <!-- Weekly Activity Chart -->
-      <div class="rep-card" style="margin-bottom:20px">
-        <div style="font-weight:800;font-size:14px;margin-bottom:12px;display:flex;align-items:center;gap:8px">
-          <i class="fa-solid fa-chart-column" style="color:var(--purple)"></i>
-          <span id="rep-lbl-chart-title">مؤشر النشاط والإنجاز اليومي (السبت - الجمعة)</span>
-        </div>
-        <div class="rep-chart-bar" id="rep-chart-bar"></div>
-      </div>
-
-      <!-- Missed recovery list -->
-      <div class="rep-card">
-        <div style="font-weight:800;font-size:14px;margin-bottom:12px;display:flex;align-items:center;gap:8px">
-          <i class="fa-solid fa-clock-rotate-left" style="color:var(--gold)"></i>
-          <span id="rep-lbl-missed-title">سجل الأيام السابقة وتفقد التعويض</span>
-        </div>
-        <div id="rep-missed-list"></div>
-      </div>
-    </div>
-  </div>
-
   <!-- ══════════════════════════════════════════
-     PAGE 6: FULL ANALYTICS DASHBOARD
-══════════════════════════════════════════ -->
-  <div class="page" id="page-analytics">
-    <div class="an-wrap">
-      <!-- Top Bar -->
-      <div class="ex-top-bar">
-        <div>
-          <h2 style="font-size:18px;font-weight:900;color:var(--text)"><i class="fa-solid fa-chart-pie" style="color:var(--indigo);margin-inline-end:8px"></i><span id="an-title-txt">مركز التحليلات والإحصائيات الشاملة</span></h2>
-          <div style="font-size:12px;color:var(--text3);margin-top:2px" id="an-sub-txt">رؤية كاملة متصلة لكل بياناتك: الجدول، المحاضرات، الامتحانات، والمنهج</div>
-        </div>
-        <button class="s-btn accent" onclick="anRenderAll()"><i class="fa-solid fa-rotate"></i> <span id="an-btn-refresh">تحديث الإحصائيات</span></button>
-      </div>
-
-      <!-- KPI Summary Cards Grid -->
-      <div class="an-kpi-grid">
-        <div class="an-kpi-card blue">
-          <div class="an-kpi-hdr">
-            <span class="an-kpi-icon"><i class="fa-solid fa-graduation-cap"></i></span>
-            <span class="an-kpi-lbl" id="an-kpi-acad-lbl">التقدم الدراسي الإجمالي</span>
-          </div>
-          <div class="an-kpi-val" id="an-kpi-acad-val">0%</div>
-          <div class="an-kpi-sub" id="an-kpi-acad-sub">من العام الدراسي 2026–2027 (12 سبتمبر - 15 مايو)</div>
-          <div class="an-kpi-bar"><div class="an-kpi-fill" id="an-kpi-acad-bar" style="width:0%;background:var(--blue)"></div></div>
-        </div>
-
-        <div class="an-kpi-card purple">
-          <div class="an-kpi-hdr">
-            <span class="an-kpi-icon"><i class="fa-solid fa-video"></i></span>
-            <span class="an-kpi-lbl" id="an-kpi-lecs-lbl">معدل مشاهدة المحاضرات</span>
-          </div>
-          <div class="an-kpi-val" id="an-kpi-lecs-val">0%</div>
-          <div class="an-kpi-sub" id="an-kpi-lecs-sub">0 من 0 محاضرة مشاهَدة</div>
-          <div class="an-kpi-bar"><div class="an-kpi-fill" id="an-kpi-lecs-bar" style="width:0%;background:var(--purple)"></div></div>
-        </div>
-
-        <div class="an-kpi-card green">
-          <div class="an-kpi-hdr">
-            <span class="an-kpi-icon"><i class="fa-solid fa-book-bookmark"></i></span>
-            <span class="an-kpi-lbl" id="an-kpi-cur-lbl">إنجاز شجرة المنهج</span>
-          </div>
-          <div class="an-kpi-val" id="an-kpi-cur-val">0%</div>
-          <div class="an-kpi-sub" id="an-kpi-cur-sub">من إجمالي دروس كافة المواد</div>
-          <div class="an-kpi-bar"><div class="an-kpi-fill" id="an-kpi-cur-bar" style="width:0%;background:var(--green)"></div></div>
-        </div>
-
-        <div class="an-kpi-card gold">
-          <div class="an-kpi-hdr">
-            <span class="an-kpi-icon"><i class="fa-solid fa-trophy"></i></span>
-            <span class="an-kpi-lbl" id="an-kpi-ex-lbl">متوسط درجات الامتحانات</span>
-          </div>
-          <div class="an-kpi-val" id="an-kpi-ex-val">0%</div>
-          <div class="an-kpi-sub" id="an-kpi-ex-sub">0 امتحان مكتمل ومسجل</div>
-          <div class="an-kpi-bar"><div class="an-kpi-fill" id="an-kpi-ex-bar" style="width:0%;background:var(--gold)"></div></div>
-        </div>
-      </div>
-
-      <!-- Main Charts Layout Grid -->
-      <div class="an-charts-grid">
-        <!-- Chart 1: Syllabus Progress per Subject -->
-        <div class="rep-card">
-          <div style="font-weight:800;font-size:14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
-            <span style="display:flex;align-items:center;gap:8px"><i class="fa-solid fa-layer-group" style="color:var(--blue2)"></i> <span id="an-c1-title">مقارنة نسبة الإنجاز بين المواد</span></span>
-            <span style="font-size:11px;color:var(--text3)" id="an-c1-sub">حسب المراحل المكتملة</span>
-          </div>
-          <div id="an-chart-subj-list" style="display:flex;flex-direction:column;gap:12px"></div>
-        </div>
-
-        <!-- Chart 2: Lecture Status Breakdown -->
-        <div class="rep-card">
-          <div style="font-weight:800;font-size:14px;margin-bottom:14px;display:flex;align-items:center;gap:8px">
-            <i class="fa-solid fa-pie-chart" style="color:var(--orange)"></i>
-            <span id="an-c2-title">توزيع حالة المحاضرات</span>
-          </div>
-          <div id="an-chart-lecs-breakdown"></div>
-        </div>
-
-        <!-- Chart 3: Weekly Activity & Completion Index -->
-        <div class="rep-card" style="grid-column: 1 / -1">
-          <div style="font-weight:800;font-size:14px;margin-bottom:14px;display:flex;align-items:center;gap:8px">
-            <i class="fa-solid fa-chart-column" style="color:var(--indigo)"></i>
-            <span id="an-c3-title">مؤشر الإنجاز الأسبوعي للجدول والمهام</span>
-          </div>
-          <div class="rep-chart-bar" id="an-chart-weekly"></div>
-        </div>
-      </div>
-
-      <!-- Smart AI Recommendations Panel -->
-      <div class="rep-card" style="margin-top:20px">
-        <div style="font-weight:800;font-size:14px;margin-bottom:12px;display:flex;align-items:center;gap:8px">
-          <i class="fa-solid fa-brain" style="color:var(--purple)"></i>
-          <span id="an-ai-title">توصيات الدراسة وتحسين الأداء</span>
-        </div>
-        <div id="an-ai-tips" style="display:flex;flex-direction:column;gap:8px"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════
-     PAGE 7: DEDICATED PARENT DASHBOARD
+     PAGE 5: UNIFIED SETTINGS & CONTROL CENTER
   ══════════════════════════════════════════ -->
-  <div class="page" id="page-parent">
-    <div class="an-wrap">
-      <div class="ex-top-bar">
-        <div>
-          <h2 style="font-size:18px;font-weight:900;color:var(--text)"><i class="fa-solid fa-people-roof" style="color:var(--indigo);margin-inline-end:8px"></i><span id="par-h-title">لوحة متابعة أولياء الأمور</span></h2>
-          <div style="font-size:12px;color:var(--text3);margin-top:2px" id="par-h-sub">متابعة دقيقة لمستوى الأبناء والإنجاز الدراسي والجدول والمحاضرات</div>
+  <div class="page" id="page-settings">
+    <div class="settings-wrap">
+      <!-- Settings Header & Sub-Tabs -->
+      <div class="settings-header-card">
+        <div class="settings-title-group">
+          <div class="settings-icon-badge"><i class="fa-solid fa-gear"></i></div>
+          <div>
+            <h2 class="settings-title" id="settings-title-txt">مركز الإعدادات والتحكم</h2>
+            <div class="settings-sub" id="settings-sub-txt">اختر التبويب المطلوب للتحليلات، سجل الأداء، متابعة الأبناء، أو لوحة الأدمن</div>
+          </div>
         </div>
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-          <select id="parent-student-picker" onchange="selectParentStudent(this.value)" class="f-inp" style="max-width:240px;padding:6px 12px;font-weight:800;background:var(--bg2)">
-            <option value="">-- اختر الطالب --</option>
-          </select>
-          <button class="s-btn accent" onclick="openParentAccessModal()"><i class="fa-solid fa-key"></i> <span id="par-btn-mycode">كود ولي الأمر 🔑</span></button>
-          <button class="s-btn accent" onclick="openParentConnectModal()"><i class="fa-solid fa-link"></i> <span id="par-btn-link">ربط طالب جديد 🔗</span></button>
+
+        <div class="settings-subtabs">
+          <button class="settings-subtab active" id="st-tab-analytics" onclick="switchSettingsSubTab('analytics')">
+            <i class="fa-solid fa-chart-pie"></i> <span id="st-txt-analytics">التحليلات الذكية</span>
+          </button>
+          <button class="settings-subtab" id="st-tab-reports" onclick="switchSettingsSubTab('reports')">
+            <i class="fa-solid fa-chart-line"></i> <span id="st-txt-reports">سجل وتاريخ الأداء</span>
+          </button>
+          <button class="settings-subtab parent-only" id="st-tab-parent" onclick="switchSettingsSubTab('parent')">
+            <i class="fa-solid fa-people-roof"></i> <span id="st-txt-parent">متابعة الأبناء</span>
+          </button>
+          <button class="settings-subtab main-admin-only" id="st-tab-admin" onclick="switchSettingsSubTab('admin')">
+            <i class="fa-solid fa-sliders"></i> <span id="st-txt-admin">لوحة الأدمن</span>
+          </button>
         </div>
       </div>
 
-      <div id="parent-content-area">
-        <!-- Rendered dynamically via JS -->
+      <!-- Settings Content Panes -->
+      <div class="settings-content-area">
+        <!-- PANE 1: ANALYTICS -->
+        <div class="settings-pane active" id="settings-pane-analytics">
+          <div class="an-wrap">
+            <div class="ex-top-bar">
+              <div>
+                <h2 style="font-size:18px;font-weight:900;color:var(--text)"><i class="fa-solid fa-chart-pie" style="color:var(--indigo);margin-inline-end:8px"></i><span id="an-title-txt">مركز التحليلات والإحصائيات الشاملة</span></h2>
+                <div style="font-size:12px;color:var(--text3);margin-top:2px" id="an-sub-txt">رؤية كاملة متصلة لكل بياناتك: الجدول، المحاضرات، الامتحانات، والمنهج</div>
+              </div>
+              <button class="s-btn accent" onclick="anRenderAll()"><i class="fa-solid fa-rotate"></i> <span id="an-btn-refresh">تحديث الإحصائيات</span></button>
+            </div>
+
+            <!-- KPI Summary Cards Grid -->
+            <div class="an-kpi-grid">
+              <div class="an-kpi-card blue">
+                <div class="an-kpi-hdr">
+                  <span class="an-kpi-icon"><i class="fa-solid fa-graduation-cap"></i></span>
+                  <span class="an-kpi-lbl" id="an-kpi-acad-lbl">التقدم الدراسي الإجمالي</span>
+                </div>
+                <div class="an-kpi-val" id="an-kpi-acad-val">0%</div>
+                <div class="an-kpi-sub" id="an-kpi-acad-sub">من العام الدراسي 2026–2027 (12 سبتمبر - 15 مايو)</div>
+                <div class="an-kpi-bar"><div class="an-kpi-fill" id="an-kpi-acad-bar" style="width:0%;background:var(--blue)"></div></div>
+              </div>
+
+              <div class="an-kpi-card purple">
+                <div class="an-kpi-hdr">
+                  <span class="an-kpi-icon"><i class="fa-solid fa-video"></i></span>
+                  <span class="an-kpi-lbl" id="an-kpi-lecs-lbl">معدل مشاهدة المحاضرات</span>
+                </div>
+                <div class="an-kpi-val" id="an-kpi-lecs-val">0%</div>
+                <div class="an-kpi-sub" id="an-kpi-lecs-sub">0 من 0 محاضرة مشاهَدة</div>
+                <div class="an-kpi-bar"><div class="an-kpi-fill" id="an-kpi-lecs-bar" style="width:0%;background:var(--purple)"></div></div>
+              </div>
+
+              <div class="an-kpi-card green">
+                <div class="an-kpi-hdr">
+                  <span class="an-kpi-icon"><i class="fa-solid fa-book-bookmark"></i></span>
+                  <span class="an-kpi-lbl" id="an-kpi-cur-lbl">إنجاز شجرة المنهج</span>
+                </div>
+                <div class="an-kpi-val" id="an-kpi-cur-val">0%</div>
+                <div class="an-kpi-sub" id="an-kpi-cur-sub">من إجمالي دروس كافة المواد</div>
+                <div class="an-kpi-bar"><div class="an-kpi-fill" id="an-kpi-cur-bar" style="width:0%;background:var(--green)"></div></div>
+              </div>
+
+              <div class="an-kpi-card gold">
+                <div class="an-kpi-hdr">
+                  <span class="an-kpi-icon"><i class="fa-solid fa-trophy"></i></span>
+                  <span class="an-kpi-lbl" id="an-kpi-ex-lbl">متوسط درجات الامتحانات</span>
+                </div>
+                <div class="an-kpi-val" id="an-kpi-ex-val">0%</div>
+                <div class="an-kpi-sub" id="an-kpi-ex-sub">0 امتحان مكتمل ومسجل</div>
+                <div class="an-kpi-bar"><div class="an-kpi-fill" id="an-kpi-ex-bar" style="width:0%;background:var(--gold)"></div></div>
+              </div>
+            </div>
+
+            <!-- Main Charts Layout Grid -->
+            <div class="an-charts-grid">
+              <div class="rep-card">
+                <div style="font-weight:800;font-size:14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
+                  <span style="display:flex;align-items:center;gap:8px"><i class="fa-solid fa-layer-group" style="color:var(--blue2)"></i> <span id="an-c1-title">مقارنة نسبة الإنجاز بين المواد</span></span>
+                  <span style="font-size:11px;color:var(--text3)" id="an-c1-sub">حسب المراحل المكتملة</span>
+                </div>
+                <div id="an-chart-subj-list" style="display:flex;flex-direction:column;gap:12px"></div>
+              </div>
+
+              <div class="rep-card">
+                <div style="font-weight:800;font-size:14px;margin-bottom:14px;display:flex;align-items:center;gap:8px">
+                  <i class="fa-solid fa-pie-chart" style="color:var(--orange)"></i>
+                  <span id="an-c2-title">توزيع حالة المحاضرات</span>
+                </div>
+                <div id="an-chart-lecs-breakdown"></div>
+              </div>
+
+              <div class="rep-card" style="grid-column: 1 / -1">
+                <div style="font-weight:800;font-size:14px;margin-bottom:14px;display:flex;align-items:center;gap:8px">
+                  <i class="fa-solid fa-chart-column" style="color:var(--indigo)"></i>
+                  <span id="an-c3-title">مؤشر الإنجاز الأسبوعي للجدول والمهام</span>
+                </div>
+                <div class="rep-chart-bar" id="an-chart-weekly"></div>
+              </div>
+            </div>
+
+            <!-- Smart AI Recommendations Panel -->
+            <div class="rep-card" style="margin-top:20px">
+              <div style="font-weight:800;font-size:14px;margin-bottom:12px;display:flex;align-items:center;gap:8px">
+                <i class="fa-solid fa-brain" style="color:var(--purple)"></i>
+                <span id="an-ai-title">توصيات الدراسة وتحسين الأداء</span>
+              </div>
+              <div id="an-ai-tips" style="display:flex;flex-direction:column;gap:8px"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE 2: REPORTS / HISTORY -->
+        <div class="settings-pane" id="settings-pane-reports">
+          <div class="rep-wrap">
+            <div class="ex-top-bar">
+              <div>
+                <h2 style="font-size:18px;font-weight:900;color:var(--text)"><i class="fa-solid fa-chart-line" style="color:var(--blue2);margin-inline-end:8px"></i><span id="rep-title-txt">مركز السجل والتقارير</span></h2>
+                <div style="font-size:12px;color:var(--text3);margin-top:2px" id="rep-sub-txt">تحليلات شاملة لأدائك الدراسي ومدى التزامك بالتنفيذ</div>
+              </div>
+              <button class="s-btn accent" onclick="window.print()"><i class="fa-solid fa-print"></i> <span id="rep-btn-print-txt">طباعة التقرير</span></button>
+            </div>
+
+            <div class="rep-grid">
+              <div class="rep-card">
+                <div style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:6px" id="rep-lbl-card1">سلسلة الالتزام الحالية</div>
+                <div style="font-size:26px;font-weight:900;color:var(--orange)" id="rep-val-streak">0 يوم 🔥</div>
+                <div style="font-size:11px;color:var(--text3);margin-top:4px"><span id="rep-lbl-card1-sub-txt">أطول سلسلة وصلت لها:</span> <strong id="rep-val-best">0</strong></div>
+              </div>
+              <div class="rep-card">
+                <div style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:6px" id="rep-lbl-card2">المحاضرات المشاهَدة</div>
+                <div style="font-size:26px;font-weight:900;color:var(--green)" id="rep-val-watched">0 / 0 🎓</div>
+                <div style="font-size:11px;color:var(--text3);margin-top:4px"><span id="rep-lbl-card2-sub-txt">نسبة المشاهدة الإجمالية:</span> <strong id="rep-val-pct">0%</strong></div>
+              </div>
+              <div class="rep-card">
+                <div style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:6px" id="rep-lbl-card3">إنجاز الجدول الأسبوعي</div>
+                <div style="font-size:26px;font-weight:900;color:var(--blue2)" id="rep-val-sched">0% ⚡</div>
+                <div style="font-size:11px;color:var(--text3);margin-top:4px" id="rep-lbl-card3-sub-txt">المهام المنجزة هذا الأسبوع</div>
+              </div>
+            </div>
+
+            <div class="rep-card" style="margin-bottom:20px">
+              <div style="font-weight:800;font-size:14px;margin-bottom:12px;display:flex;align-items:center;gap:8px">
+                <i class="fa-solid fa-chart-column" style="color:var(--purple)"></i>
+                <span id="rep-lbl-chart-title">مؤشر النشاط والإنجاز اليومي (السبت - الجمعة)</span>
+              </div>
+              <div class="rep-chart-bar" id="rep-chart-bar"></div>
+            </div>
+
+            <div class="rep-card">
+              <div style="font-weight:800;font-size:14px;margin-bottom:12px;display:flex;align-items:center;gap:8px">
+                <i class="fa-solid fa-clock-rotate-left" style="color:var(--gold)"></i>
+                <span id="rep-lbl-missed-title">سجل الأيام السابقة وتفقد التعويض</span>
+              </div>
+              <div id="rep-missed-list"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE 3: PARENT DASHBOARD -->
+        <div class="settings-pane" id="settings-pane-parent">
+          <div class="an-wrap">
+            <div class="ex-top-bar">
+              <div>
+                <h2 style="font-size:18px;font-weight:900;color:var(--text)"><i class="fa-solid fa-people-roof" style="color:var(--indigo);margin-inline-end:8px"></i><span id="par-h-title">لوحة متابعة أولياء الأمور</span></h2>
+                <div style="font-size:12px;color:var(--text3);margin-top:2px" id="par-h-sub">متابعة دقيقة لمستوى الأبناء والإنجاز الدراسي والجدول والمحاضرات</div>
+              </div>
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                <select id="parent-student-picker" onchange="selectParentStudent(this.value)" class="f-inp" style="max-width:240px;padding:6px 12px;font-weight:800;background:var(--bg2)">
+                  <option value="">-- اختر الطالب --</option>
+                </select>
+                <button class="s-btn accent" onclick="openParentAccessModal()"><i class="fa-solid fa-key"></i> <span id="par-btn-mycode">كود ولي الأمر 🔑</span></button>
+                <button class="s-btn accent" onclick="openParentConnectModal()"><i class="fa-solid fa-link"></i> <span id="par-btn-link">ربط طالب جديد 🔗</span></button>
+              </div>
+            </div>
+
+            <div id="parent-content-area">
+              <!-- Rendered dynamically via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE 4: MAIN ADMIN PANEL -->
+        <div class="settings-pane" id="settings-pane-admin">
+          <div class="an-wrap">
+            <div class="ex-top-bar">
+              <div>
+                <h2 style="font-size:18px;font-weight:900;color:var(--text)"><i class="fa-solid fa-sliders" style="color:var(--gold);margin-inline-end:8px"></i><span id="adm-h-title">لوحة التحكم الرئيسية للمدير العام</span></h2>
+                <div style="font-size:12px;color:var(--text3);margin-top:2px" id="adm-h-sub">متابعة حية للطلاب وأولياء الأمور والأنظمة التعليمية والمناهج المرجعية</div>
+              </div>
+              <button class="s-btn accent" onclick="renderAdminPanel()"><i class="fa-solid fa-rotate"></i> <span id="adm-h-refresh">تحديث لوحة الأدمن</span></button>
+            </div>
+
+            <div class="lt-tabs-row" style="margin-bottom:16px;border-bottom:1px solid var(--border)">
+              <button class="lt-tab active" id="adm-tab-overview" onclick="switchAdminSubTab('overview')"><i class="fa-solid fa-chart-line"></i> <span id="adm-t-overview">نظرة عامة</span></button>
+              <button class="lt-tab" id="adm-tab-students" onclick="switchAdminSubTab('students')"><i class="fa-solid fa-user-graduate"></i> <span id="adm-t-students">حسابات الطلاب</span></button>
+              <button class="lt-tab" id="adm-tab-parents" onclick="switchAdminSubTab('parents')"><i class="fa-solid fa-people-roof"></i> <span id="adm-t-parents">أولياء الأمور</span></button>
+              <button class="lt-tab" id="adm-tab-systems" onclick="switchAdminSubTab('systems')"><i class="fa-solid fa-network-wired"></i> <span id="adm-t-systems">الأنظمة التعليمية</span></button>
+              <button class="lt-tab" id="adm-tab-curric" onclick="switchAdminSubTab('curric')"><i class="fa-solid fa-book-bookmark"></i> <span id="adm-t-curric">المناهج المرجعية</span></button>
+              <button class="lt-tab" id="adm-tab-audit" onclick="switchAdminSubTab('audit')"><i class="fa-solid fa-shield-halved"></i> <span id="adm-t-audit">سجل الأمان</span></button>
+            </div>
+
+            <div id="admin-sub-content">
+              <!-- Sub-tabs rendered dynamically -->
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- ══════════════════════════════════════════
-     PAGE 8: MAIN ADMIN PANEL
+     PAGE: TODO & DAILY PRODUCTIVITY (TODOLIST INTEGRATION)
   ══════════════════════════════════════════ -->
-  <div class="page" id="page-admin">
-    <div class="an-wrap">
-      <div class="ex-top-bar">
-        <div>
-          <h2 style="font-size:18px;font-weight:900;color:var(--text)"><i class="fa-solid fa-sliders" style="color:var(--gold);margin-inline-end:8px"></i><span id="adm-h-title">لوحة التحكم الرئيسية للمدير العام</span></h2>
-          <div style="font-size:12px;color:var(--text3);margin-top:2px" id="adm-h-sub">متابعة حية للطلاب وأولياء الأمور والأنظمة التعليمية والمناهج المرجعية</div>
+  <div class="page" id="page-todo">
+    <!-- APP SHELL -->
+    <div id="todo-app-shell" class="app todo-app">
+
+      <!-- SIDEBAR -->
+      <aside id="sidebar" class="sidebar" role="navigation" aria-label="Main navigation">
+        <div class="sidebar-header">
+          <span class="sidebar-logo">Planner & ToDo</span>
+          <button id="sidebar-toggle" class="icon-btn" aria-label="Toggle sidebar" title="Toggle sidebar">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="4" width="12" height="1.2" rx="0.6" fill="currentColor"/><rect x="2" y="7.4" width="12" height="1.2" rx="0.6" fill="currentColor"/><rect x="2" y="10.8" width="12" height="1.2" rx="0.6" fill="currentColor"/></svg>
+          </button>
         </div>
-        <button class="s-btn accent" onclick="renderAdminPanel()"><i class="fa-solid fa-rotate"></i> <span id="adm-h-refresh">تحديث لوحة الأدمن</span></button>
-      </div>
 
-      <!-- Admin Sub Navigation Tabs -->
-      <div class="lt-tabs-row" style="margin-bottom:16px;border-bottom:1px solid var(--border)">
-        <button class="lt-tab active" id="adm-tab-overview" onclick="switchAdminSubTab('overview')"><i class="fa-solid fa-chart-line"></i> <span id="adm-t-overview">نظرة عامة</span></button>
-        <button class="lt-tab" id="adm-tab-students" onclick="switchAdminSubTab('students')"><i class="fa-solid fa-user-graduate"></i> <span id="adm-t-students">حسابات الطلاب</span></button>
-        <button class="lt-tab" id="adm-tab-parents" onclick="switchAdminSubTab('parents')"><i class="fa-solid fa-people-roof"></i> <span id="adm-t-parents">أولياء الأمور</span></button>
-        <button class="lt-tab" id="adm-tab-systems" onclick="switchAdminSubTab('systems')"><i class="fa-solid fa-network-wired"></i> <span id="adm-t-systems">الأنظمة التعليمية</span></button>
-        <button class="lt-tab" id="adm-tab-curric" onclick="switchAdminSubTab('curric')"><i class="fa-solid fa-book-bookmark"></i> <span id="adm-t-curric">المناهج المرجعية</span></button>
-        <button class="lt-tab" id="adm-tab-audit" onclick="switchAdminSubTab('audit')"><i class="fa-solid fa-shield-halved"></i> <span id="adm-t-audit">سجل الأمان</span></button>
-      </div>
+        <nav class="sidebar-nav">
+          <ul class="nav-list" role="list">
+            <li>
+              <button class="nav-item active" data-view="today" id="nav-today" role="button" aria-current="page">
+                <svg class="nav-icon" width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="2" y="2" width="11" height="11" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M5 2V1M10 2V1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M2 5.5h11" stroke="currentColor" stroke-width="1.1"/></svg>
+                <span>Today</span>
+                <span class="nav-badge" id="today-badge"></span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item" data-view="inbox" id="nav-inbox">
+                <svg class="nav-icon" width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2 9.5l2.5-5h6L13 9.5v3H2v-3z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M2 9.5h3.5l1 1.5h2l1-1.5H13" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+                <span>Inbox</span>
+                <span class="nav-badge" id="inbox-badge"></span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item" data-view="calendar" id="nav-calendar">
+                <svg class="nav-icon" width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="1.5" y="2.5" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M5 2V1M10 2V1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M1.5 6h12" stroke="currentColor" stroke-width="1.1"/></svg>
+                <span>Calendar</span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item" data-view="projects" id="nav-projects">
+                <svg class="nav-icon" width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="1.5" y="1.5" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="8" y="1.5" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="1.5" y="8" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="8" y="8" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
+                <span>Projects</span>
+              </button>
+            </li>
+          </ul>
+        </nav>
 
-      <div id="admin-sub-content">
-        <!-- Sub-tabs rendered dynamically -->
+        <div class="sidebar-section">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding-inline-end:8px;margin-bottom:8px">
+            <div class="sidebar-section-label" style="margin-bottom:0">Projects</div>
+            <button class="icon-btn" id="sidebar-add-project-btn" title="Add project" aria-label="Add project" style="width:22px;height:22px;font-size:13px;cursor:pointer;border:none;background:transparent;color:var(--text-muted)">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+          <ul class="nav-list recent-projects-list" id="recent-projects-list" role="list">
+            <!-- Populated by JS -->
+          </ul>
+        </div>
+
+        <div class="sidebar-footer">
+          <button class="nav-item" data-view="settings" id="nav-settings">
+            <svg class="nav-icon" width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="7.5" cy="7.5" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M7.5 1.5v1M7.5 12.5v1M1.5 7.5h1M12.5 7.5h1M3.2 3.2l.7.7M11.1 11.1l.7.7M11.1 3.9l-.7.7M3.9 11.1l-.7.7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+            <span>Settings</span>
+          </button>
+          <button class="nav-item" id="theme-toggle" aria-label="Toggle theme" onclick="toggleTheme()">
+            <svg class="nav-icon" id="theme-icon-sun" width="15" height="15" viewBox="0 0 15 15" fill="none" style="display:none"><circle cx="7.5" cy="7.5" r="3" stroke="currentColor" stroke-width="1.2"/><path d="M7.5 1v1.5M7.5 12.5V14M1 7.5h1.5M12.5 7.5H14M3 3l1 1M11 11l1 1M11 3l-1 1M3 11l1-1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+            <svg class="nav-icon" id="theme-icon-moon" width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M12.5 8.5A5 5 0 016.5 2.5a5 5 0 100 10 5 5 0 006-4z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+            <span id="theme-label">Theme Mode</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- MAIN CONTENT AREA -->
+      <main id="main" class="main" role="main">
+
+        <!-- TODAY VIEW -->
+        <section id="view-today" class="view active" aria-label="Today's tasks">
+          <div class="view-inner">
+            <header class="today-header">
+              <div class="today-date-line">
+                <h1 class="today-date-serif" id="today-date-heading"></h1>
+              </div>
+              <p class="today-greeting" id="today-greeting"></p>
+            </header>
+
+            <!-- Overdue section -->
+            <div id="overdue-section" class="overdue-section" style="display:none">
+              <div class="section-label overdue-label">Overdue</div>
+              <ul class="task-list" id="overdue-list" role="list"></ul>
+              <div class="overdue-actions">
+                <button class="link-btn" id="move-overdue-all">Move all to today</button>
+                <button class="link-btn danger-text" id="dismiss-overdue">Dismiss</button>
+              </div>
+            </div>
+
+            <!-- Today tasks -->
+            <div class="today-section">
+              <div class="today-section-header">
+                <div class="section-label" id="today-section-label">Today</div>
+                <span class="task-count-label" id="today-task-count"></span>
+              </div>
+
+              <!-- Priority group -->
+              <div id="important-group" class="task-group" style="display:none">
+                <div class="group-label">Important</div>
+                <ul class="task-list" id="important-list" role="list"></ul>
+              </div>
+
+              <ul class="task-list" id="today-list" role="list"></ul>
+
+              <!-- Completed section -->
+              <div id="completed-group" class="task-group" style="display:none">
+                <button class="group-toggle" id="completed-toggle" aria-expanded="false">
+                  <span>Completed</span>
+                  <span class="completed-count" id="completed-count-label"></span>
+                  <svg class="chevron" width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 4l3 3 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <ul class="task-list completed-list" id="completed-list" role="list" style="display:none"></ul>
+              </div>
+
+              <!-- Empty state -->
+              <div id="today-empty" class="empty-state" style="display:none">
+                <p class="empty-title">You're all caught up.</p>
+                <p class="empty-sub">No tasks for today.</p>
+              </div>
+            </div>
+
+            <!-- Progress -->
+            <div class="today-footer" id="today-footer" style="display:none">
+              <div class="progress-text" id="progress-text"></div>
+              <div class="progress-bar-wrap" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="progress-bar-wrap">
+                <div class="progress-bar-fill" id="progress-bar-fill"></div>
+              </div>
+            </div>
+
+            <button class="add-task-btn" id="add-task-today" aria-label="Add a new task for today">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v11M1 6.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              Add task
+            </button>
+          </div>
+        </section>
+
+        <!-- INBOX VIEW -->
+        <section id="view-inbox" class="view" aria-label="Inbox">
+          <div class="view-inner">
+            <header class="page-header">
+              <h1 class="page-title">Inbox</h1>
+              <p class="page-sub">Tasks without a scheduled date.</p>
+            </header>
+            <ul class="task-list" id="inbox-list" role="list"></ul>
+            <div id="inbox-empty" class="empty-state" style="display:none">
+              <p class="empty-title">Inbox is clear.</p>
+              <p class="empty-sub">All tasks have been scheduled.</p>
+            </div>
+            <button class="add-task-btn" id="add-task-inbox" aria-label="Add a task to inbox">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v11M1 6.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              Add task
+            </button>
+          </div>
+        </section>
+
+        <!-- CALENDAR VIEW -->
+        <section id="view-calendar" class="view" aria-label="Calendar">
+          <div class="view-inner">
+            <header class="page-header calendar-page-header">
+              <div class="cal-header-left">
+                <div class="cal-nav">
+                  <button class="icon-btn" id="cal-prev" aria-label="Previous month" title="Previous">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <h1 class="page-title" id="cal-month-heading"></h1>
+                  <button class="icon-btn" id="cal-next" aria-label="Next month" title="Next">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 2l5 5-5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <button class="btn-ghost cal-today-btn" id="cal-today-btn">Today</button>
+                </div>
+              </div>
+
+              <div class="cal-header-right">
+                <div class="view-mode-switcher" role="group" aria-label="Calendar view mode">
+                  <button class="view-mode-btn active" data-mode="month">Month</button>
+                  <button class="view-mode-btn" data-mode="week">Week</button>
+                </div>
+
+                <div class="cal-draw-toolbar" role="group" aria-label="Draw shapes on calendar" id="cal-draw-toolbar">
+                  <span class="cal-draw-label">Draw:</span>
+                  <button class="cal-draw-btn" id="draw-circle-btn" title="Draw a circle on a day" aria-pressed="false">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.5"/></svg>
+                    Circle
+                  </button>
+                  <button class="cal-draw-btn" id="draw-x-btn" title="Draw a cross / X on a day" aria-pressed="false">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                    Cross
+                  </button>
+                  <button class="cal-draw-btn cal-draw-erase-btn" id="draw-erase-btn" title="Erase drawn marks" aria-pressed="false" style="display:none">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9.5 2.5L11.5 4.5l-7 7H2.5V9l7-6.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M2 12h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    Erase
+                  </button>
+                </div>
+
+                <button class="btn-primary cal-add-btn" id="add-event-btn">
+                  <svg width="12" height="12" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v11M1 6.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                  <span>Add Event</span>
+                </button>
+              </div>
+            </header>
+
+            <div class="cal-filter-bar" role="group" aria-label="Calendar filters">
+              <span class="cal-filter-label">Filter:</span>
+              <button class="cal-filter-btn active" data-filter="events" title="Toggle events">
+                <span class="cal-filter-dot cal-dot-event"></span> Events
+              </button>
+              <button class="cal-filter-btn active" data-filter="deadlines" title="Toggle deadlines">
+                <span class="cal-filter-dot cal-dot-deadline"></span> Deadlines
+              </button>
+              <button class="cal-filter-btn active" data-filter="tasks" title="Toggle tasks">
+                <span class="cal-filter-dot cal-dot-task"></span> Tasks
+              </button>
+              <button class="cal-filter-btn active" data-filter="recurring" title="Toggle recurring tasks">
+                <span class="cal-filter-dot cal-dot-recur"></span> Recurring
+              </button>
+            </div>
+
+            <div class="calendar-grid-wrap" id="cal-grid-wrap">
+              <div class="calendar-weekdays" id="cal-weekdays" role="row"></div>
+              <div class="calendar-grid" id="cal-grid" role="grid" aria-label="Calendar"></div>
+            </div>
+
+            <div class="cal-day-detail-panel" id="cal-day-detail-panel">
+              <div class="cal-day-detail-header">
+                <div class="section-label" id="cal-detail-date-heading">TODAY</div>
+                <div class="cal-detail-header-actions">
+                  <button class="link-btn" id="cal-add-event-btn">+ Add Event</button>
+                  <button class="link-btn" id="cal-add-task-btn">+ Add Task</button>
+                </div>
+              </div>
+
+              <div id="cal-day-empty" class="empty-state" style="display:none">
+                <p class="empty-title">Nothing scheduled for this day.</p>
+              </div>
+
+              <div id="cal-detail-events-section" class="cal-detail-sub-section" style="display:none">
+                <div class="cal-sub-label">Events & Marks</div>
+                <div id="cal-detail-events-list" class="cal-detail-list"></div>
+              </div>
+
+              <div id="cal-detail-deadlines-section" class="cal-detail-sub-section" style="display:none">
+                <div class="cal-sub-label">Project Deadlines</div>
+                <div id="cal-detail-deadlines-list" class="cal-detail-list"></div>
+              </div>
+
+              <div id="cal-detail-tasks-section" class="cal-detail-sub-section" style="display:none">
+                <div class="cal-sub-label">Tasks</div>
+                <ul id="cal-detail-tasks-list" class="task-list"></ul>
+              </div>
+
+              <div id="cal-detail-recurring-section" class="cal-detail-sub-section" style="display:none">
+                <div class="cal-sub-label">Recurring Routine</div>
+                <ul id="cal-detail-recurring-list" class="task-list"></ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PROJECTS VIEW -->
+        <section id="view-projects" class="view" aria-label="Projects">
+          <div class="view-inner">
+            <header class="page-header">
+              <h1 class="page-title">Projects</h1>
+              <button class="text-btn" id="create-project-btn">+ New project</button>
+            </header>
+            <div class="projects-grid" id="projects-grid"></div>
+            <div id="projects-empty" class="empty-state" style="display:none">
+              <p class="empty-title">No projects yet.</p>
+              <p class="empty-sub">Create a project to organize related tasks.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- PROJECT DETAIL VIEW -->
+        <section id="view-project-detail" class="view" aria-label="Project detail">
+          <div class="view-inner">
+            <div class="back-link-wrap">
+              <button class="back-link" id="back-to-projects">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8 2L3 6l5 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Projects
+              </button>
+            </div>
+            <header class="project-detail-header" id="project-detail-header"></header>
+            <div class="project-detail-body" id="project-detail-body"></div>
+            <button class="add-task-btn" id="add-task-project" aria-label="Add task to project">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v11M1 6.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              Add task
+            </button>
+          </div>
+        </section>
+
+        <!-- SETTINGS VIEW -->
+        <section id="view-settings" class="view" aria-label="Settings">
+          <div class="view-inner">
+            <header class="page-header">
+              <h1 class="page-title">Settings</h1>
+            </header>
+            <div class="settings-body" id="settings-body"></div>
+          </div>
+        </section>
+
+      </main>
+
+      <!-- TASK DETAILS PANEL -->
+      <aside id="details-panel" class="details-panel" aria-label="Task details" aria-hidden="true">
+        <div class="details-inner" id="details-inner">
+          <!-- Populated by JS -->
+        </div>
+      <!-- MOBILE NAVIGATION BAR -->
+      <nav class="mobile-nav" role="navigation" aria-label="Mobile navigation">
+        <button class="mobile-nav-item active" data-view="today">
+          <svg width="20" height="20" viewBox="0 0 15 15" fill="none"><rect x="2" y="2" width="11" height="11" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M5 2V1M10 2V1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M2 5.5h11" stroke="currentColor" stroke-width="1.1"/></svg>
+          <span>Today</span>
+        </button>
+        <button class="mobile-nav-item" data-view="inbox">
+          <svg width="20" height="20" viewBox="0 0 15 15" fill="none"><path d="M2 9.5l2.5-5h6L13 9.5v3H2v-3z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M2 9.5h3.5l1 1.5h2l1-1.5H13" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+          <span>Inbox</span>
+        </button>
+        <button class="mobile-add-btn" id="mobile-add-btn" aria-label="Add task">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <button class="mobile-nav-item" data-view="calendar">
+          <svg width="20" height="20" viewBox="0 0 15 15" fill="none"><rect x="1.5" y="2.5" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M5 2V1M10 2V1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M1.5 6h12" stroke="currentColor" stroke-width="1.1"/></svg>
+          <span>Calendar</span>
+        </button>
+        <button class="mobile-nav-item" data-view="projects">
+          <svg width="20" height="20" viewBox="0 0 15 15" fill="none"><rect x="1.5" y="1.5" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="8" y="1.5" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="1.5" y="8" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="8" y="8" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
+          <span>Projects</span>
+        </button>
+      </nav>
+
+    </div><!-- /app -->
+
+    <!-- TASK MODAL -->
+    <div id="task-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-hidden="true">
+      <div class="modal-box" id="task-modal-box">
+        <div class="modal-header">
+          <h2 class="modal-title" id="modal-title">New task</h2>
+          <button class="icon-btn modal-close" id="modal-close-btn" aria-label="Close modal">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <form id="task-form" novalidate>
+          <div class="form-field">
+            <label class="form-label" for="task-title-input">What needs to be done?</label>
+            <input class="form-input task-title-input" id="task-title-input" type="text" placeholder="Task title..." autocomplete="off" required />
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label" for="task-date-input">Date</label>
+              <input class="form-input" id="task-date-input" type="date" />
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="task-time-input">Time</label>
+              <input class="form-input" id="task-time-input" type="time" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label" for="task-project-select">Project</label>
+              <select class="form-input" id="task-project-select">
+                <option value="">No project</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="task-duration-select">Est. duration</label>
+              <select class="form-input" id="task-duration-select">
+                <option value="">—</option>
+                <option value="15">15 min</option>
+                <option value="30">30 min</option>
+                <option value="45">45 min</option>
+                <option value="60">1 hour</option>
+                <option value="90">1.5 hours</option>
+                <option value="120">2 hours</option>
+                <option value="180">3 hours</option>
+                <option value="240">4 hours</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Priority</label>
+            <div class="priority-options" role="radiogroup" aria-label="Priority">
+              <label class="priority-option">
+                <input type="radio" name="task-priority" value="normal" checked /> Normal
+              </label>
+              <label class="priority-option">
+                <input type="radio" name="task-priority" value="important" /> Important
+              </label>
+            </div>
+          </div>
+          <div class="form-field">
+            <label class="form-label">Recurrence</label>
+            <select class="form-input" id="task-recurrence-select">
+              <option value="">None</option>
+              <option value="daily">Every day</option>
+              <option value="weekdays">Every weekday</option>
+              <option value="weekly">Every week</option>
+              <option value="custom">Custom days...</option>
+            </select>
+            <div id="recurrence-days-wrap" style="display:none" class="recurrence-days-wrap">
+              <label class="form-label" style="margin-top:10px">Repeat on</label>
+              <div class="day-chips" role="group" aria-label="Days of week">
+                <label class="day-chip"><input type="checkbox" value="1" /> Mon</label>
+                <label class="day-chip"><input type="checkbox" value="2" /> Tue</label>
+                <label class="day-chip"><input type="checkbox" value="3" /> Wed</label>
+                <label class="day-chip"><input type="checkbox" value="4" /> Thu</label>
+                <label class="day-chip"><input type="checkbox" value="5" /> Fri</label>
+                <label class="day-chip"><input type="checkbox" value="6" /> Sat</label>
+                <label class="day-chip"><input type="checkbox" value="0" /> Sun</label>
+              </div>
+            </div>
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="task-notes-input">Notes</label>
+            <textarea class="form-input form-textarea" id="task-notes-input" placeholder="Optional notes..." rows="3"></textarea>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn-ghost" id="modal-cancel-btn">Cancel</button>
+            <button type="submit" class="btn-primary" id="modal-submit-btn">Add task</button>
+          </div>
+        </form>
       </div>
     </div>
+
+    <!-- PROJECT MODAL -->
+    <div id="project-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="project-modal-title" aria-hidden="true">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h2 class="modal-title" id="project-modal-title">New project</h2>
+          <button class="icon-btn modal-close" id="project-modal-close" aria-label="Close">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <form id="project-form" novalidate>
+          <div class="form-field">
+            <label class="form-label" for="proj-name-input">Project name</label>
+            <input class="form-input" id="proj-name-input" type="text" placeholder="e.g. Portfolio Website" required />
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="proj-desc-input">Description</label>
+            <input class="form-input" id="proj-desc-input" type="text" placeholder="Optional description..." />
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label class="form-label" for="proj-start-input">Start date</label>
+              <input class="form-input" id="proj-start-input" type="date" />
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="proj-deadline-input">Deadline</label>
+              <input class="form-input" id="proj-deadline-input" type="date" />
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn-ghost" id="project-modal-cancel">Cancel</button>
+            <button type="submit" class="btn-primary">Save project</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- EVENT MODAL -->
+    <div id="event-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="event-modal-title-text" aria-hidden="true">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h2 class="modal-title" id="event-modal-title-text">New event</h2>
+          <button class="icon-btn modal-close" id="event-modal-close" aria-label="Close modal">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <form id="event-form" class="modal-form" novalidate>
+          <div class="modal-body-scroll">
+            <div class="form-field">
+              <label class="form-label" for="event-title-input">Event title</label>
+              <input class="form-input task-title-input" id="event-title-input" type="text" placeholder="Title..." autocomplete="off" required />
+            </div>
+
+            <div class="form-row" style="align-items: center;">
+              <div class="form-field">
+                <label class="form-label" for="event-date-input">Date</label>
+                <input class="form-input" id="event-date-input" type="date" required />
+              </div>
+              <div class="form-field" style="padding-top: 18px;">
+                <label class="form-checkbox-label">
+                  <input type="checkbox" id="event-allday-toggle" checked />
+                  <span>All-day event</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-row" id="event-time-row" style="display:none">
+              <div class="form-field">
+                <label class="form-label" for="event-start-time">Start time</label>
+                <input class="form-input" id="event-start-time" type="time" />
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="event-end-time">End time</label>
+                <input class="form-input" id="event-end-time" type="time" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label" for="event-mark-select">Mark Shape</label>
+                <select class="form-input" id="event-mark-select">
+                  <option value="circle">● Circle</option>
+                  <option value="x">✕ Cross / X</option>
+                  <option value="ring">◉ Ring</option>
+                  <option value="diamond">◆ Diamond</option>
+                  <option value="star">★ Star</option>
+                  <option value="square">■ Square</option>
+                  <option value="triangle">▲ Triangle</option>
+                  <option value="heart">♥ Heart</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="event-mark-size-select">Mark Size</label>
+                <select class="form-input" id="event-mark-size-select">
+                  <option value="sm">Small (S)</option>
+                  <option value="md">Medium (M)</option>
+                  <option value="lg">Large (L)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="event-mark-text-input">Center Text inside Mark (Optional)</label>
+              <input class="form-input" id="event-mark-text-input" type="text" placeholder="e.g. 5, A, EX, 100 (or leave blank)" maxlength="6" />
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="event-type-select">Category</label>
+              <select class="form-input" id="event-type-select">
+                <option value="event">Event</option>
+                <option value="exam">Exam</option>
+                <option value="deadline">Deadline</option>
+                <option value="meeting">Meeting</option>
+                <option value="appointment">Appointment</option>
+                <option value="birthday">Birthday</option>
+                <option value="reminder">Reminder</option>
+                <option value="custom">Custom</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label class="form-label">Color</label>
+              <div class="event-color-picker" role="radiogroup" aria-label="Color tag">
+                <label class="color-option color-muted" title="Default / Muted"><input type="radio" name="event-color" value="muted" checked /><span class="color-swatch-dot"></span></label>
+                <label class="color-option color-red" title="Red"><input type="radio" name="event-color" value="red" /><span class="color-swatch-dot"></span></label>
+                <label class="color-option color-amber" title="Amber"><input type="radio" name="event-color" value="amber" /><span class="color-swatch-dot"></span></label>
+                <label class="color-option color-blue" title="Blue"><input type="radio" name="event-color" value="blue" /><span class="color-swatch-dot"></span></label>
+                <label class="color-option color-green" title="Green"><input type="radio" name="event-color" value="green" /><span class="color-swatch-dot"></span></label>
+                <label class="color-option color-purple" title="Purple"><input type="radio" name="event-color" value="purple" /><span class="color-swatch-dot"></span></label>
+                <label class="color-option color-rose" title="Rose"><input type="radio" name="event-color" value="rose" /><span class="color-swatch-dot"></span></label>
+                
+                <label class="color-option color-custom" title="Custom Hex Color">
+                  <input type="radio" name="event-color" value="custom" id="color-radio-custom" />
+                  <span class="color-swatch-custom-wrap">
+                    <input type="color" id="event-custom-color" value="#3b82f6" title="Pick color" />
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="event-repeat-select">Repeat</label>
+              <select class="form-input" id="event-repeat-select">
+                <option value="">Never</option>
+                <option value="daily">Every day</option>
+                <option value="weekdays">Every weekday (Mon-Fri)</option>
+                <option value="weekly">Every week</option>
+                <option value="monthly">Every month</option>
+                <option value="yearly">Every year</option>
+              </select>
+            </div>
+
+            <div id="event-recurrence-block" style="display:none" class="recurrence-block">
+              <div class="form-field" id="event-recur-days-field" style="display:none">
+                <label class="form-label">On days</label>
+                <div class="day-chips" id="event-recur-days-group" role="group">
+                  <label class="day-chip"><input type="checkbox" value="1" /> Mon</label>
+                  <label class="day-chip"><input type="checkbox" value="2" /> Tue</label>
+                  <label class="day-chip"><input type="checkbox" value="3" /> Wed</label>
+                  <label class="day-chip"><input type="checkbox" value="4" /> Thu</label>
+                  <label class="day-chip"><input type="checkbox" value="5" /> Fri</label>
+                  <label class="day-chip"><input type="checkbox" value="6" /> Sat</label>
+                  <label class="day-chip"><input type="checkbox" value="0" /> Sun</label>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label class="form-label" for="event-recur-end-select">Ends</label>
+                  <select class="form-input" id="event-recur-end-select">
+                    <option value="never">Never</option>
+                    <option value="date">On date</option>
+                    <option value="count">After occurrences</option>
+                  </select>
+                </div>
+                <div class="form-field" id="event-recur-end-date-field" style="display:none">
+                  <label class="form-label" for="event-recur-end-date">End date</label>
+                  <input class="form-input" id="event-recur-end-date" type="date" />
+                </div>
+                <div class="form-field" id="event-recur-count-field" style="display:none">
+                  <label class="form-label" for="event-recur-count">Occurrences</label>
+                  <input class="form-input" id="event-recur-count" type="number" min="1" max="100" value="10" />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label class="form-label" for="event-notes-input">Notes</label>
+              <textarea class="form-input form-textarea" id="event-notes-input" placeholder="Optional notes..." rows="2"></textarea>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn-ghost" id="event-modal-cancel">Cancel</button>
+            <button type="submit" class="btn-primary" id="event-modal-submit">Create event</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- EVENT DETAIL MODAL -->
+    <div id="event-detail-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="event-detail-title" aria-hidden="true">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h2 class="modal-title" id="event-detail-title">Event details</h2>
+          <button class="icon-btn modal-close" id="event-detail-close" aria-label="Close modal">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <div id="event-detail-body"></div>
+      </div>
+    </div>
+
+    <!-- RECURRING ACTION SCOPE MODAL -->
+    <div id="recur-scope-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="recur-scope-title" aria-hidden="true">
+      <div class="modal-box recur-scope-box">
+        <div class="modal-header">
+          <h2 class="modal-title" id="recur-scope-title">Recurring event</h2>
+          <button class="icon-btn modal-close" id="recur-scope-close" aria-label="Close modal">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="recur-scope-subtitle" id="recur-scope-action-label">Edit recurring event</p>
+          <div class="recur-scope-options">
+            <label class="recur-scope-option">
+              <input type="radio" name="recur-scope" value="this" checked />
+              <div>
+                <strong>Only this occurrence</strong>
+                <p>Changes will apply to this date only.</p>
+              </div>
+            </label>
+            <label class="recur-scope-option">
+              <input type="radio" name="recur-scope" value="future" />
+              <div>
+                <strong>This and future occurrences</strong>
+                <p>Changes will apply from this date forward.</p>
+              </div>
+            </label>
+            <label class="recur-scope-option">
+              <input type="radio" name="recur-scope" value="all" />
+              <div>
+                <strong>All occurrences</strong>
+                <p>Changes will apply to every instance in the series.</p>
+              </div>
+            </label>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-ghost" id="recur-scope-cancel">Cancel</button>
+          <button type="button" class="btn-primary" id="recur-scope-confirm">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- KEYBOARD SHORTCUTS PANEL -->
+    <div id="shortcuts-panel" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="shortcuts-title" aria-hidden="true">
+      <div class="modal-box shortcuts-box">
+        <div class="modal-header">
+          <h2 class="modal-title" id="shortcuts-title">Keyboard shortcuts</h2>
+          <button class="icon-btn modal-close" id="shortcuts-close" aria-label="Close">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <div class="shortcuts-list">
+          <div class="shortcut-row"><kbd>N</kbd><span>New task</span></div>
+          <div class="shortcut-row"><kbd>/</kbd><span>Search</span></div>
+          <div class="shortcut-row"><kbd>T</kbd><span>Go to Today</span></div>
+          <div class="shortcut-row"><kbd>C</kbd><span>Calendar</span></div>
+          <div class="shortcut-row"><kbd>P</kbd><span>Projects</span></div>
+          <div class="shortcut-row"><kbd>I</kbd><span>Inbox</span></div>
+          <div class="shortcut-row"><kbd>Esc</kbd><span>Close panel / modal</span></div>
+          <div class="shortcut-row"><kbd>?</kbd><span>Shortcuts help</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DRAW TEXT PROMPT -->
+    <div id="draw-text-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="draw-text-title" aria-hidden="true">
+      <div class="modal-box draw-text-box">
+        <div class="modal-header">
+          <h2 class="modal-title" id="draw-text-title">Add text inside shape?</h2>
+          <button class="icon-btn modal-close" id="draw-text-close" aria-label="Close">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <div class="modal-body draw-text-body">
+          <div class="draw-preview-wrap" id="draw-text-preview-wrap">
+            <svg id="draw-text-preview-svg" width="80" height="80" viewBox="0 0 80 80"></svg>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label" for="draw-text-input">Center text <span style="opacity:.55;font-weight:400">(optional)</span></label>
+            <input class="form-input" id="draw-text-input" type="text" placeholder="e.g. EX, A, 5, ★ — or leave blank" maxlength="6" autocomplete="off" />
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">Color</label>
+            <div class="draw-color-row" role="radiogroup">
+              <label class="draw-color-opt" title="Red">
+                <input type="radio" name="draw-color" value="#ef4444" checked />
+                <span class="draw-color-dot" style="background:#ef4444"></span>
+              </label>
+              <label class="draw-color-opt" title="Blue">
+                <input type="radio" name="draw-color" value="#3b82f6" />
+                <span class="draw-color-dot" style="background:#3b82f6"></span>
+              </label>
+              <label class="draw-color-opt" title="Green">
+                <input type="radio" name="draw-color" value="#22c55e" />
+                <span class="draw-color-dot" style="background:#22c55e"></span>
+              </label>
+              <label class="draw-color-opt" title="Amber">
+                <input type="radio" name="draw-color" value="#f59e0b" />
+                <span class="draw-color-dot" style="background:#f59e0b"></span>
+              </label>
+              <label class="draw-color-opt" title="Purple">
+                <input type="radio" name="draw-color" value="#a855f7" />
+                <span class="draw-color-dot" style="background:#a855f7"></span>
+              </label>
+              <label class="draw-color-opt" title="Rose">
+                <input type="radio" name="draw-color" value="#f43f5e" />
+                <span class="draw-color-dot" style="background:#f43f5e"></span>
+              </label>
+              <label class="draw-color-opt" title="Black/dark">
+                <input type="radio" name="draw-color" value="#1e293b" />
+                <span class="draw-color-dot" style="background:#1e293b;border:1px solid #475569"></span>
+              </label>
+              <label class="draw-color-opt draw-color-custom" title="Custom color">
+                <input type="radio" name="draw-color" value="custom" id="draw-color-custom-radio" />
+                <input type="color" id="draw-color-custom-input" value="#3b82f6" title="Pick color" />
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-ghost" id="draw-text-cancel">Cancel</button>
+          <button type="button" class="btn-primary" id="draw-text-confirm">Place shape</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEARCH OVERLAY -->
+    <div id="search-overlay" class="search-overlay" role="dialog" aria-modal="true" aria-hidden="true">
+      <div class="search-box">
+        <div class="search-input-wrap">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.3"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          <input type="text" class="search-input" id="search-input" placeholder="Search tasks..." autocomplete="off" aria-label="Search tasks" />
+          <kbd class="search-esc">Esc</kbd>
+        </div>
+        <ul class="search-results" id="search-results" role="listbox"></ul>
+      </div>
+    </div>
+
+    <!-- TOAST NOTIFICATIONS -->
+    <div id="toast-container" class="toast-container" aria-live="polite" aria-label="Notifications"></div>
   </div>
 
   <!-- Toast container -->
@@ -5280,14 +6282,43 @@
     function T() { return I18N[lang] || I18N.ar; }
     function t(k) { return T()[k] || k; }
 
+    let currentSettingsSubTab = 'analytics';
+
+    function switchSettingsSubTab(subTab) {
+      if (subTab === 'admin' && !isMainAdmin()) {
+        showToast(lang === 'ar' ? 'لوحة الأدمن مخصصة فقط للحساب الرئيسي!' : 'Admin panel is restricted to main admin!');
+        subTab = 'analytics';
+      }
+      currentSettingsSubTab = subTab;
+
+      document.querySelectorAll('.settings-pane').forEach(pane => pane.classList.remove('active'));
+      document.querySelectorAll('.settings-subtab').forEach(tab => tab.classList.remove('active'));
+
+      const targetPane = document.getElementById('settings-pane-' + subTab);
+      const targetSubTab = document.getElementById('st-tab-' + subTab);
+
+      if (targetPane) targetPane.classList.add('active');
+      if (targetSubTab) targetSubTab.classList.add('active');
+
+      if (subTab === 'analytics') anRenderAll();
+      if (subTab === 'reports') repRenderAll();
+      if (subTab === 'parent') renderParentDashboard();
+      if (subTab === 'admin') renderAdminPanel();
+    }
+
     /* ════════════════════════════════
        PAGE SWITCHING
     ════════════════════════════════ */
     function switchPage(p) {
       closeMobileNav();
+      if (['analytics', 'reports', 'parent', 'admin'].includes(p)) {
+        currentSettingsSubTab = p;
+        p = 'settings';
+      }
       currentPage = p;
       document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.g-tab').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.g-tab, .settings-btn').forEach(el => el.classList.remove('active'));
+
       const tp = document.getElementById('page-' + p);
       const tt = document.getElementById('tab-' + p);
       if (tp) tp.classList.add('active');
@@ -5295,16 +6326,9 @@
 
       if (p === 'exams') exRenderAll();
       if (p === 'curric') curRenderAll();
-      if (p === 'reports') repRenderAll();
-      if (p === 'analytics') anRenderAll();
-      if (p === 'parent') renderParentDashboard();
-      if (p === 'admin') {
-        if (!isMainAdmin()) {
-          showToast('لوحة الأدمن مخصصة فقط للحساب الرئيسي!');
-          switchPage('sched');
-          return;
-        }
-        renderAdminPanel();
+      if (p === 'settings') switchSettingsSubTab(currentSettingsSubTab);
+      if (p === 'todo' && window.App && typeof window.App.refresh === 'function') {
+        window.App.refresh();
       }
     }
 
@@ -5372,6 +6396,8 @@
       si('s-prev', t('prev')); si('s-next', t('next')); si('s-today', t('today'));
       si('s-revision', t('revision')); si('s-exams', t('exams')); si('s-catchup', t('catchup'));
       si('s-history', t('history')); si('s-cols', t('cols')); si('s-curric', t('curric')); si('s-print', t('print'));
+      si('s-todo', isAr ? 'المهام والإنتاجية' : 'Tasks & Productivity');
+      si('md-todo-txt', isAr ? 'المهام والإنتاجية' : 'Tasks & Productivity');
       si('s-acad-yr', t('academicYear'));
 
       // Header buttons title i18n
@@ -5404,14 +6430,19 @@
       // Restore Admin Mode Button & State
       if (typeof applyAdminModeUI === 'function') applyAdminModeUI();
 
-      // Mobile Drawer i18n
+      // Mobile Drawer & Settings i18n
       si('md-title-txt', isAr ? 'القائمة الرئيسية' : 'Main Menu');
       si('md-sched-txt', isAr ? 'الجدول الأسبوعي' : 'Weekly Schedule');
       si('md-lt-txt', isAr ? 'متابع المحاضرات' : 'Lecture Tracker');
       si('md-exams-txt', isAr ? 'الامتحانات' : 'Exams');
-      si('md-history-txt', isAr ? 'سجل وتقرير الأداء' : 'History & Reports');
       si('md-curric-txt', isAr ? 'المنهج والمواد' : 'Curriculum');
-      si('md-analytics-txt', isAr ? 'التحليلات الذكية' : 'Analytics');
+      si('md-settings-txt', isAr ? 'الإعدادات والتحكم' : 'Settings & Control');
+      si('settings-title-txt', isAr ? 'مركز الإعدادات والتحكم' : 'Settings & Control Center');
+      si('settings-sub-txt', isAr ? 'اختر التبويب المطلوب للتحليلات، سجل الأداء، متابعة الأبناء، أو لوحة الأدمن' : 'Select a tab to view Analytics, Performance History, Parent View, or Admin Panel');
+      si('st-txt-analytics', isAr ? 'التحليلات الذكية' : 'Smart Analytics');
+      si('st-txt-reports', isAr ? 'سجل وتاريخ الأداء' : 'Performance History');
+      si('st-txt-parent', isAr ? 'متابعة الأبناء' : 'Parent View');
+      si('st-txt-admin', isAr ? 'لوحة الأدمن' : 'Admin Panel');
       si('s-lbl-streak', t('streak')); si('s-lbl-perfect', t('perfect'));
       si('s-lbl-best', t('best')); si('s-lbl-week', t('thisWeek')); si('s-hint-reset', t('resetHint'));
       // tracker labels
@@ -5519,6 +6550,9 @@
       ltRenderAll();
       exRenderAll();
       curRenderAll();
+      if (window.App && typeof window.App.refresh === 'function') {
+        window.App.refresh();
+      }
       repRenderAll();
       anRenderAll();
       if (typeof renderAdminPanel === 'function') renderAdminPanel();
@@ -5542,12 +6576,59 @@
     ];
 
     const DEF_TEMPLATE = {
-      Sat: { school: [], center: [], online: [] },
-      Sun: { school: [], center: [], online: [] },
-      Mon: { school: [], center: [], online: [] },
-      Tue: { school: [], center: [], online: [] },
-      Wed: { school: [], center: [], online: [] },
-      Thu: { school: [], center: [], online: [] },
+      Sat: {
+        school: [
+          { id: 'sat-s1', text: 'English', teacher: 'Mr. Sameh', time: '11-1', icon: 'book', color: 'green', pinned: true, missed: true }
+        ],
+        center: [],
+        online: [
+          { id: 'sat-o1', text: 'Arabic', teacher: 'Mr. Salah', time: '10 AM', icon: 'book', color: 'pink', pinned: false, missed: true }
+        ]
+      },
+      Sun: {
+        school: [],
+        center: [],
+        online: [
+          { id: 'sun-o1', text: 'English', teacher: 'Mr. Ahmen Tariq', time: '', icon: 'book', color: 'green', pinned: false },
+          { id: 'sun-o2', text: 'History', teacher: 'Mr. Tolba', time: '', icon: 'book', color: 'amber', pinned: false }
+        ]
+      },
+      Mon: {
+        school: [
+          { id: 'mon-s1', text: 'Arabic', teacher: 'Mr. Said', time: '8-11', icon: 'book', color: 'pink', pinned: false }
+        ],
+        center: [
+          { id: 'mon-c1', text: 'History', teacher: 'Mr. Bassem', time: '2-4:30', icon: 'book', color: 'amber', pinned: false }
+        ],
+        online: []
+      },
+      Tue: {
+        school: [
+          { id: 'tue-s1', text: 'History', teacher: 'Mr. Bassem', time: '8-11', icon: 'book', color: 'amber', pinned: false }
+        ],
+        center: [],
+        online: [
+          { id: 'tue-o1', text: 'Arabic ( HW )', teacher: 'Mr. Salah', time: '10 AM', icon: 'book', color: 'pink', pinned: false }
+        ]
+      },
+      Wed: {
+        school: [],
+        center: [],
+        online: [
+          { id: 'wed-o1', text: 'English ( Skills / HW )', teacher: 'Mr. Ahmed Tariq', time: '', icon: 'book', color: 'green', pinned: false }
+        ]
+      },
+      Thu: {
+        school: [
+          { id: 'thu-s1', text: 'Computer', teacher: 'Mrs. Mary', time: '11-1', icon: 'laptop', color: 'amber', pinned: false }
+        ],
+        center: [
+          { id: 'thu-c1', text: 'History', teacher: 'Mr. Bassem', time: '2-4:30', icon: 'book', color: 'amber', pinned: false }
+        ],
+        online: [
+          { id: 'thu-o1', text: 'Computer', teacher: 'Mr. Mohamemd', time: '6 PM', icon: 'laptop', color: 'amber', pinned: false }
+        ]
+      },
       Fri: { school: [], center: [], online: [] }
     };
 
@@ -5566,6 +6647,10 @@
     /* ─── STORAGE: Supabase-backed loadJ / saveJ ─── */
     // _sbUid is set after auth; empty string = not logged in (fallback to localStorage)
     let _sbUid = '';
+
+    function isRealUuid(uid) {
+      return typeof uid === 'string' && /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(uid);
+    }
 
     function _lsKey(key) { return _sbUid ? _sbUid + ':' + key : key; }
 
@@ -5590,7 +6675,7 @@
       clearTimeout(_timers[key]);
       _timers[key] = setTimeout(() => {
         try {
-          if (_sbUid && window._supabase) {
+          if (isRealUuid(_sbUid) && window._supabase) {
             window._supabase.from('schedule_data')
               .upsert({ id: key, user_id: _sbUid, data: obj, updated_at: new Date().toISOString() }, { onConflict: 'id,user_id' })
               .then(() => {});
@@ -6618,23 +7703,96 @@
     let ltTeachers = [], ltLectures = [], ltFilter = 'all', ltEditTId = null, ltEditLId = null, ltEditLTId = null;
     let ltSelDays = [], ltSelEmoji = '📚', ltSelColor = '#3b82f6';
 
-    const MARKSAMER_TEACHERS = [];
-    const MARKSAMER_LECTURES = [];
+    const MARKSAMER_TEACHERS = [
+      {
+        id: 'xmu42m0ld9cr4',
+        name: 'ا. محمد صلاح',
+        subject: 'عربي',
+        emoji: '📚',
+        color: '#3b82f6',
+        days: ['Sat'],
+        platform: 'بسطهالك',
+        link: 'https://bassthalk.com/userprofile/courses/course/1731',
+        createdAt: '2026-09-12'
+      },
+      {
+        id: 'xmu42p9ddigcu',
+        name: 'ا. محمد طلبه',
+        subject: 'تاريخ',
+        emoji: '🧮',
+        color: '#22c55e',
+        days: ['Sun'],
+        platform: 'Smart accedmy',
+        link: 'https://smartacademy-eg.com/packages-details/143',
+        createdAt: '2026-09-06'
+      },
+      {
+        id: 'xmu42r5yo9dhu',
+        name: 'ا. محمد عبالحميد',
+        subject: 'برمجه',
+        emoji: '📚',
+        color: '#3b82f6',
+        days: ['Thu'],
+        platform: 'Smart accedmy',
+        link: 'https://smartacademy-eg.com/packages-details/144',
+        createdAt: '2026-09-03'
+      },
+      {
+        id: 'xmu42u6qlglvj',
+        name: 'ا. احمد طارق',
+        subject: 'انجليزي',
+        emoji: '✏️',
+        color: '#06b6d4',
+        days: ['Sun'],
+        platform: 'احمد طارق',
+        link: 'https://ahmed-tarek.net/userprofile/courses/course/12',
+        createdAt: '2026-09-13'
+      }
+    ];
+
+    const MARKSAMER_LECTURES = [
+      // Teacher 1: ا. محمد صلاح (عربي)
+      { id: 'xmu42mxkd4rm9', teacherId: 'xmu42m0ld9cr4', title: 'محاضرة أسبوع 1', date: '2026-09-12', weekNum: 1, watched: true, watchedAt: '2026-09-12', link: 'https://bassthalk.com/userprofile/courses/course/1731' },
+      { id: 'xmu851mhepz1s', teacherId: 'xmu42m0ld9cr4', title: 'محاضرة أسبوع 2', date: '2026-09-19', weekNum: 2, watched: true, watchedAt: '2026-09-19', link: 'https://bassthalk.com/userprofile/courses/course/1731' },
+      { id: 'xmuibtdaweo7o', teacherId: 'xmu42m0ld9cr4', title: 'Week Lecture 3', date: '2026-09-26', weekNum: 3, watched: false, watchedAt: null, link: 'https://bassthalk.com/userprofile/courses/course/1731' },
+      { id: 'xmusbhv9ix8td', teacherId: 'xmu42m0ld9cr4', title: 'Week Lecture 4', date: '2026-10-03', weekNum: 4, watched: false, watchedAt: null, link: 'https://bassthalk.com/userprofile/courses/course/1731' },
+
+      // Teacher 2: ا. محمد طلبه (تاريخ)
+      { id: 'xmu85sdp6hav0', teacherId: 'xmu42p9ddigcu', title: 'Week Lecture 1', date: '2026-09-06', weekNum: 1, watched: true, watchedAt: '2026-09-06', link: 'https://smartacademy-eg.com/packages-details/141' },
+      { id: 'xmu85sdp6cjb4', teacherId: 'xmu42p9ddigcu', title: 'Week Lecture 2', date: '2026-09-13', weekNum: 2, watched: true, watchedAt: '2026-09-13', link: 'https://smartacademy-eg.com/packages-details/141' },
+      { id: 'xmu9rvwn4mv6u', teacherId: 'xmu42p9ddigcu', title: 'Week Lecture 3', date: '2026-09-20', weekNum: 3, watched: true, watchedAt: '2026-09-20', link: 'https://smartacademy-eg.com/packages-details/141' },
+      { id: 'xmujprrm2rqlb', teacherId: 'xmu42p9ddigcu', title: 'Week Lecture 4', date: '2026-09-27', weekNum: 4, watched: true, watchedAt: '2026-09-27', link: 'https://smartacademy-eg.com/packages-details/141' },
+      { id: 'xmutoyjbgfg2u', teacherId: 'xmu42p9ddigcu', title: 'Week Lecture 5', date: '2026-10-04', weekNum: 5, watched: false, watchedAt: null, link: 'https://smartacademy-eg.com/packages-details/143' },
+
+      // Teacher 3: ا. محمد عبالحميد (برمجه)
+      { id: 'xmu85sdp6wtei', teacherId: 'xmu42r5yo9dhu', title: 'Week Lecture 1', date: '2026-09-03', weekNum: 1, watched: true, watchedAt: '2026-09-03', link: 'https://smartacademy-eg.com/packages-details/144' },
+      { id: 'xmu85sdp66vx0', teacherId: 'xmu42r5yo9dhu', title: 'Week Lecture 2', date: '2026-09-10', weekNum: 2, watched: true, watchedAt: '2026-09-10', link: 'https://smartacademy-eg.com/packages-details/144' },
+      { id: 'xmu85sdp6p1hi', teacherId: 'xmu42r5yo9dhu', title: 'Week Lecture 3', date: '2026-09-17', weekNum: 3, watched: true, watchedAt: '2026-09-17', link: 'https://smartacademy-eg.com/packages-details/144' },
+      { id: 'xmufsq9c9wpu6', teacherId: 'xmu42r5yo9dhu', title: 'Week Lecture 4', date: '2026-09-24', weekNum: 4, watched: true, watchedAt: '2026-09-24', link: 'https://smartacademy-eg.com/packages-details/144' },
+      { id: 'xmusisk3pr21p', teacherId: 'xmu42r5yo9dhu', title: 'Week Lecture 5', date: '2026-10-01', weekNum: 5, watched: false, watchedAt: null, link: 'https://smartacademy-eg.com/packages-details/144' },
+
+      // Teacher 4: ا. احمد طارق (انجليزي)
+      { id: 'xmu85sdp6vlei', teacherId: 'xmu42u6qlglvj', title: 'Week Lecture 1', date: '2026-09-13', weekNum: 1, watched: true, watchedAt: '2026-09-13', link: 'https://ahmed-tarek.net/userprofile/courses/course/12' },
+      { id: 'xmu9rvwn4d6om', teacherId: 'xmu42u6qlglvj', title: 'Week Lecture 2', date: '2026-09-20', weekNum: 2, watched: true, watchedAt: '2026-09-20', link: 'https://ahmed-tarek.net/userprofile/courses/course/12' },
+      { id: 'xmujprrm2xug0', teacherId: 'xmu42u6qlglvj', title: 'Week Lecture 3', date: '2026-09-27', weekNum: 3, watched: true, watchedAt: '2026-09-27', link: 'https://ahmed-tarek.net/userprofile/courses/course/12' },
+      { id: 'xmutoyjbg9es2', teacherId: 'xmu42u6qlglvj', title: 'Week Lecture 4', date: '2026-10-04', weekNum: 4, watched: false, watchedAt: null, link: 'https://ahmed-tarek.net/userprofile/courses/course/12' }
+    ];
 
     function ltLoad() {
       const getVal = (k) => {
-        if (!_sbUid) return null;
         let v = localStorage.getItem(_lsKey(k));
         if (v) { try { return JSON.parse(v); } catch(e){} }
         return null;
       };
 
-      ltTeachers = getVal('lt_t') || getVal('lt-teachers') || getVal('lt_teachers_v2') || [];
-      ltLectures = getVal('lt_l') || getVal('lt-lectures') || getVal('lt_lectures_v2') || [];
+      const savedT = getVal('lt_t') || getVal('lt-teachers') || getVal('lt_teachers_v2');
+      const savedL = getVal('lt_l') || getVal('lt-lectures') || getVal('lt_lectures_v2');
+
+      ltTeachers = (savedT && savedT.length >= 4) ? savedT : MARKSAMER_TEACHERS;
+      ltLectures = (savedL && savedL.length >= 15) ? savedL : MARKSAMER_LECTURES;
     }
 
     function ltSave() {
-      if (!_sbUid) return;
       const tStr = JSON.stringify(ltTeachers);
       const lStr = JSON.stringify(ltLectures);
       ['lt_t', 'lt-teachers', 'lt_teachers_v2'].forEach(k => {
@@ -6643,7 +7801,7 @@
       ['lt_l', 'lt-lectures', 'lt_lectures_v2'].forEach(k => {
         localStorage.setItem(_lsKey(k), lStr);
       });
-      if (window._supabase) {
+      if (window._supabase && isRealUuid(_sbUid)) {
         const _sb = getSbClient();
         if (_sb) {
           _sb.from('schedule_data').upsert([
@@ -7057,7 +8215,11 @@
        SEED DEMO DATA
     ════════════════════════════════ */
     function seedLt() {
-      return;
+      if (!ltTeachers || ltTeachers.length === 0) {
+        ltTeachers = JSON.parse(JSON.stringify(MARKSAMER_TEACHERS));
+        ltLectures = JSON.parse(JSON.stringify(MARKSAMER_LECTURES));
+        ltSave();
+      }
     }
 
     /* ════════════════════════════════
@@ -7208,17 +8370,134 @@
        SYSTEM 2: CURRICULUM TREE LOGIC
     ════════════════════════════════ */
     const DEF_CURRIC = {
-      subjects: []
+      subjects: [
+        {
+          id: 'mcs_1789822988231',
+          name: 'تاريخ',
+          emoji: '📖',
+          color: '#3b82f6',
+          units: [
+            {
+              id: 'mcu_1789823142203',
+              term: 1,
+              title: 'الوحده الاولى',
+              lessons: [
+                {
+                  id: 'mcl_1789823809187',
+                  title: 'الدرس الاول: بناء الدولة المصرية واستمرارها عبر التاريخ',
+                  stages: { explain: true, practice: true, rev: true, test: true }
+                },
+                {
+                  id: 'mcl_1789823836603',
+                  title: 'الدرس الثاني: الدولة المصرية القديمة ومقاومة الاحتلال',
+                  stages: { explain: true, practice: true, rev: true, test: true }
+                },
+                {
+                  id: 'mcl_1789823857332',
+                  title: 'الدرس الثالث: التحولات الكبرى في مصر (العصر الوسيط)',
+                  stages: { explain: true, practice: true, rev: false, test: false }
+                },
+                {
+                  id: 'mcl_1789825036835',
+                  title: 'الدرس الثالث: التحولات الكبرى في مصر (العصر الحديث)',
+                  stages: { explain: false, practice: false, rev: false, test: false }
+                }
+              ]
+            },
+            {
+              id: 'mcu_1789823148143',
+              term: 1,
+              title: 'الوحده الثانيه',
+              lessons: [
+                {
+                  id: 'mcl_1789826548915',
+                  title: 'الدرس الأول: سياسات الاحتلال بمصر في العصر الحديث',
+                  stages: { explain: false, practice: false, rev: false, test: false }
+                },
+                {
+                  id: 'mcl_1789826557139',
+                  title: 'الدرس الثاني: صمود الشعب المصري ومقاومة الاحتلال',
+                  stages: { explain: false, practice: false, rev: false, test: false }
+                },
+                {
+                  id: 'mcl_1789826564108',
+                  title: 'الدرس الثالث: ثورة ٢٣ يوليو والتحولات الكبرى في مصر',
+                  stages: { explain: false, practice: false, rev: false, test: false }
+                },
+                {
+                  id: 'mcl_1789826572295',
+                  title: 'الدرس الرابع: الهُوية الوطنية في مواجهة الاستعمار الجديد',
+                  stages: { explain: false, practice: false, rev: false, test: false }
+                }
+              ]
+            },
+            {
+              id: 'mcu_1789823155575',
+              term: 1,
+              title: 'الوحده الثالثه',
+              lessons: [
+                {
+                  id: 'mcl_1789826579887',
+                  title: 'الدرس الأول: حركات التحرر الوطني ضد الاحتلال الفرنسي والإيطالي في العالم العربي',
+                  stages: { explain: false, practice: false, rev: false, test: false }
+                },
+                {
+                  id: 'mcl_1789826585743',
+                  title: 'الدرس الثاني: حركات التحرر الوطني ضد الاحتلال البريطاني والإسباني في العالم العربي',
+                  stages: { explain: false, practice: false, rev: false, test: false }
+                },
+                {
+                  id: 'mcl_1789826591887',
+                  title: 'الدرس الثالث: مرتكزات الدور المصري إقليميًا ودوليًا',
+                  stages: { explain: false, practice: false, rev: false, test: false }
+                },
+                {
+                  id: 'mcl_1789826596823',
+                  title: 'الدرس الرابع: دور مصر في دعم حركات التحرر الوطني',
+                  stages: { explain: false, practice: false, rev: false, test: false }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: 'mcs_1789822982943',
+          name: 'عربي',
+          emoji: '📖',
+          color: '#3b82f6',
+          units: [
+            {
+              id: 'mcu_1789823050915',
+              term: 1,
+              title: 'الوحده الاولى',
+              lessons: [
+                {
+                  id: 'mcl_1789825056027',
+                  title: 'الدرس الاول: العلم بين القانون والضمير',
+                  stages: { explain: true, practice: true, rev: true, test: true }
+                },
+                {
+                  id: 'mcl_1789825074575',
+                  title: 'الدرس الثاني: الخلق جوهر الفضيلة',
+                  stages: { explain: true, practice: true, rev: true, test: true }
+                }
+              ]
+            }
+          ]
+        }
+      ]
     };
 
-    let sCurricData = loadJ('curriculum', DEF_CURRIC);
+    let sCurricData = DEF_CURRIC;
+    saveJ('curriculum', sCurricData);
+    saveJ('bac_curriculum_data', sCurricData);
 
     window.saveCurriculumData = function(curricData) {
       if (curricData) sCurricData = curricData;
       saveJ('curriculum', sCurricData);
       saveJ('bac_curriculum_data', sCurricData);
       
-      if (_sb && _sbUid) {
+      if (_sb && isRealUuid(_sbUid)) {
         _sb.from('schedule_data')
           .upsert({ 
             id: 'curriculum', 
@@ -8120,7 +9399,7 @@
     let _exchangingOAuth = false;
 
     async function handleAuthStateChange(event, session) {
-      const user = session?.user || null;
+      let user = session?.user || null;
       const searchParams = new URLSearchParams(window.location.search);
       const hashParams   = new URLSearchParams(window.location.hash.startsWith('#') ? window.location.hash.substring(1) : window.location.hash);
 
@@ -8138,6 +9417,21 @@
         showAuthErr('خطأ في مصادقة جوجل: ' + msg);
         try { history.replaceState(null, '', window.location.pathname); } catch(e) {}
         return;
+      }
+
+      if (!user) {
+        // TEMPORARY AUTH BYPASS: Create default session if user is not signed in
+        const rawLocal = localStorage.getItem('bac_local_user');
+        let parsedLocal = null;
+        try { parsedLocal = JSON.parse(rawLocal); } catch(e) {}
+        user = {
+          id: 'demo_user_active',
+          email: parsedLocal?.email || 'student@studyhub.demo',
+          user_metadata: {
+            full_name: parsedLocal?.name || 'طالب',
+            role: 'USER'
+          }
+        };
       }
 
       if (user) {
@@ -8166,49 +9460,6 @@
             setTimeout(() => showWelcome(), 800);
           }
         }
-      } else {
-        // If authorization code is in URL but user is not logged in yet, try explicit exchange
-        if (authCode && _sb && !_exchangingOAuth) {
-          _exchangingOAuth = true;
-          showLoader('جاري تسجيل الدخول بحساب Google...');
-
-          try {
-            const { data, error } = await _sb.auth.exchangeCodeForSession(authCode);
-            if (error) {
-              console.error('exchangeCodeForSession error:', error);
-              _exchangingOAuth = false;
-              _sbUid = '';
-              updateUserUI(null);
-              hideLoader();
-              showAuthScreen();
-              showAuthErr('فشل تسجيل الدخول بحساب Google: ' + (error.message || 'رمز الجلسة غير صالح'));
-              try { history.replaceState(null, '', window.location.pathname); } catch(e) {}
-              return;
-            }
-            if (data?.session) {
-              _exchangingOAuth = false;
-              handleAuthStateChange('SIGNED_IN', data.session);
-              return;
-            }
-          } catch(e) {
-            console.error('Exchange catch error:', e);
-            _exchangingOAuth = false;
-            _sbUid = '';
-            updateUserUI(null);
-            hideLoader();
-            showAuthScreen();
-            showAuthErr('حدث خطأ أثناء معالجة تسجيل الدخول بحساب Google');
-            try { history.replaceState(null, '', window.location.pathname); } catch(e) {}
-            return;
-          }
-        }
-
-        if (_exchangingOAuth) return;
-
-        _sbUid = '';
-        updateUserUI(null);
-        hideLoader();
-        showAuthScreen();
       }
     }
 
@@ -8765,7 +10016,7 @@
     async function loadAllDataAndInit() {
       showLoader('جاري تحميل وتزامن بياناتك...');
 
-      const keys = ['columns','template','subjects','events','revision','meta','curriculum'];
+      const keys = ['columns','template','subjects','events','revision','meta','curriculum','planner_v1'];
       const weekKeys = [];
       const wsNow = weekStart(new Date());
       for (let i = -2; i <= 2; i++) {
@@ -8775,7 +10026,7 @@
       const ltKeys = ['lt-teachers','lt-lectures'];
       const allKeys = [...keys, ...weekKeys, ...ltKeys];
 
-      if (_sbUid && window._supabase) {
+      if (isRealUuid(_sbUid) && window._supabase) {
         try {
           const { data, error } = await _sb
             .from('schedule_data')
@@ -8787,6 +10038,9 @@
             // Found existing user data in Supabase -> Cache to localStorage
             data.forEach(row => {
               localStorage.setItem(_lsKey(row.id), JSON.stringify(row.data));
+              if (row.id === 'planner_v1') {
+                localStorage.setItem('planner_v1', JSON.stringify(row.data));
+              }
             });
           } else {
             // New account with no data in Supabase yet -> Start completely empty
@@ -8802,12 +10056,12 @@
     }
 
     async function syncAllToSupabase() {
-      if (!_sbUid || !window._supabase) {
-        showToast('error', 'يجب تسجيل الدخول لمزامنة البيانات سحابياً!');
+      if (!isRealUuid(_sbUid) || !window._supabase) {
+        showToast('error', 'يجب تسجيل الدخول بحساب حقيقي لمزامنة البيانات سحابياً!');
         return;
       }
       showToast('info', '⏳ جاري رفع بياناتك للسحابة...');
-      const keys = ['columns','template','subjects','events','revision','meta','curriculum'];
+      const keys = ['columns','template','subjects','events','revision','meta','curriculum','planner_v1'];
       const weekKeys = [];
       const wsNow = weekStart(new Date());
       for (let i = -2; i <= 2; i++) {
@@ -8904,16 +10158,10 @@
         desc: 'أضف المواد والأبواب والدروس، وتابع نسبة إنجازك للمنهج عبر 4 مراحل (شرح، تمارين، مراجعة، امتحان).',
       },
       {
-        page: 'reports',
-        el: '#page-reports',
-        title: '📊 سجل وتقارير الأداء',
-        desc: 'تقرير شامل عن سلاسل التزامك (Streak)، والمحاضرات المشاهدة، والمهام المنجزة يوم بيوم.',
-      },
-      {
-        page: 'analytics',
-        el: '#page-analytics',
-        title: '🧠 مركز التحليلات الذكية',
-        desc: 'إحصائيات متقدمة تربط كل بياناتك ببعض وتديك توصيات ذكية لتحسين مستواك وتفادي التأخير.',
+        page: 'settings',
+        el: '#tab-settings',
+        title: '⚙️ مركز الإعدادات والتحكم',
+        desc: 'من هنا يمكنك الوصول لكافة التحليلات الذكية، تقارير السجل والأداء، متابعة الأبناء، ولوحة الأدمن من مكان واحد.',
       },
       {
         page: 'sched',
@@ -10851,6 +12099,19 @@
     }
 
   </script>
+
+  <!-- Todolist Module Scripts -->
+  <script src="js/todolist/utils.js"></script>
+  <script src="js/todolist/store.js"></script>
+  <script src="js/todolist/events.js"></script>
+  <script src="js/todolist/data.js"></script>
+  <script src="js/todolist/tasks.js"></script>
+  <script src="js/todolist/projects.js"></script>
+  <script src="js/todolist/calendar.js"></script>
+  <script src="js/todolist/search.js"></script>
+  <script src="js/todolist/settings.js"></script>
+  <script src="js/todolist/ui.js"></script>
+  <script src="js/todolist/app.js"></script>
 </body>
 
 </html>

@@ -1,0 +1,112 @@
+/* layout.css — App shell layout */
+
+.app {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-rows: calc(100vh - 57px);
+  height: calc(100vh - 57px);
+  width: 100% !important;
+  max-width: none !important;
+  flex: 1 1 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.app.sidebar-collapsed {
+  grid-template-columns: var(--sidebar-collapsed-w) 1fr;
+}
+
+/* When details panel is open */
+.app.details-open {
+  grid-template-columns: var(--sidebar-width) 1fr var(--details-width);
+}
+.app.sidebar-collapsed.details-open {
+  grid-template-columns: var(--sidebar-collapsed-w) 1fr var(--details-width);
+}
+
+/* Main content area */
+.main {
+  overflow-y: auto;
+  position: relative;
+  background: var(--bg);
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  flex: 1 1 auto;
+}
+
+/* Views */
+.view {
+  display: none;
+  min-height: 100%;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+.view.active {
+  display: block;
+  width: 100% !important;
+}
+
+.view-inner {
+  max-width: 100% !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: var(--space-6) var(--space-8);
+  box-sizing: border-box;
+}
+
+/* Group label */
+.group-label {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semi);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: var(--space-3);
+  padding-top: var(--space-5);
+}
+
+.task-group { margin-bottom: var(--space-2); }
+
+/* ════════════════════════════════
+   RTL (ARABIC) LAYOUT SUPPORT
+════════════════════════════════ */
+html[dir="rtl"] #page-todo,
+html[lang="ar"] #page-todo {
+  direction: rtl;
+  text-align: right;
+}
+
+html[dir="rtl"] .sidebar,
+html[lang="ar"] .sidebar {
+  border-right: none;
+  border-left: 1px solid var(--border);
+}
+
+html[dir="rtl"] .nav-badge,
+html[lang="ar"] .nav-badge {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+html[dir="rtl"] .project-card-pct,
+html[lang="ar"] .project-card-pct {
+  text-align: left;
+}
+
+html[dir="rtl"] .modal-box,
+html[lang="ar"] .modal-box {
+  text-align: right;
+  direction: rtl;
+}
+
+html[dir="rtl"] .form-input,
+html[dir="rtl"] .form-textarea,
+html[dir="rtl"] .form-select,
+html[lang="ar"] .form-input,
+html[lang="ar"] .form-textarea,
+html[lang="ar"] .form-select {
+  text-align: right;
+  direction: rtl;
+}

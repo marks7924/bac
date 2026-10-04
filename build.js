@@ -46,7 +46,23 @@ htmlFiles.forEach(file => {
   console.log(`✅ ${file} → dist/${file}`);
 });
 
-// Also copy other static files if present
+// Also copy other static files and directories if present
+function copyFolderRecursiveSync(from, to) {
+  if (!fs.existsSync(from)) return;
+  if (!fs.existsSync(to)) fs.mkdirSync(to, { recursive: true });
+  fs.readdirSync(from).forEach(element => {
+    const stat = fs.lstatSync(path.join(from, element));
+    if (stat.isDirectory()) {
+      copyFolderRecursiveSync(path.join(from, element), path.join(to, element));
+    } else {
+      fs.copyFileSync(path.join(from, element), path.join(to, element));
+    }
+  });
+}
+
+copyFolderRecursiveSync(path.join(__dirname, 'css'), path.join(dist, 'css'));
+copyFolderRecursiveSync(path.join(__dirname, 'js'), path.join(dist, 'js'));
+
 const extras = ['baccalaureate-schedule.html', 'lecture-tracker.html', 'schema.sql'];
 extras.forEach(file => {
   const src = path.join(__dirname, file);
