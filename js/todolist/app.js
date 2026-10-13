@@ -10,6 +10,7 @@ const App = (() => {
 
   function navigate(view) {
     currentView = view;
+    try { localStorage.setItem('sh_last_todo_view', view); } catch(e) {}
 
     // Deactivate all views
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -57,7 +58,12 @@ const App = (() => {
   }
 
   function getAppEl() {
-    return document.getElementById('todo-app-shell') || document.getElementById('app') || document.querySelector('.todo-app');
+    const el = document.getElementById('todo-app-shell') || document.getElementById('app') || document.querySelector('.todo-app');
+    // Hide the internal sidebar — navigation is in the Study Hub top nav bar
+    if (el && !el.classList.contains('no-sidebar')) {
+      el.classList.add('no-sidebar');
+    }
+    return el;
   }
 
   function refresh() {
@@ -84,11 +90,11 @@ const App = (() => {
       btn.addEventListener('click', () => navigate(btn.dataset.view));
     });
 
-    // Sidebar toggle
-    document.getElementById('sidebar-toggle')?.addEventListener('click', () => {
-      const appEl = getAppEl();
-      if (appEl) appEl.classList.toggle('sidebar-collapsed');
-    });
+    // Sidebar toggle — disabled: sidebar is permanently hidden, nav is in Study Hub top bar
+    // document.getElementById('sidebar-toggle')?.addEventListener('click', () => {
+    //   const appEl = getAppEl();
+    //   if (appEl) appEl.classList.toggle('sidebar-collapsed');
+    // });
 
     // Study Hub cancel button
     document.getElementById('studyhub-cancel-btn')?.addEventListener('click', () => {
@@ -292,7 +298,9 @@ const App = (() => {
 
     // Initial render
     UI.updateSidebar();
-    navigate('today');
+    if (initialView) {
+      navigate(initialView);
+    }
   }
 
   function getCurrentView() { return currentView; }
@@ -301,6 +309,58 @@ const App = (() => {
   return { init, navigate, refresh, getCurrentView };
 })();
 
-// -- Boot ------------------------------------------------
+document.addEventListener('DOMContentLoaded', () => {
+  // Read saved state BEFORE initializing App (prevents overwriting saved view!)
+  let lastPage = 'todo';
+  let lastTodoView = 'today';
+  let lastProjectId = null;
+  try {
+    lastPage = localStorage.getItem('sh_last_page') || 'todo';
+    lastTodoView = localStorage.getItem('sh_last_todo_view') || 'today';
+    lastProjectId = localStorage.getItem('sh_last_project_id');
+  } catch(e) {}
 
-document.addEventListener('DOMContentLoaded', () => App.init());
+  const outerPages = ['sched', 'lt', 'exams', 'curric', 'settings'];
+
+  if (outerPages.includes(lastPage)) {
+    // Outer page: init App structure without navigating to 'today' (keeps saved view intact!)
+    App.init();
+
+    const restoreOuter = () => {
+      if (typeof window.switchPage === 'function') {
+        window.switchPage(lastPage);
+      }
+    };
+    restoreOuter();
+    setTimeout(restoreOuter, 60);
+    setTimeout(restoreOuter, 250);
+  } else {
+    // Todo page: determine safe view
+    const safeView = ['today', 'projects', 'calendar', 'inbox', 'project-detail'].includes(lastTodoView) ? lastTodoView : 'today';
+
+    if (safeView === 'project-detail' && lastProjectId && Store.getProject(lastProjectId)) {
+      App.init();
+      Projects.openProjectDetail(lastProjectId);
+    } else {
+      App.init(safeView === 'project-detail' ? 'projects' : safeView);
+    }
+
+    const todoPage = document.getElementById('page-todo');
+    if (todoPage) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.g-tab').forEach(t => t.classList.remove('active'));
+      todoPage.classList.add('active');
+    }
+
+    // Activate the correct top-bar tab
+    const tabMap = { today: 'tab-today', projects: 'tab-projects', calendar: 'tab-calendar', 'project-detail': 'tab-projects' };
+    const tabEl = document.getElementById(tabMap[safeView] || 'tab-today');
+    if (tabEl) tabEl.classList.add('active');
+
+    // Render today's lectures if going to today
+    if (safeView === 'today' && typeof window.renderTodayLectures === 'function') {
+      setTimeout(() => window.renderTodayLectures(), 300);
+    }
+  }
+});
+

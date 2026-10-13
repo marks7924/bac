@@ -480,6 +480,72 @@ const UI = (() => {
     }
     inner.appendChild(fields);
 
+    // Task-type specific info section
+    if ((task.taskType === 'video' || task.videoDuration || task.videoLink) && (task.videoLink || task.videoDuration)) {
+      const typeSection = document.createElement('div');
+      typeSection.className = 'detail-notes';
+      typeSection.style.marginBottom = '0';
+      if (task.videoDuration) {
+        const dur = document.createElement('div');
+        dur.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:6px';
+        const formatted = Utils.parseDurationToHM ? Utils.parseDurationToHM(task.videoDuration) : task.videoDuration;
+        dur.innerHTML = `<span style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Duration</span><span style="font-size:13px;font-weight:700;color:var(--accent)">⏱ ${Utils.sanitizeHTML(formatted)}</span>`;
+        typeSection.appendChild(dur);
+      }
+      if (task.videoLink) {
+        const lnk = document.createElement('a');
+        lnk.href = task.videoLink;
+        lnk.target = '_blank';
+        lnk.rel = 'noopener';
+        lnk.style.cssText = 'display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--accent);text-decoration:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;width:100%;box-sizing:border-box;overflow:hidden;white-space:nowrap;text-overflow:ellipsis';
+        lnk.innerHTML = `<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6h8M6 2l4 4-4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg> Open Video`;
+        typeSection.appendChild(lnk);
+      }
+      inner.appendChild(typeSection);
+    }
+
+    const hasHw = task.taskType === 'homework' || (task.hwRanges && task.hwRanges.length) || task.hwPages || task.hwScore;
+    if (hasHw) {
+      const hwSection = document.createElement('div');
+      hwSection.className = 'detail-notes';
+      // Page ranges as chips
+      let ranges = [];
+      if (Array.isArray(task.hwRanges) && task.hwRanges.length) {
+        ranges = task.hwRanges;
+      } else if (task.hwPages) {
+        ranges = typeof task.hwPages === 'string'
+          ? task.hwPages.split(',').map(s => s.trim()).filter(Boolean)
+          : [String(task.hwPages)];
+      }
+      if (ranges.length) {
+        const lbl = document.createElement('div');
+        lbl.className = 'detail-notes-label';
+        lbl.textContent = 'Page Ranges';
+        hwSection.appendChild(lbl);
+        const chips = document.createElement('div');
+        chips.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;margin-top:6px';
+        ranges.forEach(r => {
+          const chip = document.createElement('span');
+          chip.style.cssText = 'background:rgba(245,158,11,0.14);color:#f59e0b;border:1px solid rgba(245,158,11,0.35);border-radius:6px;padding:4px 10px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:4px';
+          chip.textContent = '📖 ' + r;
+          chips.appendChild(chip);
+        });
+        hwSection.appendChild(chips);
+      }
+      if (task.hwScore) {
+        const scoreLbl = document.createElement('div');
+        scoreLbl.className = 'detail-notes-label';
+        scoreLbl.style.marginTop = '10px';
+        scoreLbl.textContent = 'Score';
+        const scoreVal = document.createElement('div');
+        scoreVal.style.cssText = 'font-size:14px;font-weight:800;color:var(--success);margin-top:4px';
+        scoreVal.textContent = '✅ ' + task.hwScore;
+        hwSection.appendChild(scoreLbl);
+        hwSection.appendChild(scoreVal);
+      }
+      if (ranges.length || task.hwScore) inner.appendChild(hwSection);
+    }
+
     // Notes
     const notesSection = document.createElement('div');
     notesSection.className = 'detail-notes';
@@ -545,6 +611,28 @@ const UI = (() => {
 
     actionsRow.appendChild(editBtn);
     if (task.plannedDate !== Utils.todayStr()) actionsRow.appendChild(moveBtn);
+
+    if (task.projectId) {
+      const archiveBtn = document.createElement('button');
+      archiveBtn.className = 'btn-ghost';
+      archiveBtn.style.fontSize = 'var(--text-sm)';
+      archiveBtn.style.padding = '7px 14px';
+      archiveBtn.innerHTML = task.archived ? '↩️ Unarchive' : '📦 Archive';
+      archiveBtn.title = task.archived ? 'Restore task to project' : 'Archive task';
+      archiveBtn.addEventListener('click', () => {
+        if (task.archived) {
+          Store.unarchiveTask(task.id);
+          UI.toast('Task unarchived.');
+        } else {
+          Store.archiveTask(task.id);
+          UI.toast('Task archived.');
+          closeDetails();
+        }
+        App.refresh();
+      });
+      actionsRow.appendChild(archiveBtn);
+    }
+
     actionsRow.appendChild(deleteBtn);
     inner.appendChild(actionsRow);
   }

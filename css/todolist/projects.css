@@ -161,3 +161,140 @@
 }
 .deadline-badge.ok { color: var(--success); background: rgba(127,165,138,0.1); }
 .deadline-badge.soon { color: var(--accent); background: var(--accent-muted); }
+
+/* Projects subtabs (Active vs Archive) */
+.projects-subtabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+.projects-subtab {
+  background: none;
+  border: none;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all var(--transition-fast);
+}
+
+.projects-subtab:hover {
+  color: var(--text-primary);
+  background: var(--surface-muted);
+}
+
+.projects-subtab.active {
+  color: var(--accent);
+  background: var(--accent-muted);
+}
+
+.projects-archive-count-badge {
+  background: var(--accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+}
+
+/* Collapsible Done section in Project Detail */
+.project-done-section {
+  margin-top: var(--space-6);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+.project-done-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--surface);
+  cursor: pointer;
+  user-select: none;
+}
+
+.project-done-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.project-done-chevron {
+  transition: transform 0.2s ease;
+  transform: rotate(-90deg);
+}
+
+.project-done-chevron.open {
+  transform: rotate(0deg);
+}
+
+.project-done-count {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.btn-archive-project-done {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  background: var(--accent-muted);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-archive-project-done:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+.project-done-list {
+  padding: 8px 12px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* Unarchive button in archive list */
+.btn-unarchive-task {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: var(--accent-muted);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.btn-unarchive-task:hover {
+  background: var(--accent);
+  color: #fff;
+}

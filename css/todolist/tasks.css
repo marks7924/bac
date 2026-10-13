@@ -131,6 +131,12 @@
 }
 .task-row:hover .task-project-tag { background: var(--surface-2); }
 
+.task-type-badge {
+  font-size: 13px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
 .task-priority-dot {
   width: 5px;
   height: 5px;

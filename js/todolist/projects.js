@@ -1,5 +1,5 @@
 /**
- * projects.js \u2014 Project views and project modal
+ * projects.js — Project views and project modal
  */
 
 const Projects = (() => {
@@ -7,6 +7,8 @@ const Projects = (() => {
   // -- Project modal --------------------------------------
 
   let editingProjectId = null;
+  let currentSubTab = 'active'; // 'active' | 'archive'
+  let isDoneExpanded = false;
 
   function openCreateModal() {
     editingProjectId = null;
@@ -60,11 +62,29 @@ const Projects = (() => {
   }
 
   function initModal() {
-    document.getElementById('project-form').addEventListener('submit', onFormSubmit);
-    document.getElementById('project-modal-close').addEventListener('click', closeModal);
-    document.getElementById('project-modal-cancel').addEventListener('click', closeModal);
-    document.getElementById('project-modal').addEventListener('click', e => {
+    document.getElementById('project-form')?.addEventListener('submit', onFormSubmit);
+    document.getElementById('project-modal-close')?.addEventListener('click', closeModal);
+    document.getElementById('project-modal-cancel')?.addEventListener('click', closeModal);
+    document.getElementById('project-modal')?.addEventListener('click', e => {
       if (e.target === e.currentTarget) closeModal();
+    });
+
+    // Subtabs in main projects view
+    document.getElementById('tab-projects-active')?.addEventListener('click', () => {
+      switchProjectsSubTab('active');
+    });
+    document.getElementById('tab-projects-archive')?.addEventListener('click', () => {
+      switchProjectsSubTab('archive');
+    });
+    document.getElementById('btn-unarchive-all-tasks')?.addEventListener('click', () => {
+      const count = Store.unarchiveAllTasks();
+      UI.toast(`${count} task(s) unarchived.`);
+      renderProjectsList();
+    });
+
+    document.getElementById('back-to-projects')?.addEventListener('click', () => {
+      try { localStorage.removeItem('sh_last_project_id'); } catch(e) {}
+      App.navigate('projects');
     });
   }
 
@@ -84,20 +104,148 @@ const Projects = (() => {
     const grid = document.getElementById('projects-grid');
     const empty = document.getElementById('projects-empty');
     const projects = Store.getProjects();
-    grid.innerHTML = '';
+    if (grid) grid.innerHTML = '';
 
     if (!projects.length) {
-      empty.style.display = 'block';
-      grid.style.display = 'none';
+      if (empty) empty.style.display = 'block';
+      if (grid) grid.style.display = 'none';
+    } else {
+      if (empty) empty.style.display = 'none';
+      if (grid) {
+        grid.style.display = 'flex';
+        projects.forEach(proj => {
+          const card = buildProjectCard(proj);
+          grid.appendChild(card);
+        });
+      }
+    }
+
+    // Render Archive Tab & Counter Badge
+    renderArchiveList();
+    switchProjectsSubTab(currentSubTab);
+  }
+
+  function renderArchiveList() {
+    const archiveList = document.getElementById('projects-archive-list');
+    const archiveEmpty = document.getElementById('projects-archive-empty');
+    const unarchiveAllBtn = document.getElementById('btn-unarchive-all-tasks');
+    const badge = document.getElementById('projects-archive-count');
+
+    const archivedTasks = Store.getArchivedTasks();
+    if (badge) badge.textContent = archivedTasks.length;
+
+    if (!archiveList) return;
+    archiveList.innerHTML = '';
+
+    if (!archivedTasks.length) {
+      if (archiveEmpty) archiveEmpty.style.display = 'block';
+      if (unarchiveAllBtn) unarchiveAllBtn.style.display = 'none';
       return;
     }
-    empty.style.display = 'none';
-    grid.style.display = 'flex';
 
-    projects.forEach(proj => {
-      const card = buildProjectCard(proj);
-      grid.appendChild(card);
+    if (archiveEmpty) archiveEmpty.style.display = 'none';
+    if (unarchiveAllBtn) unarchiveAllBtn.style.display = 'inline-flex';
+
+    archivedTasks.forEach(task => {
+      const isDone = task.status === 'completed';
+      const row = document.createElement('li');
+      row.className = `task-row${isDone ? ' completed' : ''}`;
+      row.dataset.id = task.id;
+
+      // Check indicator
+      const check = document.createElement('div');
+      check.className = isDone ? 'task-check done' : 'task-check';
+      check.style.cursor = 'default';
+      check.setAttribute('aria-hidden', 'true');
+      if (isDone) {
+        check.innerHTML = `<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+      }
+
+      // Body
+      const body = document.createElement('div');
+      body.className = 'task-body';
+
+      const title = document.createElement('span');
+      title.className = 'task-title';
+      title.textContent = task.title;
+      body.appendChild(title);
+
+      const meta = document.createElement('div');
+      meta.className = 'task-meta';
+
+      const statusBadge = document.createElement('span');
+      statusBadge.className = 'task-type-badge';
+      if (isDone) {
+        statusBadge.style.cssText = 'background:rgba(16,185,129,.14);color:#10b981;font-size:10px;border-radius:4px;padding:2px 6px;font-weight:700';
+        statusBadge.textContent = '✅ Completed';
+      } else {
+        statusBadge.style.cssText = 'background:rgba(245,158,11,.14);color:#f59e0b;font-size:10px;border-radius:4px;padding:2px 6px;font-weight:700';
+        statusBadge.textContent = '⏳ Undone';
+      }
+      meta.appendChild(statusBadge);
+
+      if (task.projectId) {
+        const proj = Store.getProject(task.projectId);
+        if (proj) {
+          const tag = document.createElement('span');
+          tag.className = 'task-project-tag';
+          tag.textContent = '📁 ' + proj.name;
+          meta.appendChild(tag);
+        }
+      }
+
+      if (isDone && task.completedAt) {
+        const d = new Date(task.completedAt);
+        const compDate = document.createElement('span');
+        compDate.className = 'task-time';
+        compDate.textContent = 'Completed ' + d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        meta.appendChild(compDate);
+      } else if (task.plannedDate) {
+        const planDate = document.createElement('span');
+        planDate.className = 'task-time';
+        planDate.textContent = 'Due ' + Utils.formatDisplayDate(task.plannedDate);
+        meta.appendChild(planDate);
+      }
+
+      body.appendChild(meta);
+
+      // Actions: Unarchive button
+      const actions = document.createElement('div');
+      actions.className = 'task-actions';
+      actions.style.opacity = '1';
+
+      const unarchiveBtn = document.createElement('button');
+      unarchiveBtn.className = 'btn-unarchive-task';
+      unarchiveBtn.innerHTML = `↩️ Unarchive`;
+      unarchiveBtn.title = 'Unarchive and restore to project';
+      unarchiveBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        Store.unarchiveTask(task.id);
+        UI.toast('Task unarchived.');
+        renderProjectsList();
+      });
+
+      actions.appendChild(unarchiveBtn);
+
+      row.appendChild(check);
+      row.appendChild(body);
+      row.appendChild(actions);
+      archiveList.appendChild(row);
     });
+  }
+
+  function switchProjectsSubTab(tab) {
+    currentSubTab = tab;
+    const activeBtn = document.getElementById('tab-projects-active');
+    const archiveBtn = document.getElementById('tab-projects-archive');
+    const activeCont = document.getElementById('projects-active-container');
+    const archiveCont = document.getElementById('projects-archive-container');
+
+    if (activeBtn) activeBtn.classList.toggle('active', tab === 'active');
+    if (archiveBtn) archiveBtn.classList.toggle('active', tab === 'archive');
+
+    if (activeCont) activeCont.style.display = (tab === 'active') ? 'block' : 'none';
+    if (archiveCont) archiveCont.style.display = (tab === 'archive') ? 'block' : 'none';
   }
 
   function buildProjectCard(proj) {
@@ -123,7 +271,7 @@ const Projects = (() => {
 
     let dateRange = '';
     if (proj.startDate && proj.deadline) {
-      dateRange = `${Utils.formatShortDate(proj.startDate)} \u2014 ${Utils.formatShortDate(proj.deadline)}`;
+      dateRange = `${Utils.formatShortDate(proj.startDate)} — ${Utils.formatShortDate(proj.deadline)}`;
     } else if (proj.deadline) {
       dateRange = (isAr ? 'ينتهي في ' : 'Due ') + Utils.formatShortDate(proj.deadline);
     }
@@ -189,6 +337,7 @@ const Projects = (() => {
 
   function openProjectDetail(projectId) {
     currentProjectId = projectId;
+    try { localStorage.setItem('sh_last_project_id', projectId); } catch(e) {}
     App.navigate('project-detail');
     renderProjectDetail(projectId);
   }
@@ -198,7 +347,10 @@ const Projects = (() => {
     if (!proj) return;
 
     const { total, completed, pct } = Store.getProjectProgress(projectId);
-    const tasks = Store.getTasksForProject(projectId);
+    // Non-archived tasks of this project
+    const tasks = Store.getTasksForProject(projectId, false);
+    const activeTasks = tasks.filter(t => t.status !== 'completed');
+    const doneTasks = tasks.filter(t => t.status === 'completed');
 
     // Header
     const header = document.getElementById('project-detail-header');
@@ -212,7 +364,7 @@ const Projects = (() => {
 
     let dateRange = '';
     if (proj.startDate && proj.deadline) {
-      dateRange = `${Utils.formatShortDate(proj.startDate)} \u2014 ${Utils.formatShortDate(proj.deadline)}`;
+      dateRange = `${Utils.formatShortDate(proj.startDate)} — ${Utils.formatShortDate(proj.deadline)}`;
     } else if (proj.deadline) {
       dateRange = `Due ${Utils.formatShortDate(proj.deadline)}`;
     }
@@ -221,7 +373,7 @@ const Projects = (() => {
       <div class="project-detail-name">${Utils.sanitizeHTML(proj.name)}</div>
       ${proj.description ? `<div class="project-card-desc" style="margin-bottom:12px">${Utils.sanitizeHTML(proj.description)}</div>` : ''}
       <div class="project-detail-meta">
-        ${dateRange}${deadlineStr ? ` \u00b7 ${deadlineStr}` : ''}
+        ${dateRange}${deadlineStr ? ` · ${deadlineStr}` : ''}
       </div>
       <div class="project-detail-stats">
         <div>
@@ -245,15 +397,14 @@ const Projects = (() => {
       </div>
     `;
 
-    // Body \u2014 group tasks by date
+    // Body — group active tasks by date
     const body = document.getElementById('project-detail-body');
     body.innerHTML = '';
 
-    // Sort tasks: dated first (by date), then undated
-    const dated = tasks.filter(t => t.plannedDate).sort((a,b) => a.plannedDate.localeCompare(b.plannedDate));
-    const undated = tasks.filter(t => !t.plannedDate);
+    const dated = activeTasks.filter(t => t.plannedDate).sort((a,b) => a.plannedDate.localeCompare(b.plannedDate));
+    const undated = activeTasks.filter(t => !t.plannedDate);
 
-    // Group by date
+    // Group active dated tasks
     const dateGroups = {};
     dated.forEach(t => {
       if (!dateGroups[t.plannedDate]) dateGroups[t.plannedDate] = [];
@@ -292,7 +443,7 @@ const Projects = (() => {
       const list = document.createElement('ul');
       list.className = 'task-list';
       dateTasks.forEach(task => {
-        list.appendChild(Tasks.buildTaskRow(task, { showProject: false }));
+        list.appendChild(Tasks.buildTaskRow(task, { showProject: false, showArchiveBtn: true }));
       });
       group.appendChild(list);
       body.appendChild(group);
@@ -330,10 +481,68 @@ const Projects = (() => {
       const list = document.createElement('ul');
       list.className = 'task-list';
       undated.forEach(task => {
-        list.appendChild(Tasks.buildTaskRow(task, { showProject: false, showDate: false }));
+        list.appendChild(Tasks.buildTaskRow(task, { showProject: false, showDate: false, showArchiveBtn: true }));
       });
       unscheduledWrap.appendChild(list);
       body.appendChild(unscheduledWrap);
+    }
+
+    // ── COLLAPSIBLE DONE TASKS SECTION ──
+    if (doneTasks.length > 0) {
+      const doneSection = document.createElement('div');
+      doneSection.className = 'project-done-section';
+      doneSection.id = 'project-done-section';
+
+      const doneHeader = document.createElement('div');
+      doneHeader.className = 'project-done-header';
+
+      const toggleBtn = document.createElement('button');
+      toggleBtn.type = 'button';
+      toggleBtn.className = 'project-done-toggle';
+      toggleBtn.setAttribute('aria-expanded', isDoneExpanded ? 'true' : 'false');
+      toggleBtn.innerHTML = `
+        <svg class="project-done-chevron${isDoneExpanded ? ' open' : ''}" width="12" height="12" viewBox="0 0 10 10" fill="none">
+          <path d="M2 4l3 3 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Completed</span>
+        <span class="project-done-count">(${doneTasks.length})</span>
+      `;
+
+      const archiveDoneBtn = document.createElement('button');
+      archiveDoneBtn.type = 'button';
+      archiveDoneBtn.className = 'btn-archive-project-done';
+      archiveDoneBtn.innerHTML = `📦 Archive Done (${doneTasks.length})`;
+      archiveDoneBtn.title = 'Archive all done tasks in this project';
+      archiveDoneBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const count = Store.archiveDoneTasks(projectId);
+        UI.toast(`${count} done task(s) archived.`);
+        renderProjectDetail(projectId);
+      });
+
+      doneHeader.appendChild(toggleBtn);
+      doneHeader.appendChild(archiveDoneBtn);
+
+      const doneList = document.createElement('ul');
+      doneList.className = 'task-list project-done-list';
+      doneList.style.display = isDoneExpanded ? 'block' : 'none';
+
+      doneTasks.forEach(task => {
+        doneList.appendChild(Tasks.buildTaskRow(task, { showProject: false, showArchiveBtn: true }));
+      });
+
+      doneHeader.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-archive-project-done')) return;
+        isDoneExpanded = !isDoneExpanded;
+        doneList.style.display = isDoneExpanded ? 'block' : 'none';
+        toggleBtn.setAttribute('aria-expanded', isDoneExpanded ? 'true' : 'false');
+        const chevron = doneHeader.querySelector('.project-done-chevron');
+        if (chevron) chevron.classList.toggle('open', isDoneExpanded);
+      });
+
+      doneSection.appendChild(doneHeader);
+      doneSection.appendChild(doneList);
+      body.appendChild(doneSection);
     }
 
     if (!tasks.length) {
@@ -344,9 +553,12 @@ const Projects = (() => {
     }
 
     // Add task button
-    document.getElementById('add-task-project').onclick = () => {
-      Tasks.openCreateModal({ projectId });
-    };
+    const addBtn = document.getElementById('add-task-project');
+    if (addBtn) {
+      addBtn.onclick = () => {
+        Tasks.openCreateModal({ projectId });
+      };
+    }
   }
 
   function getCurrentProjectId() { return currentProjectId; }

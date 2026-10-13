@@ -358,6 +358,151 @@
       font-size: 14px;
     }
 
+    .g-tab-icon {
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+    }
+
+    .g-tab-badge {
+      background: var(--blue);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 1px 5px;
+      border-radius: 10px;
+      min-width: 16px;
+      text-align: center;
+      display: none;
+    }
+
+    /* TODAY'S LECTURES SECTION */
+    .today-lectures-wrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .today-lectures-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .today-lectures-title {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .today-lec-count {
+      background: rgba(99,102,241,0.12);
+      color: #6366f1;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 20px;
+    }
+
+    .today-lec-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .today-lec-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border2);
+      transition: background 0.15s;
+    }
+
+    .today-lec-item:last-child {
+      border-bottom: none;
+    }
+
+    .today-lec-item.watched {
+      opacity: 0.55;
+    }
+
+    .today-lec-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .today-lec-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .today-lec-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .today-lec-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 2px;
+    }
+
+    .today-lec-meta span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .today-lec-link {
+      width: 28px;
+      height: 28px;
+      background: rgba(99,102,241,0.12);
+      color: #6366f1;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      text-decoration: none;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+
+    .today-lec-link:hover {
+      background: rgba(99,102,241,0.22);
+    }
+
+    .today-lec-done {
+      color: #22c55e;
+      font-size: 16px;
+    }
+
+    .today-lec-pending {
+      color: var(--text3);
+      font-size: 16px;
+    }
+
     /* SETTINGS ICON BUTTON IN NAVBAR */
     .settings-btn {
       width: 38px;
@@ -2391,9 +2536,83 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 24px;
+      margin-bottom: 12px;
       flex-wrap: wrap;
     }
+
+    /* ── Fixed Exam Filter Bar ── */
+    .ex-filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      flex-wrap: wrap;
+      background: var(--card);
+      border: 1px solid var(--border2);
+      border-radius: var(--r);
+      padding: 8px 12px;
+      margin-bottom: 18px;
+      gap: 0;
+      row-gap: 6px;
+    }
+    .ex-filter-group {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    .ex-filter-label {
+      font-size: 12px;
+      color: var(--text3);
+      padding: 0 6px 0 2px;
+      opacity: .6;
+    }
+    .ex-filter-divider {
+      width: 1px;
+      height: 22px;
+      background: var(--border2);
+      margin: 0 10px;
+      flex-shrink: 0;
+    }
+    .ex-chip {
+      background: var(--card2);
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text2);
+      cursor: pointer;
+      transition: background .15s, color .15s, border-color .15s;
+      white-space: nowrap;
+    }
+    .ex-chip:hover { background: var(--border2); color: var(--text); }
+    .ex-chip.active {
+      background: var(--blue2);
+      border-color: var(--blue2);
+      color: #fff;
+    }
+    /* Grade chip specific active colors */
+    #ex-g-fail.active    { background: var(--red);  border-color: var(--red);  color:#fff }
+    #ex-g-pass.active    { background: var(--gold); border-color: var(--gold); color:#fff }
+    #ex-g-good.active    { background: var(--blue2);border-color: var(--blue2);color:#fff }
+    #ex-g-excel.active   { background: #9b87f5;     border-color: #9b87f5;     color:#fff }
+    #ex-g-full.active    { background: var(--green); border-color: var(--green); color:#fff }
+
+    /* ── Permanently hide todo sidebar (navigation is in study hub top bar) ── */
+    #todo-app-shell.no-sidebar > .sidebar,
+    .no-sidebar > #sidebar {
+      display: none !important;
+      width: 0 !important;
+      overflow: hidden !important;
+      pointer-events: none !important;
+    }
+    #todo-app-shell.no-sidebar {
+      grid-template-columns: 1fr !important;
+    }
+    #todo-app-shell.no-sidebar.details-open {
+      grid-template-columns: 1fr var(--details-width) !important;
+    }
+
 
     .ex-radar {
       background: linear-gradient(135deg, rgba(239, 68, 68, 0.14), rgba(99, 102, 241, 0.14));
@@ -4358,9 +4577,10 @@
       </div>
     </div>
     <nav class="g-nav">
-      <button class="g-tab active" id="tab-sched" onclick="switchPage('sched')">
-        <i class="fa-solid fa-calendar-week"></i>
-        <span id="tab-sched-txt">الجدول الأسبوعي</span>
+      <button class="g-tab active" id="tab-today" onclick="switchToTodoView('today')">
+        <svg class="g-tab-icon" width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="2" y="2" width="11" height="11" rx="1.5" stroke="currentColor" stroke-width="1.2"></rect><path d="M5 2V1M10 2V1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"></path><path d="M2 5.5h11" stroke="currentColor" stroke-width="1.1"></path></svg>
+        <span id="tab-today-txt">Today</span>
+        <span class="g-tab-badge" id="main-today-badge"></span>
       </button>
       <button class="g-tab" id="tab-lt" onclick="switchPage('lt')">
         <i class="fa-solid fa-video"></i>
@@ -4370,13 +4590,13 @@
         <i class="fa-solid fa-calendar-check"></i>
         <span id="s-exams">امتحانات</span>
       </button>
-      <button class="g-tab" id="tab-curric" onclick="switchPage('curric')">
-        <i class="fa-solid fa-book-bookmark"></i>
-        <span id="s-curric">منهج</span>
+      <button class="g-tab" id="tab-projects" onclick="switchToTodoView('projects')">
+        <svg class="g-tab-icon" width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="1.5" y="1.5" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.2"></rect><rect x="8" y="1.5" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.2"></rect><rect x="1.5" y="8" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.2"></rect><rect x="8" y="8" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.2"></rect></svg>
+        <span id="tab-projects-txt">Projects</span>
       </button>
-      <button class="g-tab" id="tab-todo" onclick="switchPage('todo')">
-        <i class="fa-solid fa-list-check"></i>
-        <span id="s-todo">المهام والإنتاجية</span>
+      <button class="g-tab" id="tab-calendar" onclick="switchToTodoView('calendar')">
+        <svg class="g-tab-icon" width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="1.5" y="2.5" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.2"></rect><path d="M5 2V1M10 2V1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"></path><path d="M1.5 6h12" stroke="currentColor" stroke-width="1.1"></path></svg>
+        <span id="tab-calendar-txt">Calendar</span>
       </button>
     </nav>
     <div class="g-actions">
@@ -4439,8 +4659,8 @@
       <button class="g-btn" onclick="toggleMobileNav(event)" style="padding:4px 8px;font-size:16px;">✕</button>
     </div>
     <div class="g-mobile-drawer-body">
-      <button class="g-mobile-nav-item" onclick="switchPage('sched')">
-        <i class="fa-solid fa-calendar-week"></i> <span id="md-sched-txt">الجدول الأسبوعي</span>
+      <button class="g-mobile-nav-item" onclick="switchToTodoView('today')">
+        <i class="fa-regular fa-calendar-day"></i> <span>Today</span>
       </button>
       <button class="g-mobile-nav-item" onclick="switchPage('lt')">
         <i class="fa-solid fa-video"></i> <span id="md-lt-txt">متابع المحاضرات</span>
@@ -4448,11 +4668,11 @@
       <button class="g-mobile-nav-item" onclick="switchPage('exams')">
         <i class="fa-solid fa-calendar-check"></i> <span id="md-exams-txt">الامتحانات</span>
       </button>
-      <button class="g-mobile-nav-item" onclick="switchPage('curric')">
-        <i class="fa-solid fa-book-bookmark"></i> <span id="md-curric-txt">المنهج والمواد</span>
+      <button class="g-mobile-nav-item" onclick="switchToTodoView('projects')">
+        <i class="fa-solid fa-grid-2"></i> <span>Projects</span>
       </button>
-      <button class="g-mobile-nav-item" onclick="switchPage('todo')">
-        <i class="fa-solid fa-list-check"></i> <span id="md-todo-txt">المهام والإنتاجية</span>
+      <button class="g-mobile-nav-item" onclick="switchToTodoView('calendar')">
+        <i class="fa-regular fa-calendar"></i> <span>Calendar</span>
       </button>
       <button class="g-mobile-nav-item" onclick="switchPage('settings')">
         <i class="fa-solid fa-gear"></i> <span id="md-settings-txt">الإعدادات والتحكم</span>
@@ -4463,7 +4683,7 @@
   <!-- ══════════════════════════════════════════
      PAGE 1: WEEKLY SCHEDULE
 ══════════════════════════════════════════ -->
-  <div class="page active" id="page-sched">
+  <div class="page" id="page-sched">
     <div class="sched-wrap">
 
       <!-- Sub toolbar -->
@@ -4659,15 +4879,34 @@
         </div>
       </div>
 
-      <!-- Actions & Filter -->
+      <!-- Actions bar -->
       <div class="ex-top-bar">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
           <button class="s-btn accent admin-only" onclick="exAddPrompt(this)"><i class="fa-solid fa-plus"></i> <span id="ex-btn-add-txt">إضافة امتحان جديد</span></button>
         </div>
-        <div class="lt-tabs">
-          <button class="lt-tab active" id="ex-f-all" onclick="exSetFilter('all')"><i class="fa-solid fa-layer-group"></i> <span id="ex-f-all-txt">الكل</span></button>
-          <button class="lt-tab" id="ex-f-upcoming" onclick="exSetFilter('upcoming')"><i class="fa-solid fa-clock"></i> <span id="ex-f-upcoming-txt">القادمة</span></button>
-          <button class="lt-tab" id="ex-f-done" onclick="exSetFilter('done')"><i class="fa-solid fa-check-circle"></i> <span id="ex-f-done-txt">المكتملة</span></button>
+      </div>
+      <!-- Fixed Exam Filter Bar -->
+
+      <div class="ex-filter-bar" id="ex-filter-bar">
+        <div class="ex-filter-group">
+          <span class="ex-filter-label"><i class="fa-solid fa-layer-group"></i></span>
+          <button class="ex-chip active" id="ex-f-all" onclick="exSetFilter('all')"><span id="ex-f-all-txt">All</span></button>
+          <button class="ex-chip" id="ex-f-upcoming" onclick="exSetFilter('upcoming')"><i class="fa-solid fa-clock"></i> <span id="ex-f-upcoming-txt">Upcoming</span></button>
+          <button class="ex-chip" id="ex-f-done" onclick="exSetFilter('done')"><i class="fa-solid fa-check-circle"></i> <span id="ex-f-done-txt">Done</span></button>
+        </div>
+        <div class="ex-filter-divider"></div>
+        <div class="ex-filter-group" id="ex-subject-chips">
+          <span class="ex-filter-label"><i class="fa-solid fa-tag"></i></span>
+          <!-- populated by JS -->
+        </div>
+        <div class="ex-filter-divider"></div>
+        <div class="ex-filter-group">
+          <span class="ex-filter-label"><i class="fa-solid fa-chart-simple"></i></span>
+          <button class="ex-chip ex-g-chip" id="ex-g-fail"    onclick="exSetGradeFilter('fail')"    title="Less than 50%">Fail &lt;50%</button>
+          <button class="ex-chip ex-g-chip" id="ex-g-pass"    onclick="exSetGradeFilter('pass')"    title="50% to 64%">Pass 50-64%</button>
+          <button class="ex-chip ex-g-chip" id="ex-g-good"    onclick="exSetGradeFilter('good')"    title="65% to 79%">Good 65-79%</button>
+          <button class="ex-chip ex-g-chip" id="ex-g-excel"   onclick="exSetGradeFilter('excellent')" title="80% to 94%">Excellent 80-94%</button>
+          <button class="ex-chip ex-g-chip" id="ex-g-full"    onclick="exSetGradeFilter('full')"    title="95% and above">Full Mark 95%+</button>
         </div>
       </div>
 
@@ -4947,7 +5186,7 @@
   ══════════════════════════════════════════ -->
   <div class="page" id="page-todo">
     <!-- APP SHELL -->
-    <div id="todo-app-shell" class="app todo-app">
+    <div id="todo-app-shell" class="app todo-app no-sidebar">
 
       <!-- SIDEBAR -->
       <aside id="sidebar" class="sidebar" role="navigation" aria-label="Main navigation">
@@ -5024,7 +5263,6 @@
               <div class="today-date-line">
                 <h1 class="today-date-serif" id="today-date-heading"></h1>
               </div>
-              <p class="today-greeting" id="today-greeting"></p>
             </header>
 
             <!-- Overdue section -->
@@ -5081,6 +5319,10 @@
               <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v11M1 6.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               Add task
             </button>
+
+            <!-- TODAY'S LECTURES FROM SCHEDULE -->
+            <div id="today-lectures-section" style="margin-top:16px"></div>
+
           </div>
         </section>
 
@@ -5209,14 +5451,44 @@
         <!-- PROJECTS VIEW -->
         <section id="view-projects" class="view" aria-label="Projects">
           <div class="view-inner">
-            <header class="page-header">
-              <h1 class="page-title">Projects</h1>
-              <button class="text-btn" id="create-project-btn">+ New project</button>
+            <header class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+              <div>
+                <h1 class="page-title">Projects</h1>
+                <p class="page-sub">Organize tasks by project or goal.</p>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px">
+                <button class="text-btn" id="create-project-btn">+ New project</button>
+              </div>
             </header>
-            <div class="projects-grid" id="projects-grid"></div>
-            <div id="projects-empty" class="empty-state" style="display:none">
-              <p class="empty-title">No projects yet.</p>
-              <p class="empty-sub">Create a project to organize related tasks.</p>
+
+            <div class="projects-subtabs" id="projects-subtabs">
+              <button class="projects-subtab active" id="tab-projects-active">
+                <span>Active Projects</span>
+              </button>
+              <button class="projects-subtab" id="tab-projects-archive">
+                <span>📦 Archive</span>
+                <span class="projects-archive-count-badge" id="projects-archive-count">0</span>
+              </button>
+            </div>
+
+            <div id="projects-active-container">
+              <div class="projects-grid" id="projects-grid"></div>
+              <div id="projects-empty" class="empty-state" style="display:none">
+                <p class="empty-title">No projects yet.</p>
+                <p class="empty-sub">Create a project to organize related tasks.</p>
+              </div>
+            </div>
+
+            <div id="projects-archive-container" style="display:none">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                <span style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Archived Completed Tasks</span>
+                <button type="button" class="btn-archive-project-done" id="btn-unarchive-all-tasks" style="display:none">↩️ Unarchive All</button>
+              </div>
+              <ul class="task-list" id="projects-archive-list"></ul>
+              <div id="projects-archive-empty" class="empty-state" style="display:none">
+                <p class="empty-title">No archived tasks.</p>
+                <p class="empty-sub">Tasks archived from your projects will appear here so you can unarchive them anytime.</p>
+              </div>
             </div>
           </div>
         </section>
@@ -5293,6 +5565,102 @@
           </button>
         </div>
         <form id="task-form" novalidate>
+          <!-- TASK TYPE SELECTOR -->
+          <div class="form-field" id="task-type-field">
+            <label class="form-label">Task Type</label>
+            <div class="task-type-chips" id="task-type-chips" role="radiogroup">
+              <label class="task-type-chip" title="General task">
+                <input type="radio" name="task-type" value="general" checked />
+                <span>📄 General</span>
+              </label>
+              <label class="task-type-chip" title="Video lecture">
+                <input type="radio" name="task-type" value="video" />
+                <span>🎥 Video</span>
+              </label>
+              <label class="task-type-chip" title="Homework">
+                <input type="radio" name="task-type" value="homework" />
+                <span>📝 Homework</span>
+              </label>
+              <label class="task-type-chip" title="Revision">
+                <input type="radio" name="task-type" value="revision" />
+                <span>🔄 Revision</span>
+              </label>
+              <label class="task-type-chip" title="Sheet">
+                <input type="radio" name="task-type" value="sheet" />
+                <span>📑 Sheet</span>
+              </label>
+              <label class="task-type-chip" title="Exam">
+                <input type="radio" name="task-type" value="exam" />
+                <span>📊 Exam</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- VIDEO FIELDS -->
+          <div class="task-type-extra" id="type-extra-video" style="display:none">
+            <div class="form-field">
+              <label class="form-label" for="task-video-link">Video Link</label>
+              <input class="form-input" id="task-video-link" type="url" placeholder="https://youtube.com/..." />
+            </div>
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label" for="task-video-duration-select">Duration (from list)</label>
+                <select class="form-input" id="task-video-duration-select">
+                  <option value="">— Pick —</option>
+                  <option value="15">15 min</option>
+                  <option value="30">30 min</option>
+                  <option value="45">45 min</option>
+                  <option value="60">1 hr</option>
+                  <option value="90">1 hr 30 min</option>
+                  <option value="120">2 hrs</option>
+                  <option value="150">2 hrs 30 min</option>
+                  <option value="180">3 hrs</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="task-video-duration">Custom Duration</label>
+                <input class="form-input" id="task-video-duration" type="text" placeholder="e.g. 1:45:00 or 50m" />
+              </div>
+            </div>
+          </div>
+
+          <!-- HOMEWORK FIELDS -->
+          <div class="task-type-extra" id="type-extra-homework" style="display:none">
+            <div class="form-field">
+              <label class="form-label">Page Ranges</label>
+              <div class="hw-ranges-wrap">
+                <div class="hw-ranges-tags" id="hw-ranges-tags"></div>
+                <div style="display:flex;gap:6px;margin-top:6px">
+                  <input class="form-input" id="hw-range-input" type="text" placeholder="e.g. p5-12" style="flex:1" />
+                  <button type="button" class="btn-sm" id="hw-range-add-btn" onclick="hwAddRange()" style="padding:6px 12px;border-radius:var(--radius-sm);background:var(--accent-muted);color:var(--accent);border:1px solid var(--accent);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">+ Add</button>
+                </div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Press Enter or click Add after each range. Example: p1-15, p20-35</div>
+              </div>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="task-hw-score">Score (optional)</label>
+              <input class="form-input" id="task-hw-score" type="text" placeholder="e.g. 18/20" style="max-width:140px" />
+            </div>
+          </div>
+
+          <!-- EXAM FIELDS -->
+          <div class="task-type-extra" id="type-extra-exam" style="display:none">
+            <div class="form-row">
+              <div class="form-field">
+                <label class="form-label" for="task-exam-score">Achieved Score</label>
+                <input class="form-input" id="task-exam-score" type="text" placeholder="e.g. 45/50" style="max-width:110px" />
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="task-exam-location">Location</label>
+                <select class="form-input" id="task-exam-location">
+                  <option value="school">School</option>
+                  <option value="online">Online</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
           <div class="form-field">
             <label class="form-label" for="task-title-input">What needs to be done?</label>
             <input class="form-input task-title-input" id="task-title-input" type="text" placeholder="Task title..." autocomplete="off" required />
@@ -5841,6 +6209,67 @@
     </div>
   </div>
 
+  <!-- ══ LECTURE DETAIL PANEL MODAL ══ -->
+  <div id="mod-lec-detail" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:16px" onclick="if(event.target===this)closeLecDetail()">
+    <div id="ld-header-color" style="background:var(--surface);border-radius:16px;width:100%;max-width:560px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;border-left:4px solid var(--accent)" onclick="event.stopPropagation()">
+      <!-- Header -->
+      <div style="padding:18px 20px 12px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between">
+        <div>
+          <div id="ld-title" style="font-size:16px;font-weight:800;color:var(--text-primary);margin-bottom:3px">Lecture Title</div>
+          <div id="ld-sub" style="font-size:12px;color:var(--text-muted)">Teacher • Date</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button id="ld-watch-btn" onclick="ldToggleWatch()" style="border:none;padding:6px 14px;border-radius:8px;color:#fff;font-size:12px;font-weight:700;cursor:pointer">Mark Watched</button>
+          <button onclick="closeLecDetail()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;line-height:1;padding:2px">&times;</button>
+        </div>
+      </div>
+
+      <!-- Scrollable body -->
+      <div style="flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:14px">
+
+        <!-- Fields row -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Lecture Time</label>
+            <input id="ld-time" type="text" class="f-inp" placeholder="e.g. 8:00 AM – 9:30 AM" style="margin-top:4px">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Video Link</label>
+            <input id="ld-link" type="url" class="f-inp" placeholder="https://..." style="margin-top:4px">
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em">Homework / Notes</label>
+          <textarea id="ld-hw" rows="2" placeholder="Homework, pages to read, tasks..." style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text-primary);font-size:13px;margin-top:4px;resize:vertical;font-family:inherit"></textarea>
+        </div>
+
+        <!-- Completion checklist -->
+        <div style="background:var(--bg);border-radius:10px;border:1px solid var(--border);overflow:hidden">
+          <div style="padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <span style="font-size:13px;font-weight:700;color:var(--text-primary)"><i class="fa-solid fa-list-check" style="color:var(--accent);margin-right:6px"></i>Items &amp; Checklist</span>
+            <span id="ld-pct-label" style="font-size:12px;font-weight:700">0/0 done — 0%</span>
+          </div>
+          <div style="padding:4px 0;height:3px;background:var(--border)"><div id="ld-pct-bar" style="height:100%;width:0%;background:var(--accent);transition:width .3s"></div></div>
+          <div id="ld-items-list" style="min-height:40px"></div>
+          <div style="padding:10px 14px;border-top:1px solid var(--border);display:flex;gap:8px">
+            <input id="ld-new-item" type="text" placeholder="Add item (e.g. Watch video, Do pages 5-12)" style="flex:1;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text-primary);font-size:13px" onkeydown="if(event.key==='Enter'){event.preventDefault();ldAddItem();}">
+            <button onclick="ldAddItem()" style="padding:7px 14px;border-radius:8px;background:var(--accent-muted);color:var(--accent);border:1px solid var(--accent);font-size:12px;font-weight:700;cursor:pointer">+ Add</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+        <button id="ld-del-btn" onclick="ldDeleteCurrentLec(this)" style="background:rgba(239,68,68,0.12);color:var(--red);border:1px solid rgba(239,68,68,0.25);padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px"><i class="fa-solid fa-trash"></i> <span>Delete</span></button>
+        <div style="display:flex;gap:8px">
+          <button onclick="closeLecDetail()" style="padding:8px 18px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text-secondary);font-size:13px;font-weight:600;cursor:pointer">Cancel</button>
+          <button onclick="saveLecDetail()" style="padding:8px 18px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Academic Onboarding & Settings Modal -->
   <div class="sh-overlay" id="mod-academic-onboarding" style="display:none" onclick="if(event.target.id==='mod-academic-onboarding')closeModal('mod-academic-onboarding')">
     <div class="sh-modal" onclick="event.stopPropagation()">
@@ -6338,6 +6767,197 @@
       if (p === 'todo' && window.App && typeof window.App.refresh === 'function') {
         window.App.refresh();
       }
+
+      // Persist last page so reload returns here
+      try { localStorage.setItem('sh_last_page', p); } catch(e) {}
+    }
+
+    /* ════════════════════════════════
+       SWITCH TO TODO SUB-VIEW (Today / Projects / Calendar)
+    ════════════════════════════════ */
+    let _currentTodoView = 'today';
+    function switchToTodoView(view) {
+      _currentTodoView = view;
+      closeMobileNav();
+
+      // Step 1: Activate the outer todo PAGE container
+      document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.g-tab, .settings-btn').forEach(el => el.classList.remove('active'));
+      const tp = document.getElementById('page-todo');
+      if (tp) tp.classList.add('active');
+
+      // Step 2: Highlight the correct top-nav tab
+      const tabMap = { today: 'tab-today', projects: 'tab-projects', calendar: 'tab-calendar' };
+      const tt = document.getElementById(tabMap[view] || 'tab-today');
+      if (tt) tt.classList.add('active');
+
+      // Step 3: Navigate the inner todo app
+      const doNavigate = () => {
+        if (window.App && typeof window.App.navigate === 'function') {
+          window.App.navigate(view);
+        } else {
+          const navIdMap = { today: 'nav-today', calendar: 'nav-calendar', projects: 'nav-projects' };
+          const navBtn = document.getElementById(navIdMap[view]);
+          if (navBtn) navBtn.click();
+        }
+        if (view === 'today') {
+          setTimeout(() => renderTodayLectures(), 150);
+          setTimeout(() => updateMainTodayBadge(), 150);
+        }
+      };
+
+      if (window.App && typeof window.App.navigate === 'function') {
+        doNavigate();
+      } else {
+        setTimeout(doNavigate, 200);
+      }
+
+      // Persist so reload returns to this tab
+      try {
+        localStorage.setItem('sh_last_page', 'todo');
+        localStorage.setItem('sh_last_todo_view', view);
+      } catch(e) {}
+    }
+
+    /* ════════════════════════════════
+       PAGE RELOAD PERSISTENCE RESTORER
+    ════════════════════════════════ */
+    window.restoreLastPage = function() {
+      let lastPage = 'todo';
+      let lastTodoView = 'today';
+      let lastProjectId = null;
+      try {
+        lastPage = localStorage.getItem('sh_last_page') || 'todo';
+        lastTodoView = localStorage.getItem('sh_last_todo_view') || 'today';
+        lastProjectId = localStorage.getItem('sh_last_project_id');
+      } catch(e) {}
+
+      const outerPages = ['sched', 'lt', 'exams', 'curric', 'settings'];
+      if (outerPages.includes(lastPage)) {
+        if (typeof switchPage === 'function') switchPage(lastPage);
+      } else {
+        const safeView = ['today', 'projects', 'calendar', 'inbox', 'project-detail'].includes(lastTodoView) ? lastTodoView : 'today';
+        if (safeView === 'project-detail' && lastProjectId && window.Projects && typeof window.Projects.openProjectDetail === 'function') {
+          window.Projects.openProjectDetail(lastProjectId);
+        } else if (typeof switchToTodoView === 'function') {
+          switchToTodoView(safeView === 'project-detail' ? 'projects' : safeView);
+        } else if (typeof switchPage === 'function') {
+          switchPage('todo');
+        }
+      }
+    };
+
+    /* ════════════════════════════════
+       TODAY BADGE UPDATER
+    ════════════════════════════════ */
+    function updateMainTodayBadge() {
+      const badge = document.getElementById('main-today-badge');
+      if (!badge) return;
+      const todayBadge = document.getElementById('today-badge');
+      if (todayBadge && todayBadge.textContent) {
+        badge.textContent = todayBadge.textContent;
+        badge.style.display = '';
+      } else {
+        badge.textContent = '';
+        badge.style.display = 'none';
+      }
+    }
+
+    /* ════════════════════════════════
+       TODAY LECTURES SECTION
+    ════════════════════════════════ */
+    function renderTodayLectures() {
+      const container = document.getElementById('today-lectures-section');
+      if (!container) return;
+
+      // Get today's day name
+      const DAY_ORDER = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      const now = new Date();
+      const dayName = DAY_ORDER[now.getDay()];
+      // Use the baccalaureate schedule template
+      const templateRaw = localStorage.getItem('template');
+      const columnsRaw = localStorage.getItem('columns');
+      let todayLectures = [];
+      try {
+        const tmpl = templateRaw ? JSON.parse(templateRaw) : null;
+        const cols = columnsRaw ? JSON.parse(columnsRaw) : [{ key: 'school' }, { key: 'center' }, { key: 'online' }, { key: 'homestudy' }];
+        if (tmpl && tmpl[dayName]) {
+          cols.forEach(col => {
+            const items = tmpl[dayName][col.key] || [];
+            items.forEach(item => {
+              todayLectures.push({ ...item, col: col.label || col.key });
+            });
+          });
+        }
+      } catch(e) {}
+
+      // Also check from ltTeachers / ltLectures for today's scheduled lectures
+      try {
+        const ltTeachers = JSON.parse(localStorage.getItem('lt_teachers') || '[]');
+        const ltLectures = JSON.parse(localStorage.getItem('lt_lectures') || '[]');
+        const DOW = { Sat: 6, Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5 };
+        const todayDowNum = now.getDay();
+        const todayDateStr = now.toISOString().split('T')[0];
+        ltTeachers.forEach(tc => {
+          if (!tc.days) return;
+          const isScheduledToday = tc.days.some(d => DOW[d] === todayDowNum);
+          if (isScheduledToday) {
+            // Check if a lecture exists today
+            const lec = ltLectures.find(l => l.teacherId === tc.id && l.date === todayDateStr);
+            todayLectures.push({
+              _isLtLecture: true,
+              id: lec ? lec.id : tc.id + '_today',
+              text: lec ? lec.title : (tc.name + ' – ' + tc.subject),
+              teacher: tc.name,
+              subject: tc.subject,
+              time: tc.time || '',
+              link: tc.link || lec?.link || '',
+              watched: lec ? lec.watched : false,
+              color: 'lt',
+              col: tc.platform || 'Online'
+            });
+          }
+        });
+      } catch(e) {}
+
+      if (!todayLectures.length) {
+        container.innerHTML = '';
+        return;
+      }
+
+      const isAr = window.lang === 'ar';
+      container.innerHTML = `
+        <div class="today-lectures-wrap">
+          <div class="today-lectures-header">
+            <div class="today-lectures-title">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M4.5 5h5M4.5 7h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+              ${isAr ? 'محاضرات اليوم' : "Today's Lectures"}
+            </div>
+            <span class="today-lec-count">${todayLectures.length}</span>
+          </div>
+          <div class="today-lec-list">
+            ${todayLectures.map(lec => `
+              <div class="today-lec-item ${lec.watched ? 'watched' : ''}">
+                <div class="today-lec-icon" style="${lec.color === 'lt' ? 'background:rgba(99,102,241,0.12);color:#6366f1' : 'background:rgba(59,130,246,0.1);color:#3b82f6'}">
+                  <i class="fa-solid fa-video"></i>
+                </div>
+                <div class="today-lec-info">
+                  <div class="today-lec-title">${lec.text || (lec.teacher + ' – ' + (lec.subject || ''))}</div>
+                  <div class="today-lec-meta">
+                    ${lec.teacher ? `<span><i class="fa-solid fa-user-tie"></i> ${lec.teacher}</span>` : ''}
+                    ${lec.time ? `<span><i class="fa-solid fa-clock"></i> ${lec.time}</span>` : ''}
+                    ${lec.col ? `<span><i class="fa-solid fa-location-dot"></i> ${lec.col}</span>` : ''}
+                  </div>
+                </div>
+                ${lec.link ? `<a href="${lec.link}" target="_blank" class="today-lec-link" onclick="event.stopPropagation()" title="Open">
+                  <i class="fa-solid fa-play"></i>
+                </a>` : ''}
+                ${lec.watched ? `<span class="today-lec-done"><i class="fa-solid fa-check-circle"></i></span>` : '<span class="today-lec-pending"><i class="fa-regular fa-circle"></i></span>'}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
     }
 
     /* ════════════════════════════════
@@ -6644,7 +7264,107 @@
     };
 
     const DEF_SUBJECTS = [];
-    const DEF_EVENTS   = [];
+    const DEF_EVENTS   = [
+      {
+        id: 'xmutyya9y0py0',
+        title: 'October exam history',
+        subject: 'History',
+        date: '2026-10-04',
+        notes: 'Tolba online',
+        location: 'online',
+        grade: 99,
+        maxGrade: 100,
+        createdAt: '2026-10-04'
+      },
+      {
+        id: 'xmv6zpsux879t',
+        title: 'October exam Programming',
+        subject: 'Programming',
+        date: '2026-10-07',
+        notes: 'Online',
+        location: 'online',
+        grade: null,
+        maxGrade: 100,
+        createdAt: '2026-10-07'
+      },
+      {
+        id: 'xmv6zii25biru',
+        title: 'October exam history',
+        subject: 'History',
+        date: '2026-10-12',
+        notes: 'Bassem center',
+        location: 'center',
+        grade: null,
+        maxGrade: 100,
+        createdAt: '2026-10-12'
+      },
+      {
+        id: 'xmv6zlbjstas6',
+        title: 'October exam English',
+        subject: 'English',
+        date: '2026-10-12',
+        notes: 'Online',
+        location: 'online',
+        grade: null,
+        maxGrade: 100,
+        createdAt: '2026-10-12'
+      },
+      {
+        id: 'xmv6zjppxwauf',
+        title: 'October exam Arabic',
+        subject: 'Arabic',
+        date: '2026-10-15',
+        notes: 'Online',
+        location: 'online',
+        grade: null,
+        maxGrade: 100,
+        createdAt: '2026-10-13'
+      },
+      {
+        id: 'xmv6zlwlw3s4w',
+        title: 'October exam Englsh',
+        subject: 'English',
+        date: '2026-10-17',
+        notes: 'School',
+        location: 'school',
+        grade: null,
+        maxGrade: 100,
+        createdAt: '2026-10-13'
+      },
+      {
+        id: 'xmv6zmxksdbj8',
+        title: 'October exam Arabic',
+        subject: 'Arabic',
+        date: '2026-10-19',
+        notes: 'School',
+        location: 'school',
+        grade: null,
+        maxGrade: 100,
+        createdAt: '2026-10-13'
+      },
+      {
+        id: 'xmv6zqnq1hx2h',
+        title: 'October exam history',
+        subject: 'History',
+        date: '2026-10-20',
+        notes: 'School',
+        location: 'school',
+        grade: null,
+        maxGrade: 100,
+        createdAt: '2026-10-13'
+      },
+      {
+        id: 'xmv6zrvb10cme',
+        title: 'October exam Programming',
+        subject: 'Programming',
+        date: '2026-10-22',
+        notes: 'School',
+        location: 'school',
+        grade: null,
+        maxGrade: 100,
+        createdAt: '2026-10-13'
+      }
+    ];
     const DEF_REVISION = [];
 
     function defWeek() {
@@ -7728,6 +8448,7 @@
         emoji: '📚',
         color: '#3b82f6',
         days: ['Sat'],
+        time: '10:00',
         platform: 'بسطهالك',
         link: 'https://bassthalk.com/userprofile/courses/course/1731',
         createdAt: '2026-09-12'
@@ -7739,19 +8460,21 @@
         emoji: '🧮',
         color: '#22c55e',
         days: ['Sun'],
+        time: '00:00',
         platform: 'Smart accedmy',
-        link: 'https://smartacademy-eg.com/packages-details/143',
+        link: 'https://smartacademy-eg.com/packages-details/141',
         createdAt: '2026-09-06'
       },
       {
         id: 'xmu42r5yo9dhu',
         name: 'ا. محمد عبالحميد',
-        subject: 'برمجه',
+        subject: 'برمجة',
         emoji: '📚',
         color: '#3b82f6',
         days: ['Thu'],
+        time: '18:00',
         platform: 'Smart accedmy',
-        link: 'https://smartacademy-eg.com/packages-details/144',
+        link: 'https://smartacademy-eg.com/packages-details/183',
         createdAt: '2026-09-03'
       },
       {
@@ -7761,6 +8484,7 @@
         emoji: '✏️',
         color: '#06b6d4',
         days: ['Sun'],
+        time: '00:00',
         platform: 'احمد طارق',
         link: 'https://ahmed-tarek.net/userprofile/courses/course/12',
         createdAt: '2026-09-13'
@@ -7770,32 +8494,42 @@
     const MARKSAMER_LECTURES = [
       // Teacher 1: ا. محمد صلاح (عربي)
       { id: 'xmu42mxkd4rm9', teacherId: 'xmu42m0ld9cr4', title: 'محاضرة أسبوع 1', date: '2026-09-12', weekNum: 1, watched: true, watchedAt: '2026-09-12', link: 'https://bassthalk.com/userprofile/courses/course/1731' },
-      { id: 'xmu851mhepz1s', teacherId: 'xmu42m0ld9cr4', title: 'محاضرة أسبوع 2', date: '2026-09-19', weekNum: 2, watched: true, watchedAt: '2026-09-19', link: 'https://bassthalk.com/userprofile/courses/course/1731' },
-      { id: 'xmuibtdaweo7o', teacherId: 'xmu42m0ld9cr4', title: 'Week Lecture 3', date: '2026-09-26', weekNum: 3, watched: false, watchedAt: null, link: 'https://bassthalk.com/userprofile/courses/course/1731' },
-      { id: 'xmusbhv9ix8td', teacherId: 'xmu42m0ld9cr4', title: 'Week Lecture 4', date: '2026-10-03', weekNum: 4, watched: false, watchedAt: null, link: 'https://bassthalk.com/userprofile/courses/course/1731' },
+      { id: 'xmu8ky4du2yez', teacherId: 'xmu42m0ld9cr4', title: 'محاضرة أسبوع 2', date: '2026-09-19', weekNum: 2, watched: true, watchedAt: '2026-09-19', link: 'https://bassthalk.com/userprofile/courses/course/1731' },
+      { id: 'xmutze4zueh6n', teacherId: 'xmu42m0ld9cr4', title: 'Week Lecture 3', date: '2026-09-26', weekNum: 3, watched: true, watchedAt: '2026-09-26', link: 'https://bassthalk.com/userprofile/courses/course/1731' },
+      { id: 'xmuu0bcf3is6b', teacherId: 'xmu42m0ld9cr4', title: 'Week Lecture 4', date: '2026-10-03', weekNum: 4, watched: false, watchedAt: null, link: 'https://bassthalk.com/userprofile/courses/course/1731' },
 
       // Teacher 2: ا. محمد طلبه (تاريخ)
-      { id: 'xmu85sdp6hav0', teacherId: 'xmu42p9ddigcu', title: 'Week Lecture 1', date: '2026-09-06', weekNum: 1, watched: true, watchedAt: '2026-09-06', link: 'https://smartacademy-eg.com/packages-details/141' },
-      { id: 'xmu85sdp6cjb4', teacherId: 'xmu42p9ddigcu', title: 'Week Lecture 2', date: '2026-09-13', weekNum: 2, watched: true, watchedAt: '2026-09-13', link: 'https://smartacademy-eg.com/packages-details/141' },
-      { id: 'xmu9rvwn4mv6u', teacherId: 'xmu42p9ddigcu', title: 'Week Lecture 3', date: '2026-09-20', weekNum: 3, watched: true, watchedAt: '2026-09-20', link: 'https://smartacademy-eg.com/packages-details/141' },
-      { id: 'xmujprrm2rqlb', teacherId: 'xmu42p9ddigcu', title: 'Week Lecture 4', date: '2026-09-27', weekNum: 4, watched: true, watchedAt: '2026-09-27', link: 'https://smartacademy-eg.com/packages-details/141' },
-      { id: 'xmutoyjbgfg2u', teacherId: 'xmu42p9ddigcu', title: 'Week Lecture 5', date: '2026-10-04', weekNum: 5, watched: false, watchedAt: null, link: 'https://smartacademy-eg.com/packages-details/143' },
+      { id: 'xmu42pbdow4y1', teacherId: 'xmu42p9ddigcu', title: 'محاضرة أسبوع 1', date: '2026-09-06', weekNum: 1, watched: true, watchedAt: '2026-09-06', link: 'https://smartacademy-eg.com/packages-details/141' },
+      { id: 'xmu42pe2wftua', teacherId: 'xmu42p9ddigcu', title: 'محاضرة أسبوع 2', date: '2026-09-13', weekNum: 2, watched: true, watchedAt: '2026-09-13', link: 'https://smartacademy-eg.com/packages-details/141' },
+      { id: 'xmu9tperemvuw', teacherId: 'xmu42p9ddigcu', title: 'Week Lecture 3', date: '2026-09-20', weekNum: 3, watched: true, watchedAt: '2026-09-20', link: 'https://smartacademy-eg.com/packages-details/141' },
+      { id: 'xmutze4zuss60', teacherId: 'xmu42p9ddigcu', title: 'Week Lecture 4', date: '2026-09-27', weekNum: 4, watched: true, watchedAt: '2026-09-27', link: 'https://smartacademy-eg.com/packages-details/141' },
+      { id: 'xmuu0do3af7ra', teacherId: 'xmu42p9ddigcu', title: 'Week Lecture 5', date: '2026-10-04', weekNum: 5, watched: true, watchedAt: '2026-10-04', link: 'https://smartacademy-eg.com/packages-details/141' },
+      { id: 'xmv3oa95s4v4c', teacherId: 'xmu42p9ddigcu', title: 'Week Lecture 6', date: '2026-10-11', weekNum: 6, watched: false, watchedAt: null, link: 'https://smartacademy-eg.com/packages-details/141' },
 
-      // Teacher 3: ا. محمد عبالحميد (برمجه)
-      { id: 'xmu85sdp6wtei', teacherId: 'xmu42r5yo9dhu', title: 'Week Lecture 1', date: '2026-09-03', weekNum: 1, watched: true, watchedAt: '2026-09-03', link: 'https://smartacademy-eg.com/packages-details/144' },
-      { id: 'xmu85sdp66vx0', teacherId: 'xmu42r5yo9dhu', title: 'Week Lecture 2', date: '2026-09-10', weekNum: 2, watched: true, watchedAt: '2026-09-10', link: 'https://smartacademy-eg.com/packages-details/144' },
-      { id: 'xmu85sdp6p1hi', teacherId: 'xmu42r5yo9dhu', title: 'Week Lecture 3', date: '2026-09-17', weekNum: 3, watched: true, watchedAt: '2026-09-17', link: 'https://smartacademy-eg.com/packages-details/144' },
-      { id: 'xmufsq9c9wpu6', teacherId: 'xmu42r5yo9dhu', title: 'Week Lecture 4', date: '2026-09-24', weekNum: 4, watched: true, watchedAt: '2026-09-24', link: 'https://smartacademy-eg.com/packages-details/144' },
-      { id: 'xmusisk3pr21p', teacherId: 'xmu42r5yo9dhu', title: 'Week Lecture 5', date: '2026-10-01', weekNum: 5, watched: false, watchedAt: null, link: 'https://smartacademy-eg.com/packages-details/144' },
+      // Teacher 3: ا. محمد عبالحميد (برمجة)
+      { id: 'xmu42r890k49h', teacherId: 'xmu42r5yo9dhu', title: 'محاضرة أسبوع 1', date: '2026-09-03', weekNum: 1, watched: true, watchedAt: '2026-09-03', link: 'https://smartacademy-eg.com/packages-details/144' },
+      { id: 'xmu42r9rsvtym', teacherId: 'xmu42r5yo9dhu', title: 'محاضرة أسبوع 2', date: '2026-09-10', weekNum: 2, watched: true, watchedAt: '2026-09-10', link: 'https://smartacademy-eg.com/packages-details/144' },
+      { id: 'xmu572znuhtyf', teacherId: 'xmu42r5yo9dhu', title: 'محاضرة أسبوع 3', date: '2026-09-17', weekNum: 3, watched: true, watchedAt: '2026-09-17', link: 'https://smartacademy-eg.com/packages-details/144' },
+      { id: 'xmuh6yxum6oui', teacherId: 'xmu42r5yo9dhu', title: 'Week Lecture 4', date: '2026-09-24', weekNum: 4, watched: true, watchedAt: '2026-09-24', link: 'https://smartacademy-eg.com/packages-details/144' },
+      { id: 'xmuylvuxlzxkx', teacherId: 'xmu42r5yo9dhu', title: 'Week Lecture 5', date: '2026-10-08', weekNum: 5, watched: false, watchedAt: null, link: 'https://smartacademy-eg.com/packages-details/183' },
 
       // Teacher 4: ا. احمد طارق (انجليزي)
-      { id: 'xmu85sdp6vlei', teacherId: 'xmu42u6qlglvj', title: 'Week Lecture 1', date: '2026-09-13', weekNum: 1, watched: true, watchedAt: '2026-09-13', link: 'https://ahmed-tarek.net/userprofile/courses/course/12' },
-      { id: 'xmu9rvwn4d6om', teacherId: 'xmu42u6qlglvj', title: 'Week Lecture 2', date: '2026-09-20', weekNum: 2, watched: true, watchedAt: '2026-09-20', link: 'https://ahmed-tarek.net/userprofile/courses/course/12' },
-      { id: 'xmujprrm2xug0', teacherId: 'xmu42u6qlglvj', title: 'Week Lecture 3', date: '2026-09-27', weekNum: 3, watched: true, watchedAt: '2026-09-27', link: 'https://ahmed-tarek.net/userprofile/courses/course/12' },
-      { id: 'xmutoyjbg9es2', teacherId: 'xmu42u6qlglvj', title: 'Week Lecture 4', date: '2026-10-04', weekNum: 4, watched: false, watchedAt: null, link: 'https://ahmed-tarek.net/userprofile/courses/course/12' }
+      { id: 'xmu42ud1g0n98', teacherId: 'xmu42u6qlglvj', title: 'محاضرة أسبوع 1', date: '2026-09-13', weekNum: 1, watched: true, watchedAt: '2026-09-13', link: 'https://ahmed-tarek.net/userprofile/courses/course/12' },
+      { id: 'xmu9tperecc9x', teacherId: 'xmu42u6qlglvj', title: 'Week Lecture 2', date: '2026-09-20', weekNum: 2, watched: true, watchedAt: '2026-09-20', link: 'https://ahmed-tarek.net/userprofile/courses/course/12' },
+      { id: 'xmutze4zurx8x', teacherId: 'xmu42u6qlglvj', title: 'Week Lecture 3', date: '2026-09-27', weekNum: 3, watched: true, watchedAt: '2026-09-27', link: 'https://ahmed-tarek.net/userprofile/courses/course/12' },
+      { id: 'xmuu0i7m3b2w1', teacherId: 'xmu42u6qlglvj', title: 'Week Lecture 4', date: '2026-10-04', weekNum: 4, watched: true, watchedAt: '2026-10-04', link: 'https://ahmed-tarek.net/userprofile/courses/course/12' }
     ];
 
     let ltDeleted = [];
+
+    function isLecDeleted(l) {
+      if (!l) return false;
+      if (ltDeleted.includes(l.id)) return true;
+      if (l.teacherId && l.date && (ltDeleted.includes(`${l.teacherId}_${l.date}`) || ltDeleted.includes(`${l.teacherId}_canceled_${l.date}`))) return true;
+      if (l.teacherId && l.weekNum && (ltDeleted.includes(`${l.teacherId}_w${l.weekNum}`) || ltDeleted.includes(`${l.teacherId}_week_${l.weekNum}`))) return true;
+      if (l.teacherId && l.title && ltDeleted.includes(`${l.teacherId}_${l.title}`)) return true;
+      return false;
+    }
 
     function ltLoad() {
       const getVal = (k) => {
@@ -7813,7 +8547,10 @@
 
       ltTeachers = Array.isArray(savedT) ? savedT : JSON.parse(JSON.stringify(MARKSAMER_TEACHERS));
       let rawLecs = Array.isArray(savedL) ? savedL : JSON.parse(JSON.stringify(MARKSAMER_LECTURES));
-      ltLectures = rawLecs.filter(l => !ltDeleted.includes(`${l.teacherId}_${l.date}`) && !ltDeleted.includes(l.id));
+      ltLectures = rawLecs.filter(l => !isLecDeleted(l));
+      if (Array.isArray(savedL) && rawLecs.length !== ltLectures.length) {
+        ltSave();
+      }
     }
 
     function ltSave() {
@@ -7890,10 +8627,11 @@
             if (ld > now) continue;
             const ldStr = dStr(ld);
             const delKey = `${tc.id}_${ldStr}`;
-            const isDeletedByUser = ltDeleted.includes(delKey);
+            const isDeletedByUser = ltDeleted.includes(delKey) || ltDeleted.includes(`${tc.id}_canceled_${ldStr}`);
             const exists = ltLectures.some(l => l.teacherId === tc.id && l.date === ldStr);
             if (!exists && !isDeletedByUser) {
               const wn = ltLectures.filter(l => l.teacherId === tc.id).length + 1;
+              if (ltDeleted.includes(`${tc.id}_w${wn}`) || ltDeleted.includes(`${tc.id}_week_${wn}`)) continue;
               ltLectures.push({
                 id: genId(), teacherId: tc.id,
                 title: `${lang === 'ar' ? 'محاضرة أسبوع' : 'Week Lecture'} ${wn}`,
@@ -7943,10 +8681,17 @@
           if (ld > now) ld.setDate(ld.getDate() - 7);
           const ldStr = dStr(ld);
           const delKey = `${tc.id}_${ldStr}`;
-          const isDeletedByUser = ltDeleted.includes(delKey);
+          const isDeletedByUser = ltDeleted.includes(delKey) || 
+                                  ltDeleted.includes(`${tc.id}_canceled_${ldStr}`) ||
+                                  ltDeleted.some(k => k === delKey || k.startsWith(tc.id + '_' + ldStr));
           const exists = ltLectures.some(l => l.teacherId === tc.id && l.date === ldStr);
           if (!exists && !isDeletedByUser) {
             const wn = ltLecsFor(tc.id).length + 1;
+            const weekKey = `${tc.id}_w${wn}`;
+            const weekKey2 = `${tc.id}_week_${wn}`;
+            if (ltDeleted.includes(weekKey) || ltDeleted.includes(weekKey2)) {
+              return;
+            }
             ltLectures.push({ id: genId(), teacherId: tc.id, title: `${lang === 'ar' ? 'محاضرة أسبوع' : 'Week Lecture'} ${wn}`, date: ldStr, weekNum: wn, link: tc.link || '', notes: '', watched: false, watchedAt: null, createdAt: ltTodayStr() });
             added++;
           }
@@ -8061,12 +8806,20 @@
         badge = `<span class="lec-badge over">${t('ltOverBadge')} ${wks > 1 ? wks + ' ' + t('ltWeeksPlural') : t('ltWeek')}</span>`;
       } else badge = `<span class="lec-badge new">${t('ltNewBadge')}</span>`;
       let ageText = age === 0 ? t('ltToday') : age === 1 ? t('ltYesterday') : t('ltDaysAgo').replace('{n}', age);
-      return `<div class="lec-item ${status}" data-id="${lec.id}" onclick="ltToggleWatch('${lec.id}')">
+      const itemStats = (() => {
+        if (!lec.lecItems || !lec.lecItems.length) return '';
+        const done = lec.lecItems.filter(i => i.done).length;
+        const total = lec.lecItems.length;
+        const pct = Math.round(done / total * 100);
+        const col = pct === 100 ? 'var(--green)' : pct > 50 ? 'var(--accent)' : '#f59e0b';
+        return `<span style="color:${col};font-weight:700;font-size:11px">${done}/${total} (${pct}%)</span>`;
+      })();
+      return `<div class="lec-item ${status}" data-id="${lec.id}" onclick="openLecDetail('${lec.id}')" style="cursor:pointer">
     <span class="s-handle admin-only lec-drag-handle" style="cursor:grab;color:var(--text3);font-size:12px;margin-inline-end:6px" onclick="event.stopPropagation()"><i class="fa-solid fa-grip-vertical"></i></span>
-    <div class="lec-chk">${status === 'watched' ? '<i class="fa-solid fa-check"></i>' : ''}</div>
+    <div class="lec-chk" onclick="event.stopPropagation();ltToggleWatch('${lec.id}')" title="Toggle watched" style="cursor:pointer">${status === 'watched' ? '<i class="fa-solid fa-check"></i>' : ''}</div>
     <div class="lec-info">
-      <div class="lec-ttl ${status === 'watched' ? 'watched' : ''}">${esc(lec.title)} <span class="week-tag"><i class="fa-solid fa-hashtag"></i>${lec.weekNum || '?'}</span></div>
-      <div class="lec-meta"><span><i class="fa-solid fa-calendar"></i> ${lec.date}</span><span>${ageText}</span>${lec.notes ? `<span>${esc(lec.notes)}</span>` : ''}</div>
+      <div class="lec-ttl ${status === 'watched' ? 'watched' : ''}">${lec.lecTime ? `<span style="font-size:10px;color:var(--accent);font-weight:700;margin-inline-end:5px"><i class="fa-solid fa-clock"></i> ${lec.lecTime}</span>` : ''}${esc(lec.title)} <span class="week-tag"><i class="fa-solid fa-hashtag"></i>${lec.weekNum || '?'}</span></div>
+      <div class="lec-meta"><span><i class="fa-solid fa-calendar"></i> ${lec.date}</span><span>${ageText}</span>${lec.notes ? `<span>${esc(lec.notes)}</span>` : ''}${itemStats}</div>
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
       ${badge}
@@ -8079,6 +8832,7 @@
     </div>
   </div>`;
     }
+
 
     window.ltMoveLec = function(lecId, dir) {
       const lec = ltLectures.find(l => l.id === lecId);
@@ -8098,82 +8852,6 @@
         ltRenderAll();
       }
     };
-
-    function ltRestoreAllLecturesSilently() {
-      const DOW = { Sat: 6, Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5 };
-      let added = 0;
-      ltTeachers.forEach(tc => {
-        if (!tc.days || !tc.days.length) return;
-        tc.days.forEach(dk => {
-          const target = DOW[dk]; const now = new Date(); const cur = now.getDay();
-          const diff = (target - cur + 7) % 7;
-          for (let w = 0; w < 4; w++) {
-            const ld = new Date(now);
-            ld.setDate(now.getDate() - (diff === 0 ? 0 : 7 - diff) - (w * 7));
-            if (ld > now) continue;
-            const ldStr = dStr(ld);
-            const exists = ltLectures.some(l => l.teacherId === tc.id && l.date === ldStr);
-            if (!exists) {
-              const wn = ltLectures.filter(l => l.teacherId === tc.id).length + 1;
-              ltLectures.push({
-                id: genId(), teacherId: tc.id,
-                title: `${lang === 'ar' ? 'محاضرة أسبوع' : 'Week Lecture'} ${wn}`,
-                date: ldStr, weekNum: wn, link: tc.link || '', notes: '',
-                watched: false, watchedAt: null, createdAt: ltTodayStr()
-              });
-              added++;
-            }
-          }
-        });
-      });
-      if (added > 0) ltSave();
-    }
-
-    window.ltRestoreAllLectures = function() {
-      ltRestoreAllLecturesSilently();
-      ltSave(); ltRenderAll();
-      showToast('success', lang === 'ar' ? 'تم استرجاع وتوليد كافة المحاضرات للمعلمين بنجاح!' : 'Restored all teacher lectures successfully!');
-    };
-
-    function ltToggle(tid) {
-      const tog = document.getElementById('ltog-' + tid), list = document.getElementById('llecs-' + tid);
-      if (!list) return;
-      const hidden = list.style.display === 'none';
-      list.style.display = hidden ? 'flex' : 'none';
-      if (tog) tog.classList.toggle('collapsed', !hidden);
-    }
-
-    function ltToggleWatch(lid) {
-      const lec = ltLectures.find(l => l.id === lid); if (!lec) return;
-      lec.watched = !lec.watched; lec.watchedAt = lec.watched ? ltTodayStr() : null;
-      ltSave(); ltRenderAll();
-      showToast(lec.watched ? 'success' : 'info', lec.watched ? t('ltWatchOn') : t('ltWatchOff'));
-    }
-
-
-
-    function ltGenWeek(silent = false) {
-      const DOW = { Sat: 6, Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5 };
-      let added = 0;
-      ltTeachers.forEach(tc => {
-        if (!tc.days || !tc.days.length) return;
-        tc.days.forEach(dk => {
-          const target = DOW[dk]; const now = new Date(); const cur = now.getDay();
-          const diff = (target - cur + 7) % 7;
-          const ld = new Date(now); ld.setDate(now.getDate() - (diff === 0 ? 0 : 7 - diff));
-          if (ld > now) ld.setDate(ld.getDate() - 7);
-          const ldStr = dStr(ld);
-          const exists = ltLectures.some(l => l.teacherId === tc.id && l.date === ldStr);
-          if (!exists) {
-            const wn = ltLecsFor(tc.id).length + 1;
-            ltLectures.push({ id: genId(), teacherId: tc.id, title: `${lang === 'ar' ? 'محاضرة أسبوع' : 'Week Lecture'} ${wn}`, date: ldStr, weekNum: wn, link: tc.link || '', notes: '', watched: false, watchedAt: null, createdAt: ltTodayStr() });
-            added++;
-          }
-        });
-      });
-      if (added > 0) { ltSave(); ltRenderAll(); showToast('success', `${lang === 'ar' ? 'تم تنزيل' : 'Added'} ${added} ${t('ltAdded')}`); }
-      else if (!silent) { showToast('info', t('ltAlreadyUp')); }
-    }
 
     /* ── Teacher modal ── */
     function buildDayChips() {
@@ -8286,19 +8964,181 @@
     function delLecture(anchor) {
       if (!ltEditLId) return;
       const targetLec = ltLectures.find(x => x.id === ltEditLId);
-      if (targetLec) {
-        const key1 = `${targetLec.teacherId}_${targetLec.date}`;
-        const key2 = targetLec.id;
-        if (!ltDeleted.includes(key1)) ltDeleted.push(key1);
-        if (!ltDeleted.includes(key2)) ltDeleted.push(key2);
-        saveJ('lt_deleted', ltDeleted);
-      }
+      const delId = ltEditLId;
       mkConfirmPop(t('lDelConfirm'), () => {
-        ltLectures = ltLectures.filter(x => x.id !== ltEditLId);
-        ltSave(); closeModal('mod-lecture'); ltRenderAll();
+        if (targetLec) {
+          const keysToAdd = [
+            targetLec.id,
+            `${targetLec.teacherId}_${targetLec.date}`,
+            `${targetLec.teacherId}_canceled_${targetLec.date}`,
+            `${targetLec.teacherId}_w${targetLec.weekNum}`,
+            `${targetLec.teacherId}_week_${targetLec.weekNum}`,
+            `${targetLec.teacherId}_${targetLec.title}`
+          ];
+          keysToAdd.forEach(k => {
+            if (k && !ltDeleted.includes(k)) ltDeleted.push(k);
+          });
+          saveJ('lt_deleted', ltDeleted);
+          const uid = getActiveSyncUid();
+          try {
+            localStorage.setItem(uid + ':lt_deleted', JSON.stringify(ltDeleted));
+            localStorage.setItem('lt_deleted', JSON.stringify(ltDeleted));
+          } catch(e){}
+        }
+        ltLectures = ltLectures.filter(x => x.id !== delId && !isLecDeleted(x));
+        ltSave();
+        closeModal('mod-lecture');
+        ltRenderAll();
         showToast('info', t('lDeleted'));
       }, anchor || document.getElementById('btn-del-lec'));
     }
+
+    /* ── Lecture Detail Panel ── */
+    let _ldLecId = null;
+
+    window.openLecDetail = function(lid) {
+      const lec = ltLectures.find(l => l.id === lid);
+      if (!lec) return;
+      _ldLecId = lid;
+      const tc = ltTeachers.find(t => t.id === lec.teacherId);
+      const color = tc?.color || '#3b82f6';
+
+      // Header
+      document.getElementById('ld-title').textContent = lec.title;
+      document.getElementById('ld-sub').textContent = (tc?.name || '') + (lec.date ? ' • ' + lec.date : '');
+      document.getElementById('ld-time').value = lec.lecTime || '';
+      document.getElementById('ld-hw').value = lec.lecHw || '';
+      document.getElementById('ld-link').value = lec.link || '';
+      document.getElementById('ld-header-color').style.borderLeftColor = color;
+
+      // Watched toggle
+      const watchBtn = document.getElementById('ld-watch-btn');
+      const isWatched = lec.watched;
+      watchBtn.textContent = isWatched ? '✅ Watched' : '○ Mark Watched';
+      watchBtn.style.background = isWatched ? 'var(--success)' : 'var(--accent)';
+
+      // Items checklist
+      renderLecDetailItems(lec);
+
+      document.getElementById('mod-lec-detail').style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    };
+
+    function renderLecDetailItems(lec) {
+      const items = lec.lecItems || [];
+      const container = document.getElementById('ld-items-list');
+      const total = items.length;
+      const done = items.filter(i => i.done).length;
+      const pct = total === 0 ? 0 : Math.round(done / total * 100);
+      const col = pct === 100 ? 'var(--success)' : pct > 50 ? 'var(--accent)' : (pct > 0 ? '#f59e0b' : 'var(--text-muted)');
+
+      // Update percentage bar
+      const pctEl = document.getElementById('ld-pct-label');
+      const barEl = document.getElementById('ld-pct-bar');
+      if (pctEl) { pctEl.textContent = `${done}/${total} done — ${pct}%`; pctEl.style.color = col; }
+      if (barEl) { barEl.style.width = pct + '%'; barEl.style.background = col; }
+
+      if (items.length === 0) {
+        container.innerHTML = `<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:16px">No items yet. Add items below.</div>`;
+        return;
+      }
+      container.innerHTML = items.map((item, idx) => `
+        <div class="ld-item" onclick="ldToggleItem(${idx})" style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;cursor:pointer;transition:background .15s;${item.done ? 'opacity:.65' : ''}" onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background='transparent'">
+          <div style="width:18px;height:18px;border-radius:50%;border:2px solid ${item.done ? 'var(--success)' : 'var(--border)'};background:${item.done ? 'var(--success)' : 'transparent'};display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s">
+            ${item.done ? '<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ''}
+          </div>
+          <span style="flex:1;font-size:13px;${item.done ? 'text-decoration:line-through;color:var(--text-muted)' : 'color:var(--text-primary)'}">${esc(item.text)}</span>
+          <button onclick="event.stopPropagation();ldDeleteItem(${idx})" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;padding:2px 4px" title="Remove">×</button>
+        </div>
+      `).join('');
+    }
+
+    window.ldToggleItem = function(idx) {
+      const lec = ltLectures.find(l => l.id === _ldLecId);
+      if (!lec || !lec.lecItems) return;
+      lec.lecItems[idx].done = !lec.lecItems[idx].done;
+      ltSave();
+      renderLecDetailItems(lec);
+    };
+
+    window.ldDeleteItem = function(idx) {
+      const lec = ltLectures.find(l => l.id === _ldLecId);
+      if (!lec || !lec.lecItems) return;
+      lec.lecItems.splice(idx, 1);
+      ltSave();
+      renderLecDetailItems(lec);
+    };
+
+    window.ldAddItem = function() {
+      const input = document.getElementById('ld-new-item');
+      const text = input.value.trim();
+      if (!text) return;
+      const lec = ltLectures.find(l => l.id === _ldLecId);
+      if (!lec) return;
+      if (!lec.lecItems) lec.lecItems = [];
+      lec.lecItems.push({ text, done: false });
+      input.value = '';
+      ltSave();
+      renderLecDetailItems(lec);
+    };
+
+    window.ldToggleWatch = function() {
+      const lec = ltLectures.find(l => l.id === _ldLecId);
+      if (!lec) return;
+      lec.watched = !lec.watched;
+      lec.watchedAt = lec.watched ? ltTodayStr() : null;
+      ltSave(); ltRenderAll();
+      openLecDetail(_ldLecId); // refresh
+    };
+
+    window.ldDeleteCurrentLec = function(anchor) {
+      if (!_ldLecId) return;
+      const targetLec = ltLectures.find(x => x.id === _ldLecId);
+      const delId = _ldLecId;
+      mkConfirmPop(t('lDelConfirm'), () => {
+        if (targetLec) {
+          const keysToAdd = [
+            targetLec.id,
+            `${targetLec.teacherId}_${targetLec.date}`,
+            `${targetLec.teacherId}_canceled_${targetLec.date}`,
+            `${targetLec.teacherId}_w${targetLec.weekNum}`,
+            `${targetLec.teacherId}_week_${targetLec.weekNum}`,
+            `${targetLec.teacherId}_${targetLec.title}`
+          ];
+          keysToAdd.forEach(k => {
+            if (k && !ltDeleted.includes(k)) ltDeleted.push(k);
+          });
+          saveJ('lt_deleted', ltDeleted);
+          const uid = getActiveSyncUid();
+          try {
+            localStorage.setItem(uid + ':lt_deleted', JSON.stringify(ltDeleted));
+            localStorage.setItem('lt_deleted', JSON.stringify(ltDeleted));
+          } catch(e){}
+        }
+        ltLectures = ltLectures.filter(x => x.id !== delId && !isLecDeleted(x));
+        ltSave();
+        closeLecDetail();
+        ltRenderAll();
+        showToast('info', t('lDeleted'));
+      }, anchor || document.getElementById('ld-del-btn'));
+    };
+
+    window.saveLecDetail = function() {
+      const lec = ltLectures.find(l => l.id === _ldLecId);
+      if (!lec) return;
+      lec.lecTime = document.getElementById('ld-time').value.trim();
+      lec.lecHw   = document.getElementById('ld-hw').value.trim();
+      lec.link    = document.getElementById('ld-link').value.trim();
+      ltSave(); ltRenderAll();
+      document.getElementById('mod-lec-detail').style.display = 'none';
+      document.body.style.overflow = '';
+      showToast('success', 'Lecture saved.');
+    };
+
+    window.closeLecDetail = function() {
+      document.getElementById('mod-lec-detail').style.display = 'none';
+      document.body.style.overflow = '';
+    };
 
     /* ════════════════════════════════
        SHARED UTILS
@@ -8325,26 +9165,110 @@
        SEED DEMO DATA
     ════════════════════════════════ */
     function seedLt() {
+      const SEED_KEY = 'lt_seeded_20261014';
+      if (localStorage.getItem(SEED_KEY)) {
+        return;
+      }
+      localStorage.setItem(SEED_KEY, '1');
       if (!ltTeachers || ltTeachers.length === 0) {
         ltTeachers = JSON.parse(JSON.stringify(MARKSAMER_TEACHERS));
-        ltLectures = JSON.parse(JSON.stringify(MARKSAMER_LECTURES));
-        ltSave();
       }
+      if (!ltLectures || ltLectures.length === 0) {
+        ltLectures = JSON.parse(JSON.stringify(MARKSAMER_LECTURES));
+      }
+      ltLectures = ltLectures.filter(l => !isLecDeleted(l));
+      ltSave();
     }
 
     /* ════════════════════════════════
        SYSTEM 1: EXAM CENTER LOGIC
     ════════════════════════════════ */
     let exFilter = 'all';
+    let exSubjectFilter = null;
+    let exGradeFilter  = null;
 
     function exSetFilter(f) {
       exFilter = f;
-      ['all', 'upcoming', 'done'].forEach(k => {
-        const el = document.getElementById('ex-f-' + k);
-        if (el) el.classList.toggle('active', k === f);
+      document.querySelectorAll('#ex-filter-bar .ex-filter-group:first-child .ex-chip').forEach(el => {
+        el.classList.toggle('active', el.id === 'ex-f-' + f);
       });
       exRenderAll();
     }
+
+    window.exSetGradeFilter = function(g) {
+      exGradeFilter = exGradeFilter === g ? null : g;
+      const gIds = { fail:'ex-g-fail', pass:'ex-g-pass', good:'ex-g-good', excellent:'ex-g-excel', full:'ex-g-full' };
+      Object.entries(gIds).forEach(([k, id]) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('active', k === exGradeFilter);
+      });
+      exRenderAll();
+    };
+
+    window.exFilterBySubject = function(subj) {
+      exSubjectFilter = exSubjectFilter === subj ? null : subj;
+      // chip highlights updated in exRenderAll via populateSubjectChips
+      exRenderAll();
+    };
+
+    function exGradePct(ex) {
+      if (ex.grade == null) return null;
+      return Math.round((ex.grade / (ex.maxGrade || 50)) * 100);
+    }
+    function exGradeCategory(pct) {
+      if (pct == null) return null;
+      if (pct < 50)  return 'fail';       // < 50%
+      if (pct < 65)  return 'pass';       // 50-64%
+      if (pct < 80)  return 'good';       // 65-79%
+      if (pct < 95)  return 'excellent';  // 80-94%
+      return 'full';                       // 95%+
+    }
+
+    function populateSubjectChips(exams) {
+      const container = document.getElementById('ex-subject-chips');
+      if (!container) return;
+      const subjects = [...new Set(exams.map(e => e.subject || 'General'))].sort();
+      // Keep the label span, remove old chips
+      const label = container.querySelector('.ex-filter-label');
+      container.innerHTML = '';
+      if (label) container.appendChild(label);
+      else { const l = document.createElement('span'); l.className = 'ex-filter-label'; l.innerHTML = '<i class="fa-solid fa-tag"></i>'; container.appendChild(l); }
+      subjects.forEach(s => {
+        const btn = document.createElement('button');
+        btn.className = 'ex-chip' + (exSubjectFilter === s ? ' active' : '');
+        btn.textContent = s;
+        btn.onclick = () => window.exFilterBySubject(s);
+        container.appendChild(btn);
+      });
+    }
+
+
+    /* ── Homework multi-range helpers ── */
+    window._hwRanges = window._hwRanges || [];
+    window.hwAddRange = function() {
+      const input = document.getElementById('hw-range-input');
+      if (!input) return;
+      const val = input.value.trim();
+      if (!val) return;
+      if (!Array.isArray(window._hwRanges)) window._hwRanges = [];
+      window._hwRanges.push(val);
+      input.value = '';
+      window.renderHwRangeTags();
+      input.focus();
+    };
+    window.hwRemoveRange = function(idx) {
+      if (!Array.isArray(window._hwRanges)) window._hwRanges = [];
+      window._hwRanges.splice(idx, 1);
+      window.renderHwRangeTags();
+    };
+    window.renderHwRangeTags = function() {
+      const container = document.getElementById('hw-ranges-tags');
+      if (!container) return;
+      const arr = window._hwRanges || [];
+      container.innerHTML = arr.map((r, i) =>
+        `<span style="display:inline-flex;align-items:center;gap:4px;background:var(--accent-muted);color:var(--accent);border:1px solid var(--accent);border-radius:var(--radius-sm);padding:3px 8px;font-size:12px;font-weight:700;margin:2px">${esc(r)}<button type="button" onclick="window.hwRemoveRange(${i})" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:14px;line-height:1;padding:0 2px">&times;</button></span>`
+      ).join('');
+    };
 
     function exRenderAll() {
       const grid = document.getElementById('ex-grid');
@@ -8373,7 +9297,14 @@
 
       let filtered = sorted;
       if (exFilter === 'upcoming') filtered = sorted.filter(e => dStr(parseD(e.date)) >= sTodayStr && e.grade == null);
-      if (exFilter === 'done') filtered = sorted.filter(e => e.grade != null || dStr(parseD(e.date)) < sTodayStr);
+      if (exFilter === 'done')     filtered = sorted.filter(e => e.grade != null || dStr(parseD(e.date)) < sTodayStr);
+      // Subject filter
+      if (exSubjectFilter) filtered = filtered.filter(e => (e.subject || 'General') === exSubjectFilter);
+      // Grade filter
+      if (exGradeFilter) filtered = filtered.filter(e => exGradeCategory(exGradePct(e)) === exGradeFilter);
+
+      // Populate subject chips from full sorted list
+      populateSubjectChips(sorted);
 
       if (!filtered.length) {
         grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text3);font-size:13px;font-weight:700">${t('noExamsCat')}</div>`;
@@ -8381,6 +9312,7 @@
       }
 
       grid.innerHTML = filtered.map(ex => {
+
         const diff = ltDaysBetween(sTodayStr, ex.date);
         const isPast = diff < 0;
         const isUrgent = diff >= 0 && diff <= 3;
@@ -8402,11 +9334,16 @@
         return `<div class="ex-card">
       <div>
         <div class="ex-card-hdr">
-          <span style="font-size:11px;font-weight:800;padding:2px 8px;border-radius:6px;background:rgba(99,102,241,0.15);color:var(--blue2);"><i class="fa-solid fa-book"></i> ${esc(ex.subject || (lang === 'ar' ? 'عام' : 'General'))}</span>
+          <span class="ex-subject-tag" onclick="exFilterBySubject('${esc(ex.subject || 'General')}')" title="Filter by ${esc(ex.subject || 'General')}" style="cursor:pointer;font-size:11px;font-weight:800;padding:2px 8px;border-radius:6px;background:rgba(99,102,241,0.15);color:var(--blue2);transition:background .15s" onmouseover="this.style.background='rgba(99,102,241,0.3)'" onmouseout="this.style.background='rgba(99,102,241,0.15)'"><i class="fa-solid fa-tag"></i> ${esc(ex.subject || (lang === 'ar' ? 'عام' : 'General'))}</span>
           <span class="ex-badge ${badgeClass}">${badgeTxt}</span>
         </div>
         <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:6px">${esc(ex.title)}</div>
-        <div style="font-size:12px;color:var(--text3);margin-bottom:10px"><i class="fa-solid fa-calendar-day"></i> ${lang === 'ar' ? 'الموعد:' : 'Date:'} ${ex.date}</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:4px"><i class="fa-solid fa-calendar-day"></i> ${lang === 'ar' ? 'الموعد:' : 'Date:'} ${ex.date}</div>
+        ${ex.location ? `<div style="font-size:11px;color:var(--text3);margin-bottom:8px">${
+          ex.location === 'school' ? '<i class="fa-solid fa-school"></i> ' + (lang === 'ar' ? 'في المدرسة' : 'At School') :
+          ex.location === 'online' ? '<i class="fa-solid fa-wifi"></i> ' + (lang === 'ar' ? 'أونلاين' : 'Online') :
+          '<i class="fa-solid fa-location-pin"></i> ' + esc(ex.location)
+        }</div>` : ''}
         ${ex.notes ? `<div style="font-size:11px;color:var(--text2);background:var(--bg2);padding:6px 10px;border-radius:6px;margin-bottom:10px">${esc(ex.notes)}</div>` : ''}
       </div>
       <div>
@@ -8418,6 +9355,7 @@
       </div>
     </div>`;
       }).join('');
+
     }
 
     window.exAddPrompt = function (anchor) {
@@ -8438,18 +9376,42 @@
       <div style="flex:1"><label style="font-size:11px;font-weight:700;color:var(--text2)">${t('examDateLbl')}</label><input type="date" id="ex-d-in" value="${sTodayStr}" style="width:100%"></div>
       <div style="width:90px"><label style="font-size:11px;font-weight:700;color:var(--text2)">${t('examMaxGradeLbl')}</label><input type="number" id="ex-m-in" value="50" style="width:100%"></div>
     </div>
+    <div style="margin-top:6px">
+      <label style="font-size:11px;font-weight:700;color:var(--text2)">${isAr ? 'مكان الامتحان' : 'Exam Location'}</label>
+      <div style="display:flex;gap:5px;margin-top:4px">
+        <label style="flex:1;display:flex;align-items:center;gap:5px;cursor:pointer;background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:6px 8px;font-size:11px;font-weight:700">
+          <input type="radio" name="ex-loc-new" value="school" checked> <i class="fa-solid fa-school"></i> ${isAr ? 'مدرسة' : 'School'}
+        </label>
+        <label style="flex:1;display:flex;align-items:center;gap:5px;cursor:pointer;background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:6px 8px;font-size:11px;font-weight:700">
+          <input type="radio" name="ex-loc-new" value="online"> <i class="fa-solid fa-wifi"></i> ${isAr ? 'أونلاين' : 'Online'}
+        </label>
+        <label style="flex:1;display:flex;align-items:center;gap:5px;cursor:pointer;background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:6px 8px;font-size:11px;font-weight:700">
+          <input type="radio" name="ex-loc-new" value="custom"> <i class="fa-solid fa-location-pin"></i> ${isAr ? 'آخر' : 'Other'}
+        </label>
+      </div>
+      <input type="text" id="ex-loc-custom-new" placeholder="${isAr ? 'أدخل المكان...' : 'Enter location...'}" style="width:100%;margin-top:4px;display:none">
+    </div>
     <div class="pop-actions" style="margin-top:12px;display:flex;gap:6px">
       <button class="p-btn p-save" id="ex-save" style="flex:1">${t('addBtn')}</button>
       <button class="p-btn p-del" onclick="closeAnyPop()" style="flex:1">${t('flCancel')}</button>
     </div>
   `;
+      // Toggle custom location field
+      pop.querySelectorAll('input[name="ex-loc-new"]').forEach(r => {
+        r.addEventListener('change', () => {
+          pop.querySelector('#ex-loc-custom-new').style.display = r.value === 'custom' ? 'block' : 'none';
+        });
+      });
       pop.querySelector('#ex-save').onclick = () => {
         const title = pop.querySelector('#ex-t-in').value.trim();
         const subject = pop.querySelector('#ex-s-in').value;
         const date = pop.querySelector('#ex-d-in').value || sTodayStr;
         const maxGrade = parseInt(pop.querySelector('#ex-m-in').value) || 50;
+        const locVal = pop.querySelector('input[name="ex-loc-new"]:checked')?.value || 'school';
+        const locCustom = pop.querySelector('#ex-loc-custom-new').value.trim();
+        const location = locVal === 'custom' ? (locCustom || 'Other') : locVal;
         if (!title) return;
-        sEvents.push({ id: genId(), title, subject, date, maxGrade, grade: null, notes: '' });
+        sEvents.push({ id: genId(), title, subject, date, maxGrade, grade: null, notes: '', location });
         saveJ('events', sEvents); closeAnyPop(); exRenderAll();
       };
       document.body.appendChild(pop); posPop(pop, anchor || document.body);
@@ -8493,6 +9455,21 @@
       <div style="width:90px"><label style="font-size:11px;font-weight:700;color:var(--text2)">${t('examMaxGradeLbl')}</label><input type="number" id="ex-em-in" value="${ex.maxGrade || 50}" style="width:100%"></div>
     </div>
     <div style="margin-top:6px">
+      <label style="font-size:11px;font-weight:700;color:var(--text2)">${isAr ? 'مكان الامتحان' : 'Exam Location'}</label>
+      <div style="display:flex;gap:5px;margin-top:4px">
+        <label style="flex:1;display:flex;align-items:center;gap:5px;cursor:pointer;background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:6px 8px;font-size:11px;font-weight:700">
+          <input type="radio" name="ex-loc-edit" value="school" ${!ex.location || ex.location === 'school' ? 'checked' : ''}> <i class="fa-solid fa-school"></i> ${isAr ? 'مدرسة' : 'School'}
+        </label>
+        <label style="flex:1;display:flex;align-items:center;gap:5px;cursor:pointer;background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:6px 8px;font-size:11px;font-weight:700">
+          <input type="radio" name="ex-loc-edit" value="online" ${ex.location === 'online' ? 'checked' : ''}> <i class="fa-solid fa-wifi"></i> ${isAr ? 'أونلاين' : 'Online'}
+        </label>
+        <label style="flex:1;display:flex;align-items:center;gap:5px;cursor:pointer;background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:6px 8px;font-size:11px;font-weight:700">
+          <input type="radio" name="ex-loc-edit" value="custom" ${ex.location && ex.location !== 'school' && ex.location !== 'online' ? 'checked' : ''}> <i class="fa-solid fa-location-pin"></i> ${isAr ? 'آخر' : 'Other'}
+        </label>
+      </div>
+      <input type="text" id="ex-loc-custom-edit" placeholder="${isAr ? 'أدخل المكان...' : 'Enter location...'}" value="${ex.location && ex.location !== 'school' && ex.location !== 'online' ? esc(ex.location) : ''}" style="width:100%;margin-top:4px;display:${ex.location && ex.location !== 'school' && ex.location !== 'online' ? 'block' : 'none'}">
+    </div>
+    <div style="margin-top:6px">
       <label style="font-size:11px;font-weight:700;color:var(--text2)">${isAr ? 'الدرجة المحققة (اختياري)' : 'Achieved Score (optional)'}</label>
       <input type="number" id="ex-eg-in" value="${ex.grade != null ? ex.grade : ''}" placeholder="${isAr ? 'لم تسجل بعد' : 'Not recorded'}" style="width:100%">
     </div>
@@ -8505,6 +9482,12 @@
       <button class="p-btn p-del" onclick="closeAnyPop()" style="flex:1">${t('flCancel')}</button>
     </div>
   `;
+      // Toggle custom location field
+      pop.querySelectorAll('input[name="ex-loc-edit"]').forEach(r => {
+        r.addEventListener('change', () => {
+          pop.querySelector('#ex-loc-custom-edit').style.display = r.value === 'custom' ? 'block' : 'none';
+        });
+      });
       pop.querySelector('#ex-edit-save').onclick = () => {
         const title = pop.querySelector('#ex-et-in').value.trim();
         const subject = pop.querySelector('#ex-es-in').value;
@@ -8513,6 +9496,9 @@
         const gVal = pop.querySelector('#ex-eg-in').value;
         const grade = gVal !== '' && !isNaN(parseFloat(gVal)) ? parseFloat(gVal) : null;
         const notes = pop.querySelector('#ex-en-in').value.trim();
+        const locVal = pop.querySelector('input[name="ex-loc-edit"]:checked')?.value || 'school';
+        const locCustom = pop.querySelector('#ex-loc-custom-edit').value.trim();
+        const location = locVal === 'custom' ? (locCustom || 'Other') : locVal;
 
         if (!title) return;
         ex.title = title;
@@ -8521,6 +9507,7 @@
         ex.maxGrade = maxGrade;
         ex.grade = grade;
         ex.notes = notes;
+        ex.location = location;
 
         saveJ('events', sEvents); closeAnyPop(); exRenderAll();
       };
@@ -9520,7 +10507,15 @@
       sCols = loadJ('columns', DEF_COLS);
       sTmpl = loadJ('template', DEF_TEMPLATE);
       sSubj = loadJ('subjects', DEF_SUBJECTS);
+      const EXAMS_SEED_KEY = 'exams_seeded_20261014';
       sEvents = loadJ('events', DEF_EVENTS);
+      if (!localStorage.getItem(EXAMS_SEED_KEY)) {
+        localStorage.setItem(EXAMS_SEED_KEY, '1');
+        if (!sEvents || sEvents.length === 0) {
+          sEvents = JSON.parse(JSON.stringify(DEF_EVENTS));
+          saveJ('events', sEvents);
+        }
+      }
       sRevision = loadJ('revision', DEF_REVISION);
       sMeta = loadJ('meta', defMeta());
       sMissed = reconcile();
@@ -10316,6 +11311,9 @@
 
       hideLoader();
       init();
+      if (typeof window.restoreLastPage === 'function') {
+        window.restoreLastPage();
+      }
       setupRealtimeSync();
     }
 
@@ -10345,8 +11343,8 @@
               localStorage.setItem(id, JSON.stringify(val));
 
               if (id === 'lt_deleted') {
-                ltDeleted = val;
-                ltLectures = ltLectures.filter(l => !ltDeleted.includes(`${l.teacherId}_${l.date}`) && !ltDeleted.includes(l.id));
+                ltDeleted = Array.isArray(val) ? val : [];
+                ltLectures = ltLectures.filter(l => !isLecDeleted(l));
                 if (typeof ltRenderAll === 'function') ltRenderAll();
                 if (typeof anRenderAll === 'function') anRenderAll();
               } else if (id === 'planner_v1') {
@@ -10358,7 +11356,7 @@
                 }
               } else if (id === 'lt-lectures' || id === 'lt_l' || id === 'lt_lectures_v2') {
                 let rawLecs = Array.isArray(val) ? val : [];
-                ltLectures = rawLecs.filter(l => !ltDeleted.includes(`${l.teacherId}_${l.date}`) && !ltDeleted.includes(l.id));
+                ltLectures = rawLecs.filter(l => !isLecDeleted(l));
                 if (typeof ltRenderAll === 'function') ltRenderAll();
                 if (typeof anRenderAll === 'function') anRenderAll();
                 if (typeof repRenderAll === 'function') repRenderAll();
@@ -10636,7 +11634,8 @@
 
     function endTour() {
       document.getElementById('tour-backdrop').classList.remove('active');
-      if (typeof switchPage === 'function') switchPage('sched');
+      if (typeof switchToTodoView === 'function') switchToTodoView('today');
+      else if (typeof switchPage === 'function') switchPage('todo');
     }
 
     /* ════════════════════════════════════════════════════

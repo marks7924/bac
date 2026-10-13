@@ -135,15 +135,15 @@ const Store = (() => {
   }
 
   function getTasksForDate(dateStr) {
-    return state.tasks.filter(t => t.plannedDate === dateStr && !t.recurrenceId);
+    return state.tasks.filter(t => t.plannedDate === dateStr && !t.recurrenceId && !t.archived);
   }
 
   function getInboxTasks() {
-    return state.tasks.filter(t => !t.plannedDate && !t.recurrenceId);
+    return state.tasks.filter(t => !t.plannedDate && !t.recurrenceId && !t.archived);
   }
 
-  function getTasksForProject(projectId) {
-    return state.tasks.filter(t => t.projectId === projectId);
+  function getTasksForProject(projectId, includeArchived = false) {
+    return state.tasks.filter(t => t.projectId === projectId && (includeArchived || !t.archived));
   }
 
   function getOverdueTasks() {
@@ -152,8 +152,45 @@ const Store = (() => {
       t.plannedDate &&
       t.plannedDate < today &&
       t.status !== 'completed' &&
-      !t.recurrenceId
+      !t.recurrenceId &&
+      !t.archived
     );
+  }
+
+  function getArchivedTasks(projectId = null) {
+    return state.tasks.filter(t => t.archived && (!projectId || t.projectId === projectId));
+  }
+
+  function archiveTask(id) {
+    return updateTask(id, { archived: true });
+  }
+
+  function unarchiveTask(id) {
+    return updateTask(id, { archived: false });
+  }
+
+  function archiveDoneTasks(projectId = null) {
+    let count = 0;
+    state.tasks.forEach(t => {
+      if ((!projectId || t.projectId === projectId) && t.status === 'completed' && !t.archived) {
+        t.archived = true;
+        count++;
+      }
+    });
+    if (count > 0) save();
+    return count;
+  }
+
+  function unarchiveAllTasks(projectId = null) {
+    let count = 0;
+    state.tasks.forEach(t => {
+      if (t.archived && (!projectId || t.projectId === projectId)) {
+        t.archived = false;
+        count++;
+      }
+    });
+    if (count > 0) save();
+    return count;
   }
 
   // Subtasks
@@ -218,10 +255,10 @@ const Store = (() => {
   }
 
   function getProjectProgress(projectId) {
-    const tasks = getTasksForProject(projectId);
-    if (!tasks.length) return { total: 0, completed: 0, pct: 0 };
-    const completed = tasks.filter(t => t.status === 'completed').length;
-    return { total: tasks.length, completed, pct: Math.round((completed / tasks.length) * 100) };
+    const relevantTasks = state.tasks.filter(t => t.projectId === projectId && (!t.archived || t.status === 'completed'));
+    if (!relevantTasks.length) return { total: 0, completed: 0, pct: 0 };
+    const completed = relevantTasks.filter(t => t.status === 'completed').length;
+    return { total: relevantTasks.length, completed, pct: Math.round((completed / relevantTasks.length) * 100) };
   }
 
   // -- Recurring tasks ------------------------------------
@@ -676,6 +713,7 @@ const Store = (() => {
     load, save, subscribe, getState,
     getTasks, getTask, addTask, updateTask, deleteTask, completeTask, reorderTask,
     getTasksForDate, getInboxTasks, getTasksForProject, getOverdueTasks,
+    getArchivedTasks, archiveTask, unarchiveTask, archiveDoneTasks, unarchiveAllTasks,
     addSubtask, toggleSubtask, deleteSubtask,
     getProjects, getProject, addProject, updateProject, deleteProject, getProjectProgress,
     getRecurrences, addRecurrence, updateRecurrence, deleteRecurrence,

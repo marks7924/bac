@@ -163,6 +163,59 @@
 }
 .priority-option input { accent-color: var(--accent); }
 
+/* Task type chips */
+.task-type-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.task-type-chip {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.task-type-chip input[type="radio"] {
+  display: none;
+}
+
+.task-type-chip span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 11px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.task-type-chip:hover span {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.task-type-chip.active span,
+.task-type-chip:has(input:checked) span {
+  background: var(--accent-muted);
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.task-type-extra {
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--surface);
+  padding: var(--space-3) 0;
+  margin-bottom: var(--space-2);
+}
+
 /* Recurrence */
 .recurrence-days-wrap { margin-top: var(--space-2); }
 .day-chips {
@@ -498,4 +551,39 @@
   0%, 100% { transform: translateX(0); }
   20%, 60% { transform: translateX(-8px); }
   40%, 80% { transform: translateX(8px); }
+}
+
+/* ── Homework page ranges tag input ── */
+.hw-ranges-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 8px;
+}
+.hw-ranges-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-height: 24px;
+}
+.hw-ranges-tags:empty::before {
+  content: 'No ranges added yet';
+  color: var(--text-muted);
+  font-size: 11px;
+  padding: 2px 4px;
+}
+
+/* ── Task type inline badges ── */
+.task-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── g-tab SVG icons (Study Hub top nav) ── */
+.g-tab-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
 }

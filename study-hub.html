@@ -4358,9 +4358,10 @@
       </div>
     </div>
     <nav class="g-nav">
-      <button class="g-tab active" id="tab-sched" onclick="switchPage('sched')">
-        <i class="fa-solid fa-calendar-week"></i>
-        <span id="tab-sched-txt">الجدول الأسبوعي</span>
+      <button class="g-tab active" id="tab-today" onclick="switchToTodoView('today')">
+        <svg class="g-tab-icon" width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="2" y="2" width="11" height="11" rx="1.5" stroke="currentColor" stroke-width="1.2"></rect><path d="M5 2V1M10 2V1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"></path><path d="M2 5.5h11" stroke="currentColor" stroke-width="1.1"></path></svg>
+        <span id="tab-today-txt">Today</span>
+        <span class="g-tab-badge" id="main-today-badge"></span>
       </button>
       <button class="g-tab" id="tab-lt" onclick="switchPage('lt')">
         <i class="fa-solid fa-video"></i>
@@ -4370,13 +4371,13 @@
         <i class="fa-solid fa-calendar-check"></i>
         <span id="s-exams">امتحانات</span>
       </button>
-      <button class="g-tab" id="tab-curric" onclick="switchPage('curric')">
-        <i class="fa-solid fa-book-bookmark"></i>
-        <span id="s-curric">منهج</span>
+      <button class="g-tab" id="tab-projects" onclick="switchToTodoView('projects')">
+        <svg class="g-tab-icon" width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="1.5" y="1.5" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.2"></rect><rect x="8" y="1.5" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.2"></rect><rect x="1.5" y="8" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.2"></rect><rect x="8" y="8" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.2"></rect></svg>
+        <span id="tab-projects-txt">Projects</span>
       </button>
-      <button class="g-tab" id="tab-todo" onclick="switchPage('todo')">
-        <i class="fa-solid fa-list-check"></i>
-        <span id="s-todo">المهام والإنتاجية</span>
+      <button class="g-tab" id="tab-calendar" onclick="switchToTodoView('calendar')">
+        <svg class="g-tab-icon" width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="1.5" y="2.5" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.2"></rect><path d="M5 2V1M10 2V1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"></path><path d="M1.5 6h12" stroke="currentColor" stroke-width="1.1"></path></svg>
+        <span id="tab-calendar-txt">Calendar</span>
       </button>
     </nav>
     <div class="g-actions">
@@ -4439,8 +4440,8 @@
       <button class="g-btn" onclick="toggleMobileNav(event)" style="padding:4px 8px;font-size:16px;">✕</button>
     </div>
     <div class="g-mobile-drawer-body">
-      <button class="g-mobile-nav-item" onclick="switchPage('sched')">
-        <i class="fa-solid fa-calendar-week"></i> <span id="md-sched-txt">الجدول الأسبوعي</span>
+      <button class="g-mobile-nav-item" onclick="switchToTodoView('today')">
+        <i class="fa-regular fa-calendar-day"></i> <span>Today</span>
       </button>
       <button class="g-mobile-nav-item" onclick="switchPage('lt')">
         <i class="fa-solid fa-video"></i> <span id="md-lt-txt">متابع المحاضرات</span>
@@ -4448,11 +4449,11 @@
       <button class="g-mobile-nav-item" onclick="switchPage('exams')">
         <i class="fa-solid fa-calendar-check"></i> <span id="md-exams-txt">الامتحانات</span>
       </button>
-      <button class="g-mobile-nav-item" onclick="switchPage('curric')">
-        <i class="fa-solid fa-book-bookmark"></i> <span id="md-curric-txt">المنهج والمواد</span>
+      <button class="g-mobile-nav-item" onclick="switchToTodoView('projects')">
+        <i class="fa-solid fa-grid-2"></i> <span>Projects</span>
       </button>
-      <button class="g-mobile-nav-item" onclick="switchPage('todo')">
-        <i class="fa-solid fa-list-check"></i> <span id="md-todo-txt">المهام والإنتاجية</span>
+      <button class="g-mobile-nav-item" onclick="switchToTodoView('calendar')">
+        <i class="fa-regular fa-calendar"></i> <span>Calendar</span>
       </button>
       <button class="g-mobile-nav-item" onclick="switchPage('settings')">
         <i class="fa-solid fa-gear"></i> <span id="md-settings-txt">الإعدادات والتحكم</span>
@@ -4463,7 +4464,7 @@
   <!-- ══════════════════════════════════════════
      PAGE 1: WEEKLY SCHEDULE
 ══════════════════════════════════════════ -->
-  <div class="page active" id="page-sched">
+  <div class="page" id="page-sched">
     <div class="sched-wrap">
 
       <!-- Sub toolbar -->
@@ -6341,6 +6342,40 @@
     }
 
     /* ════════════════════════════════
+       SWITCH TO TODO SUB-VIEW (Today / Projects / Calendar)
+    ════════════════════════════════ */
+    let _currentTodoView = 'today';
+    function switchToTodoView(view) {
+      _currentTodoView = view;
+      closeMobileNav();
+
+      document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.g-tab, .settings-btn').forEach(el => el.classList.remove('active'));
+      const tp = document.getElementById('page-todo');
+      if (tp) tp.classList.add('active');
+
+      const tabMap = { today: 'tab-today', projects: 'tab-projects', calendar: 'tab-calendar' };
+      const tt = document.getElementById(tabMap[view] || 'tab-today');
+      if (tt) tt.classList.add('active');
+
+      const doNavigate = () => {
+        if (window.App && typeof window.App.navigate === 'function') {
+          window.App.navigate(view);
+        } else {
+          const navIdMap = { today: 'nav-today', calendar: 'nav-calendar', projects: 'nav-projects' };
+          const navBtn = document.getElementById(navIdMap[view]);
+          if (navBtn) navBtn.click();
+        }
+      };
+
+      if (window.App && typeof window.App.navigate === 'function') {
+        doNavigate();
+      } else {
+        setTimeout(doNavigate, 200);
+      }
+    }
+
+    /* ════════════════════════════════
        LANGUAGE
     ════════════════════════════════ */
     function toggleLang() {
@@ -6641,7 +6676,107 @@
     };
 
     const DEF_SUBJECTS = [];
-    const DEF_EVENTS   = [];
+    const DEF_EVENTS   = [
+      {
+        id: 'xmutyya9y0py0',
+        title: 'October exam history',
+        subject: 'History',
+        date: '2026-10-04',
+        notes: 'Tolba online',
+        location: 'online',
+        grade: 99,
+        maxGrade: 100,
+        createdAt: '2026-10-04'
+      },
+      {
+        id: 'xmv6zpsux879t',
+        title: 'October exam Programming',
+        subject: 'Programming',
+        date: '2026-10-07',
+        notes: 'Online',
+        location: 'online',
+        grade: null,
+        maxGrade: 100,
+        createdAt: '2026-10-07'
+      },
+      {
+        id: 'xmv6zii25biru',
+        title: 'October exam history',
+        subject: 'History',
+        date: '2026-10-12',
+        notes: 'Bassem center',
+        location: 'center',
+        grade: null,
+        maxGrade: 100,
+        createdAt: '2026-10-12'
+      },
+      {
+        id: 'xmv6zlbjstas6',
+        title: 'October exam English',
+        subject: 'English',
+        date: '2026-10-12',
+        notes: 'Online',
+        location: 'online',
+        grade: null,
+        maxGrade: 100,
+        createdAt: '2026-10-12'
+      },
+      {
+        id: 'xmv6zjppxwauf',
+        title: 'October exam Arabic',
+        subject: 'Arabic',
+        date: '2026-10-15',
+        notes: 'Online',
+        location: 'online',
+        grade: null,
+        maxGrade: 100,
+        createdAt: '2026-10-13'
+      },
+      {
+        id: 'xmv6zlwlw3s4w',
+        title: 'October exam Englsh',
+        subject: 'English',
+        date: '2026-10-17',
+        notes: 'School',
+        location: 'school',
+        grade: null,
+        maxGrade: 100,
+        createdAt: '2026-10-13'
+      },
+      {
+        id: 'xmv6zmxksdbj8',
+        title: 'October exam Arabic',
+        subject: 'Arabic',
+        date: '2026-10-19',
+        notes: 'School',
+        location: 'school',
+        grade: null,
+        maxGrade: 100,
+        createdAt: '2026-10-13'
+      },
+      {
+        id: 'xmv6zqnq1hx2h',
+        title: 'October exam history',
+        subject: 'History',
+        date: '2026-10-20',
+        notes: 'School',
+        location: 'school',
+        grade: null,
+        maxGrade: 100,
+        createdAt: '2026-10-13'
+      },
+      {
+        id: 'xmv6zrvb10cme',
+        title: 'October exam Programming',
+        subject: 'Programming',
+        date: '2026-10-22',
+        notes: 'School',
+        location: 'school',
+        grade: null,
+        maxGrade: 100,
+        createdAt: '2026-10-13'
+      }
+    ];
     const DEF_REVISION = [];
 
     function defWeek() {
@@ -7725,6 +7860,7 @@
         emoji: '📚',
         color: '#3b82f6',
         days: ['Sat'],
+        time: '10:00',
         platform: 'بسطهالك',
         link: 'https://bassthalk.com/userprofile/courses/course/1731',
         createdAt: '2026-09-12'
@@ -7736,19 +7872,21 @@
         emoji: '🧮',
         color: '#22c55e',
         days: ['Sun'],
+        time: '00:00',
         platform: 'Smart accedmy',
-        link: 'https://smartacademy-eg.com/packages-details/143',
+        link: 'https://smartacademy-eg.com/packages-details/141',
         createdAt: '2026-09-06'
       },
       {
         id: 'xmu42r5yo9dhu',
         name: 'ا. محمد عبالحميد',
-        subject: 'برمجه',
+        subject: 'برمجة',
         emoji: '📚',
         color: '#3b82f6',
         days: ['Thu'],
+        time: '18:00',
         platform: 'Smart accedmy',
-        link: 'https://smartacademy-eg.com/packages-details/144',
+        link: 'https://smartacademy-eg.com/packages-details/183',
         createdAt: '2026-09-03'
       },
       {
@@ -7758,6 +7896,7 @@
         emoji: '✏️',
         color: '#06b6d4',
         days: ['Sun'],
+        time: '00:00',
         platform: 'احمد طارق',
         link: 'https://ahmed-tarek.net/userprofile/courses/course/12',
         createdAt: '2026-09-13'
@@ -7767,32 +7906,42 @@
     const MARKSAMER_LECTURES = [
       // Teacher 1: ا. محمد صلاح (عربي)
       { id: 'xmu42mxkd4rm9', teacherId: 'xmu42m0ld9cr4', title: 'محاضرة أسبوع 1', date: '2026-09-12', weekNum: 1, watched: true, watchedAt: '2026-09-12', link: 'https://bassthalk.com/userprofile/courses/course/1731' },
-      { id: 'xmu851mhepz1s', teacherId: 'xmu42m0ld9cr4', title: 'محاضرة أسبوع 2', date: '2026-09-19', weekNum: 2, watched: true, watchedAt: '2026-09-19', link: 'https://bassthalk.com/userprofile/courses/course/1731' },
-      { id: 'xmuibtdaweo7o', teacherId: 'xmu42m0ld9cr4', title: 'Week Lecture 3', date: '2026-09-26', weekNum: 3, watched: false, watchedAt: null, link: 'https://bassthalk.com/userprofile/courses/course/1731' },
-      { id: 'xmusbhv9ix8td', teacherId: 'xmu42m0ld9cr4', title: 'Week Lecture 4', date: '2026-10-03', weekNum: 4, watched: false, watchedAt: null, link: 'https://bassthalk.com/userprofile/courses/course/1731' },
+      { id: 'xmu8ky4du2yez', teacherId: 'xmu42m0ld9cr4', title: 'محاضرة أسبوع 2', date: '2026-09-19', weekNum: 2, watched: true, watchedAt: '2026-09-19', link: 'https://bassthalk.com/userprofile/courses/course/1731' },
+      { id: 'xmutze4zueh6n', teacherId: 'xmu42m0ld9cr4', title: 'Week Lecture 3', date: '2026-09-26', weekNum: 3, watched: true, watchedAt: '2026-09-26', link: 'https://bassthalk.com/userprofile/courses/course/1731' },
+      { id: 'xmuu0bcf3is6b', teacherId: 'xmu42m0ld9cr4', title: 'Week Lecture 4', date: '2026-10-03', weekNum: 4, watched: false, watchedAt: null, link: 'https://bassthalk.com/userprofile/courses/course/1731' },
 
       // Teacher 2: ا. محمد طلبه (تاريخ)
-      { id: 'xmu85sdp6hav0', teacherId: 'xmu42p9ddigcu', title: 'Week Lecture 1', date: '2026-09-06', weekNum: 1, watched: true, watchedAt: '2026-09-06', link: 'https://smartacademy-eg.com/packages-details/141' },
-      { id: 'xmu85sdp6cjb4', teacherId: 'xmu42p9ddigcu', title: 'Week Lecture 2', date: '2026-09-13', weekNum: 2, watched: true, watchedAt: '2026-09-13', link: 'https://smartacademy-eg.com/packages-details/141' },
-      { id: 'xmu9rvwn4mv6u', teacherId: 'xmu42p9ddigcu', title: 'Week Lecture 3', date: '2026-09-20', weekNum: 3, watched: true, watchedAt: '2026-09-20', link: 'https://smartacademy-eg.com/packages-details/141' },
-      { id: 'xmujprrm2rqlb', teacherId: 'xmu42p9ddigcu', title: 'Week Lecture 4', date: '2026-09-27', weekNum: 4, watched: true, watchedAt: '2026-09-27', link: 'https://smartacademy-eg.com/packages-details/141' },
-      { id: 'xmutoyjbgfg2u', teacherId: 'xmu42p9ddigcu', title: 'Week Lecture 5', date: '2026-10-04', weekNum: 5, watched: false, watchedAt: null, link: 'https://smartacademy-eg.com/packages-details/143' },
+      { id: 'xmu42pbdow4y1', teacherId: 'xmu42p9ddigcu', title: 'محاضرة أسبوع 1', date: '2026-09-06', weekNum: 1, watched: true, watchedAt: '2026-09-06', link: 'https://smartacademy-eg.com/packages-details/141' },
+      { id: 'xmu42pe2wftua', teacherId: 'xmu42p9ddigcu', title: 'محاضرة أسبوع 2', date: '2026-09-13', weekNum: 2, watched: true, watchedAt: '2026-09-13', link: 'https://smartacademy-eg.com/packages-details/141' },
+      { id: 'xmu9tperemvuw', teacherId: 'xmu42p9ddigcu', title: 'Week Lecture 3', date: '2026-09-20', weekNum: 3, watched: true, watchedAt: '2026-09-20', link: 'https://smartacademy-eg.com/packages-details/141' },
+      { id: 'xmutze4zuss60', teacherId: 'xmu42p9ddigcu', title: 'Week Lecture 4', date: '2026-09-27', weekNum: 4, watched: true, watchedAt: '2026-09-27', link: 'https://smartacademy-eg.com/packages-details/141' },
+      { id: 'xmuu0do3af7ra', teacherId: 'xmu42p9ddigcu', title: 'Week Lecture 5', date: '2026-10-04', weekNum: 5, watched: true, watchedAt: '2026-10-04', link: 'https://smartacademy-eg.com/packages-details/141' },
+      { id: 'xmv3oa95s4v4c', teacherId: 'xmu42p9ddigcu', title: 'Week Lecture 6', date: '2026-10-11', weekNum: 6, watched: false, watchedAt: null, link: 'https://smartacademy-eg.com/packages-details/141' },
 
-      // Teacher 3: ا. محمد عبالحميد (برمجه)
-      { id: 'xmu85sdp6wtei', teacherId: 'xmu42r5yo9dhu', title: 'Week Lecture 1', date: '2026-09-03', weekNum: 1, watched: true, watchedAt: '2026-09-03', link: 'https://smartacademy-eg.com/packages-details/144' },
-      { id: 'xmu85sdp66vx0', teacherId: 'xmu42r5yo9dhu', title: 'Week Lecture 2', date: '2026-09-10', weekNum: 2, watched: true, watchedAt: '2026-09-10', link: 'https://smartacademy-eg.com/packages-details/144' },
-      { id: 'xmu85sdp6p1hi', teacherId: 'xmu42r5yo9dhu', title: 'Week Lecture 3', date: '2026-09-17', weekNum: 3, watched: true, watchedAt: '2026-09-17', link: 'https://smartacademy-eg.com/packages-details/144' },
-      { id: 'xmufsq9c9wpu6', teacherId: 'xmu42r5yo9dhu', title: 'Week Lecture 4', date: '2026-09-24', weekNum: 4, watched: true, watchedAt: '2026-09-24', link: 'https://smartacademy-eg.com/packages-details/144' },
-      { id: 'xmusisk3pr21p', teacherId: 'xmu42r5yo9dhu', title: 'Week Lecture 5', date: '2026-10-01', weekNum: 5, watched: false, watchedAt: null, link: 'https://smartacademy-eg.com/packages-details/144' },
+      // Teacher 3: ا. محمد عبالحميد (برمجة)
+      { id: 'xmu42r890k49h', teacherId: 'xmu42r5yo9dhu', title: 'محاضرة أسبوع 1', date: '2026-09-03', weekNum: 1, watched: true, watchedAt: '2026-09-03', link: 'https://smartacademy-eg.com/packages-details/144' },
+      { id: 'xmu42r9rsvtym', teacherId: 'xmu42r5yo9dhu', title: 'محاضرة أسبوع 2', date: '2026-09-10', weekNum: 2, watched: true, watchedAt: '2026-09-10', link: 'https://smartacademy-eg.com/packages-details/144' },
+      { id: 'xmu572znuhtyf', teacherId: 'xmu42r5yo9dhu', title: 'محاضرة أسبوع 3', date: '2026-09-17', weekNum: 3, watched: true, watchedAt: '2026-09-17', link: 'https://smartacademy-eg.com/packages-details/144' },
+      { id: 'xmuh6yxum6oui', teacherId: 'xmu42r5yo9dhu', title: 'Week Lecture 4', date: '2026-09-24', weekNum: 4, watched: true, watchedAt: '2026-09-24', link: 'https://smartacademy-eg.com/packages-details/144' },
+      { id: 'xmuylvuxlzxkx', teacherId: 'xmu42r5yo9dhu', title: 'Week Lecture 5', date: '2026-10-08', weekNum: 5, watched: false, watchedAt: null, link: 'https://smartacademy-eg.com/packages-details/183' },
 
       // Teacher 4: ا. احمد طارق (انجليزي)
-      { id: 'xmu85sdp6vlei', teacherId: 'xmu42u6qlglvj', title: 'Week Lecture 1', date: '2026-09-13', weekNum: 1, watched: true, watchedAt: '2026-09-13', link: 'https://ahmed-tarek.net/userprofile/courses/course/12' },
-      { id: 'xmu9rvwn4d6om', teacherId: 'xmu42u6qlglvj', title: 'Week Lecture 2', date: '2026-09-20', weekNum: 2, watched: true, watchedAt: '2026-09-20', link: 'https://ahmed-tarek.net/userprofile/courses/course/12' },
-      { id: 'xmujprrm2xug0', teacherId: 'xmu42u6qlglvj', title: 'Week Lecture 3', date: '2026-09-27', weekNum: 3, watched: true, watchedAt: '2026-09-27', link: 'https://ahmed-tarek.net/userprofile/courses/course/12' },
-      { id: 'xmutoyjbg9es2', teacherId: 'xmu42u6qlglvj', title: 'Week Lecture 4', date: '2026-10-04', weekNum: 4, watched: false, watchedAt: null, link: 'https://ahmed-tarek.net/userprofile/courses/course/12' }
+      { id: 'xmu42ud1g0n98', teacherId: 'xmu42u6qlglvj', title: 'محاضرة أسبوع 1', date: '2026-09-13', weekNum: 1, watched: true, watchedAt: '2026-09-13', link: 'https://ahmed-tarek.net/userprofile/courses/course/12' },
+      { id: 'xmu9tperecc9x', teacherId: 'xmu42u6qlglvj', title: 'Week Lecture 2', date: '2026-09-20', weekNum: 2, watched: true, watchedAt: '2026-09-20', link: 'https://ahmed-tarek.net/userprofile/courses/course/12' },
+      { id: 'xmutze4zurx8x', teacherId: 'xmu42u6qlglvj', title: 'Week Lecture 3', date: '2026-09-27', weekNum: 3, watched: true, watchedAt: '2026-09-27', link: 'https://ahmed-tarek.net/userprofile/courses/course/12' },
+      { id: 'xmuu0i7m3b2w1', teacherId: 'xmu42u6qlglvj', title: 'Week Lecture 4', date: '2026-10-04', weekNum: 4, watched: true, watchedAt: '2026-10-04', link: 'https://ahmed-tarek.net/userprofile/courses/course/12' }
     ];
 
     let ltDeleted = [];
+
+    function isLecDeleted(l) {
+      if (!l) return false;
+      if (ltDeleted.includes(l.id)) return true;
+      if (l.teacherId && l.date && (ltDeleted.includes(`${l.teacherId}_${l.date}`) || ltDeleted.includes(`${l.teacherId}_canceled_${l.date}`))) return true;
+      if (l.teacherId && l.weekNum && (ltDeleted.includes(`${l.teacherId}_w${l.weekNum}`) || ltDeleted.includes(`${l.teacherId}_week_${l.weekNum}`))) return true;
+      if (l.teacherId && l.title && ltDeleted.includes(`${l.teacherId}_${l.title}`)) return true;
+      return false;
+    }
 
     function ltLoad() {
       const getVal = (k) => {
@@ -7810,7 +7959,10 @@
 
       ltTeachers = Array.isArray(savedT) ? savedT : JSON.parse(JSON.stringify(MARKSAMER_TEACHERS));
       let rawLecs = Array.isArray(savedL) ? savedL : JSON.parse(JSON.stringify(MARKSAMER_LECTURES));
-      ltLectures = rawLecs.filter(l => !ltDeleted.includes(`${l.teacherId}_${l.date}`) && !ltDeleted.includes(l.id));
+      ltLectures = rawLecs.filter(l => !isLecDeleted(l));
+      if (Array.isArray(savedL) && rawLecs.length !== ltLectures.length) {
+        ltSave();
+      }
     }
 
     function ltSave() {
@@ -7887,10 +8039,11 @@
             if (ld > now) continue;
             const ldStr = dStr(ld);
             const delKey = `${tc.id}_${ldStr}`;
-            const isDeletedByUser = ltDeleted.includes(delKey);
+            const isDeletedByUser = ltDeleted.includes(delKey) || ltDeleted.includes(`${tc.id}_canceled_${ldStr}`);
             const exists = ltLectures.some(l => l.teacherId === tc.id && l.date === ldStr);
             if (!exists && !isDeletedByUser) {
               const wn = ltLectures.filter(l => l.teacherId === tc.id).length + 1;
+              if (ltDeleted.includes(`${tc.id}_w${wn}`) || ltDeleted.includes(`${tc.id}_week_${wn}`)) continue;
               ltLectures.push({
                 id: genId(), teacherId: tc.id,
                 title: `${lang === 'ar' ? 'محاضرة أسبوع' : 'Week Lecture'} ${wn}`,
@@ -7940,10 +8093,17 @@
           if (ld > now) ld.setDate(ld.getDate() - 7);
           const ldStr = dStr(ld);
           const delKey = `${tc.id}_${ldStr}`;
-          const isDeletedByUser = ltDeleted.includes(delKey);
+          const isDeletedByUser = ltDeleted.includes(delKey) || 
+                                  ltDeleted.includes(`${tc.id}_canceled_${ldStr}`) ||
+                                  ltDeleted.some(k => k === delKey || k.startsWith(tc.id + '_' + ldStr));
           const exists = ltLectures.some(l => l.teacherId === tc.id && l.date === ldStr);
           if (!exists && !isDeletedByUser) {
             const wn = ltLecsFor(tc.id).length + 1;
+            const weekKey = `${tc.id}_w${wn}`;
+            const weekKey2 = `${tc.id}_week_${wn}`;
+            if (ltDeleted.includes(weekKey) || ltDeleted.includes(weekKey2)) {
+              return;
+            }
             ltLectures.push({ id: genId(), teacherId: tc.id, title: `${lang === 'ar' ? 'محاضرة أسبوع' : 'Week Lecture'} ${wn}`, date: ldStr, weekNum: wn, link: tc.link || '', notes: '', watched: false, watchedAt: null, createdAt: ltTodayStr() });
             added++;
           }
@@ -8096,82 +8256,6 @@
       }
     };
 
-    function ltRestoreAllLecturesSilently() {
-      const DOW = { Sat: 6, Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5 };
-      let added = 0;
-      ltTeachers.forEach(tc => {
-        if (!tc.days || !tc.days.length) return;
-        tc.days.forEach(dk => {
-          const target = DOW[dk]; const now = new Date(); const cur = now.getDay();
-          const diff = (target - cur + 7) % 7;
-          for (let w = 0; w < 4; w++) {
-            const ld = new Date(now);
-            ld.setDate(now.getDate() - (diff === 0 ? 0 : 7 - diff) - (w * 7));
-            if (ld > now) continue;
-            const ldStr = dStr(ld);
-            const exists = ltLectures.some(l => l.teacherId === tc.id && l.date === ldStr);
-            if (!exists) {
-              const wn = ltLectures.filter(l => l.teacherId === tc.id).length + 1;
-              ltLectures.push({
-                id: genId(), teacherId: tc.id,
-                title: `${lang === 'ar' ? 'محاضرة أسبوع' : 'Week Lecture'} ${wn}`,
-                date: ldStr, weekNum: wn, link: tc.link || '', notes: '',
-                watched: false, watchedAt: null, createdAt: ltTodayStr()
-              });
-              added++;
-            }
-          }
-        });
-      });
-      if (added > 0) ltSave();
-    }
-
-    window.ltRestoreAllLectures = function() {
-      ltRestoreAllLecturesSilently();
-      ltSave(); ltRenderAll();
-      showToast('success', lang === 'ar' ? 'تم استرجاع وتوليد كافة المحاضرات للمعلمين بنجاح!' : 'Restored all teacher lectures successfully!');
-    };
-
-    function ltToggle(tid) {
-      const tog = document.getElementById('ltog-' + tid), list = document.getElementById('llecs-' + tid);
-      if (!list) return;
-      const hidden = list.style.display === 'none';
-      list.style.display = hidden ? 'flex' : 'none';
-      if (tog) tog.classList.toggle('collapsed', !hidden);
-    }
-
-    function ltToggleWatch(lid) {
-      const lec = ltLectures.find(l => l.id === lid); if (!lec) return;
-      lec.watched = !lec.watched; lec.watchedAt = lec.watched ? ltTodayStr() : null;
-      ltSave(); ltRenderAll();
-      showToast(lec.watched ? 'success' : 'info', lec.watched ? t('ltWatchOn') : t('ltWatchOff'));
-    }
-
-
-
-    function ltGenWeek(silent = false) {
-      const DOW = { Sat: 6, Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5 };
-      let added = 0;
-      ltTeachers.forEach(tc => {
-        if (!tc.days || !tc.days.length) return;
-        tc.days.forEach(dk => {
-          const target = DOW[dk]; const now = new Date(); const cur = now.getDay();
-          const diff = (target - cur + 7) % 7;
-          const ld = new Date(now); ld.setDate(now.getDate() - (diff === 0 ? 0 : 7 - diff));
-          if (ld > now) ld.setDate(ld.getDate() - 7);
-          const ldStr = dStr(ld);
-          const exists = ltLectures.some(l => l.teacherId === tc.id && l.date === ldStr);
-          if (!exists) {
-            const wn = ltLecsFor(tc.id).length + 1;
-            ltLectures.push({ id: genId(), teacherId: tc.id, title: `${lang === 'ar' ? 'محاضرة أسبوع' : 'Week Lecture'} ${wn}`, date: ldStr, weekNum: wn, link: tc.link || '', notes: '', watched: false, watchedAt: null, createdAt: ltTodayStr() });
-            added++;
-          }
-        });
-      });
-      if (added > 0) { ltSave(); ltRenderAll(); showToast('success', `${lang === 'ar' ? 'تم تنزيل' : 'Added'} ${added} ${t('ltAdded')}`); }
-      else if (!silent) { showToast('info', t('ltAlreadyUp')); }
-    }
-
     /* ── Teacher modal ── */
     function buildDayChips() {
       const sel = document.getElementById('t-day-sel'); if (!sel) return;
@@ -8283,16 +8367,31 @@
     function delLecture(anchor) {
       if (!ltEditLId) return;
       const targetLec = ltLectures.find(x => x.id === ltEditLId);
-      if (targetLec) {
-        const key1 = `${targetLec.teacherId}_${targetLec.date}`;
-        const key2 = targetLec.id;
-        if (!ltDeleted.includes(key1)) ltDeleted.push(key1);
-        if (!ltDeleted.includes(key2)) ltDeleted.push(key2);
-        saveJ('lt_deleted', ltDeleted);
-      }
+      const delId = ltEditLId;
       mkConfirmPop(t('lDelConfirm'), () => {
-        ltLectures = ltLectures.filter(x => x.id !== ltEditLId);
-        ltSave(); closeModal('mod-lecture'); ltRenderAll();
+        if (targetLec) {
+          const keysToAdd = [
+            targetLec.id,
+            `${targetLec.teacherId}_${targetLec.date}`,
+            `${targetLec.teacherId}_canceled_${targetLec.date}`,
+            `${targetLec.teacherId}_w${targetLec.weekNum}`,
+            `${targetLec.teacherId}_week_${targetLec.weekNum}`,
+            `${targetLec.teacherId}_${targetLec.title}`
+          ];
+          keysToAdd.forEach(k => {
+            if (k && !ltDeleted.includes(k)) ltDeleted.push(k);
+          });
+          saveJ('lt_deleted', ltDeleted);
+          const uid = getActiveSyncUid();
+          try {
+            localStorage.setItem(uid + ':lt_deleted', JSON.stringify(ltDeleted));
+            localStorage.setItem('lt_deleted', JSON.stringify(ltDeleted));
+          } catch(e){}
+        }
+        ltLectures = ltLectures.filter(x => x.id !== delId && !isLecDeleted(x));
+        ltSave();
+        closeModal('mod-lecture');
+        ltRenderAll();
         showToast('info', t('lDeleted'));
       }, anchor || document.getElementById('btn-del-lec'));
     }
@@ -8322,11 +8421,19 @@
        SEED DEMO DATA
     ════════════════════════════════ */
     function seedLt() {
+      const SEED_KEY = 'lt_seeded_20261014';
+      if (localStorage.getItem(SEED_KEY)) {
+        return;
+      }
+      localStorage.setItem(SEED_KEY, '1');
       if (!ltTeachers || ltTeachers.length === 0) {
         ltTeachers = JSON.parse(JSON.stringify(MARKSAMER_TEACHERS));
-        ltLectures = JSON.parse(JSON.stringify(MARKSAMER_LECTURES));
-        ltSave();
       }
+      if (!ltLectures || ltLectures.length === 0) {
+        ltLectures = JSON.parse(JSON.stringify(MARKSAMER_LECTURES));
+      }
+      ltLectures = ltLectures.filter(l => !isLecDeleted(l));
+      ltSave();
     }
 
     /* ════════════════════════════════
@@ -9466,7 +9573,15 @@
       sCols = loadJ('columns', DEF_COLS);
       sTmpl = loadJ('template', DEF_TEMPLATE);
       sSubj = loadJ('subjects', DEF_SUBJECTS);
+      const EXAMS_SEED_KEY = 'exams_seeded_20261014';
       sEvents = loadJ('events', DEF_EVENTS);
+      if (!localStorage.getItem(EXAMS_SEED_KEY)) {
+        localStorage.setItem(EXAMS_SEED_KEY, '1');
+        if (!sEvents || sEvents.length === 0) {
+          sEvents = JSON.parse(JSON.stringify(DEF_EVENTS));
+          saveJ('events', sEvents);
+        }
+      }
       sRevision = loadJ('revision', DEF_REVISION);
       sMeta = loadJ('meta', defMeta());
       sMissed = reconcile();
@@ -10291,8 +10406,8 @@
               localStorage.setItem(id, JSON.stringify(val));
 
               if (id === 'lt_deleted') {
-                ltDeleted = val;
-                ltLectures = ltLectures.filter(l => !ltDeleted.includes(`${l.teacherId}_${l.date}`) && !ltDeleted.includes(l.id));
+                ltDeleted = Array.isArray(val) ? val : [];
+                ltLectures = ltLectures.filter(l => !isLecDeleted(l));
                 if (typeof ltRenderAll === 'function') ltRenderAll();
                 if (typeof anRenderAll === 'function') anRenderAll();
               } else if (id === 'planner_v1') {
@@ -10304,7 +10419,7 @@
                 }
               } else if (id === 'lt-lectures' || id === 'lt_l' || id === 'lt_lectures_v2') {
                 let rawLecs = Array.isArray(val) ? val : [];
-                ltLectures = rawLecs.filter(l => !ltDeleted.includes(`${l.teacherId}_${l.date}`) && !ltDeleted.includes(l.id));
+                ltLectures = rawLecs.filter(l => !isLecDeleted(l));
                 if (typeof ltRenderAll === 'function') ltRenderAll();
                 if (typeof anRenderAll === 'function') anRenderAll();
                 if (typeof repRenderAll === 'function') repRenderAll();

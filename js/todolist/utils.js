@@ -153,10 +153,79 @@ const Utils = (() => {
     return dates;
   }
 
+  function parseDurationToHM(raw) {
+    if (!raw && raw !== 0) return '';
+    const s = String(raw).trim();
+    if (!s) return '';
+
+    // 1. HH:MM:SS or H:MM:SS or HH:MM (e.g. 1:30:00 -> 1h 30m, no seconds!)
+    const timeMatch = s.match(/^(\d+):(\d{1,2})(?::(\d{1,2}))?$/);
+    if (timeMatch) {
+      const hours = parseInt(timeMatch[1], 10);
+      const mins = parseInt(timeMatch[2], 10);
+      if (hours > 0 && mins > 0) return `${hours}h ${mins}m`;
+      if (hours > 0) return `${hours}h`;
+      return `${mins}m`;
+    }
+
+    // 2. Pure number (minutes e.g. 90 -> 1h 30m) or "90m" / "90min"
+    const pureMinMatch = s.match(/^(\d+)\s*(?:m|min|mins|minutes?)?$/i);
+    if (pureMinMatch) {
+      const totalMinutes = parseInt(pureMinMatch[1], 10);
+      const hours = Math.floor(totalMinutes / 60);
+      const mins = totalMinutes % 60;
+      if (hours > 0 && mins > 0) return `${hours}h ${mins}m`;
+      if (hours > 0) return `${hours}h`;
+      return `${mins}m`;
+    }
+
+    // 3. Decimal hours like "1.5h" or "1.5 hr"
+    const decMatch = s.match(/^([\d.]+)\s*(?:h|hr|hours?)$/i);
+    if (decMatch && decMatch[1].includes('.')) {
+      const totalMinutes = Math.round(parseFloat(decMatch[1]) * 60);
+      const hours = Math.floor(totalMinutes / 60);
+      const mins = totalMinutes % 60;
+      if (hours > 0 && mins > 0) return `${hours}h ${mins}m`;
+      if (hours > 0) return `${hours}h`;
+      return `${mins}m`;
+    }
+
+    // 4. "1h 30" (hours and minutes without m on second number)
+    const hmShortMatch = s.match(/^(\d+)\s*(?:h|hr|hours?)\s*(\d+)$/i);
+    if (hmShortMatch) {
+      const h = parseInt(hmShortMatch[1], 10);
+      const m = parseInt(hmShortMatch[2], 10);
+      if (h > 0 && m > 0) return `${h}h ${m}m`;
+      if (h > 0) return `${h}h`;
+      return `${m}m`;
+    }
+
+    // 5. Strings like "1h 30m", "1 hr 30 min", "1h30m", "1 hour 30 mins", "2 hrs", "45 min", "50m"
+    let h = 0;
+    let m = 0;
+    const hFound = s.match(/(\d+)\s*(?:h|hr|hours?)/i);
+    const mFound = s.match(/(\d+)\s*(?:m|min|mins|minutes?)/i);
+    if (hFound || mFound) {
+      if (hFound) h = parseInt(hFound[1], 10);
+      if (mFound) m = parseInt(mFound[1], 10);
+      if (m >= 60 && h === 0) {
+        h = Math.floor(m / 60);
+        m = m % 60;
+      }
+      if (h > 0 && m > 0) return `${h}h ${m}m`;
+      if (h > 0) return `${h}h`;
+      if (m > 0) return `${m}m`;
+    }
+
+    return s;
+  }
+
   return {
     uid, todayStr, formatDateKey, parseDate, formatDisplayDate,
     formatLongDate, formatShortDate, formatMonthYear, formatTime,
-    formatDuration, greeting, daysUntil, isOverdue, sanitizeHTML,
+    formatDuration, parseDurationToHM, greeting, daysUntil, isOverdue, sanitizeHTML,
     escapeRegExp, clamp, debounce, addDays, getRecurrenceDatesInRange
   };
 })();
+
+if (typeof window !== 'undefined') window.parseDurationToHM = Utils.parseDurationToHM;
