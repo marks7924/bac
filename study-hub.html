@@ -2982,6 +2982,238 @@
       border-top: 1px solid var(--border);
     }
 
+    
+    /* ── High-Contrast Visible Card & Attachment Buttons ── */
+    .ex-card-btn {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 5px !important;
+      padding: 5px 10px !important;
+      font-size: 11.5px !important;
+      font-weight: 800 !important;
+      color: #3b82f6 !important;
+      background: rgba(59, 130, 246, 0.16) !important;
+      border: 1px solid rgba(59, 130, 246, 0.45) !important;
+      border-radius: 7px !important;
+      cursor: pointer !important;
+      text-decoration: none !important;
+      transition: all 0.18s ease !important;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12) !important;
+      line-height: 1 !important;
+    }
+    .ex-card-btn:hover {
+      background: #3b82f6 !important;
+      color: #ffffff !important;
+      border-color: #3b82f6 !important;
+      transform: translateY(-1px) !important;
+      box-shadow: 0 3px 6px rgba(59, 130, 246, 0.35) !important;
+    }
+    .ex-card-btn.del {
+      color: #ef4444 !important;
+      background: rgba(239, 68, 68, 0.16) !important;
+      border-color: rgba(239, 68, 68, 0.45) !important;
+    }
+    .ex-card-btn.del:hover {
+      background: #ef4444 !important;
+      color: #ffffff !important;
+      border-color: #ef4444 !important;
+      box-shadow: 0 3px 6px rgba(239, 68, 68, 0.35) !important;
+    }
+    .ex-card-btn.attach-btn,
+    .rev-card-attachments .ex-card-btn {
+      color: #10b981 !important;
+      background: rgba(16, 185, 129, 0.18) !important;
+      border-color: rgba(16, 185, 129, 0.5) !important;
+    }
+    .ex-card-btn.attach-btn:hover,
+    .rev-card-attachments .ex-card-btn:hover {
+      background: #10b981 !important;
+      color: #ffffff !important;
+      border-color: #10b981 !important;
+      box-shadow: 0 3px 6px rgba(16, 185, 129, 0.35) !important;
+    }
+    .rev-folder-card.is-subfolder {
+      background: var(--card) !important;
+      border: 1px solid var(--border) !important;
+      border-radius: 10px !important;
+      margin-top: 8px !important;
+    }
+    .rev-folder-card.is-subfolder:hover {
+      border-color: var(--border2) !important;
+    }
+
+    /* ── Video Groups & Units ── */
+    .rev-vids-group {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+    .rev-vids-group-hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed var(--border);
+    }
+    .rev-vids-group-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text);
+    }
+    .rev-vids-group-count {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: var(--bg2);
+      color: var(--text3);
+      border: 1px solid var(--border);
+    }
+
+    /* ── Attached Files inside Video Cards ── */
+    .rev-card-attachments {
+      margin-top: 10px;
+      padding: 10px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .rev-attach-hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11.5px;
+      font-weight: 800;
+      color: var(--text2);
+    }
+    .rev-attach-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .rev-attach-chip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 10px;
+      gap: 8px;
+      font-size: 12px;
+      transition: all 0.15s;
+    }
+    .rev-attach-chip:hover {
+      border-color: var(--border2);
+      background: var(--surface);
+    }
+    .rev-attach-chip-main {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      flex: 1;
+    }
+    .rev-attach-chip-ttl {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .rev-attach-chip-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .rev-att-icon-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text2);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 11px;
+      transition: all 0.15s;
+      text-decoration: none !important;
+    }
+    .rev-att-icon-btn:hover {
+      color: var(--text);
+      border-color: var(--border2);
+    }
+    .rev-att-icon-btn.del:hover {
+      color: #ef4444;
+      border-color: #ef4444;
+    }
+    .rev-attach-empty {
+      padding: 8px 10px;
+      text-align: center;
+      font-size: 11px;
+      color: var(--text3);
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+      background: var(--bg2);
+    }
+    .rev-attach-empty:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ── File Preview Modal ── */
+    #mod-file-preview .sh-modal {
+      max-width: 960px;
+      width: 95vw;
+      height: 90vh;
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+      overflow: hidden;
+    }
+    #mod-file-preview .sh-mh {
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      gap: 12px;
+    }
+    #mod-file-preview .sh-mb {
+      padding: 0;
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+    }
+    .fpv-iframe-wrap {
+      width: 100%;
+      height: 100%;
+      flex: 1;
+      border: none;
+      background: #2a2a2a;
+    }
+
     .rev-open-btn {
       padding: 6px 14px;
       border-radius: 8px;
@@ -6631,9 +6863,29 @@
             </select>
           </div>
         </div>
+        <div class="f-row">
+          <div class="f-grp" style="flex:1">
+            <label class="f-lbl"><i class="fa-regular fa-clock"></i> <span id="lbl-rev-dur">مدة الفيديو</span></label>
+            <input type="text" id="rev-duration" class="f-inp" placeholder="مثال: 45 دقيقة أو 1:20:00">
+          </div>
+          <div class="f-grp" style="flex:1">
+            <label class="f-lbl"><i class="fa-solid fa-layer-group"></i> <span id="lbl-rev-group">المجموعة / الوحدة (اختياري)</span></label>
+            <input type="text" id="rev-group" list="rev-group-datalist" class="f-inp" placeholder="مثال: Unit 1 أو الوحدة الأولى">
+            <datalist id="rev-group-datalist"></datalist>
+          </div>
+        </div>
         <div class="f-grp">
           <label class="f-lbl">ملاحظات أو تفاصيل إضافية</label>
           <textarea id="rev-notes" class="f-inp" rows="2" placeholder="ملاحظات حول الحصة، ما يجب حله قبل المشاهدة..."></textarea>
+        </div>
+        <div class="f-grp" style="margin-top:4px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <label class="f-lbl" style="margin-bottom:0"><i class="fa-solid fa-paperclip"></i> <span id="lbl-rev-attachments">الملفات والمذكرات المرفقة بالحصة</span></label>
+            <button type="button" class="s-btn" onclick="openAttachFileModalFromRevEdit()" style="font-size:11px;padding:3px 8px;background:var(--bg2);border:1px solid var(--border);color:var(--text)"><i class="fa-solid fa-plus"></i> <span id="btn-add-att-txt">إضافة مرفق</span></button>
+          </div>
+          <div id="rev-modal-attachments-list" style="display:flex;flex-direction:column;gap:6px;max-height:140px;overflow-y:auto;background:var(--bg2);padding:8px;border-radius:8px;border:1px solid var(--border)">
+            <div style="font-size:11px;color:var(--text3);text-align:center;padding:6px" id="rev-modal-no-att">لا توجد ملفات مرفقة بعد. انقر على "+ إضافة مرفق" لإرفاق شيت PDF أو رابط.</div>
+          </div>
         </div>
       </div>
       <div class="sh-ma">
@@ -6656,6 +6908,7 @@
         <div style="display:flex;gap:8px;margin-bottom:14px;background:var(--bg2);padding:4px;border-radius:10px">
           <button id="file-type-btn-file" type="button" class="s-btn accent" style="flex:1;font-size:12px;padding:6px 12px" onclick="setFileModalMode('file')"><i class="fa-solid fa-file"></i> ملف دراسي</button>
           <button id="file-type-btn-folder" type="button" class="s-btn" style="flex:1;font-size:12px;padding:6px 12px;background:none;border:none;color:var(--text2)" onclick="setFileModalMode('folder')"><i class="fa-solid fa-folder"></i> مجلد جديد</button>
+          <button id="file-type-btn-upload-folder" type="button" class="s-btn" style="flex:1;font-size:12px;padding:6px 12px;background:none;border:none;color:var(--text2)" onclick="setFileModalMode('upload-folder')"><i class="fa-solid fa-folder-arrow-up"></i> رفع مجلد كامل</button>
         </div>
 
         <div class="f-grp">
@@ -6669,6 +6922,10 @@
             <label class="f-lbl">اسم المجلد</label>
             <input type="text" id="fld-name" class="f-inp" placeholder="مثال: مذكرات الشرح أو شيتات الواجب">
           </div>
+          <div class="f-grp">
+            <label class="f-lbl">المجلد الرئيسي الحاوي (اختياري - لإنشاء مجلد فرعي داخل مجلد)</label>
+            <select id="fld-parent" class="f-inp"></select>
+          </div>
           <div class="f-row">
             <div class="f-grp" style="flex:1">
               <label class="f-lbl">لون المجلد</label>
@@ -6678,6 +6935,7 @@
               <label class="f-lbl">أيقونة المجلد</label>
               <select id="fld-icon" class="f-inp">
                 <option value="fa-folder">مجلد عادي 📁</option>
+                <option value="fa-folder-tree">مجلد شجري فرعي 🗂️</option>
                 <option value="fa-book-bookmark">كتاب / مذكرة 📖</option>
                 <option value="fa-file-lines">أوراق وشيتات 📄</option>
                 <option value="fa-map">خرائط وتلخيصات 🗺️</option>
@@ -6685,6 +6943,16 @@
               </select>
             </div>
           </div>
+        </div>
+
+        <!-- Upload Whole Folder Fields -->
+        <div id="modal-upload-folder-fields" style="display:none;background:var(--bg2);padding:14px;border-radius:10px;border:1px dashed var(--border);text-align:center;margin-bottom:12px">
+          <i class="fa-solid fa-folder-arrow-up" style="font-size:32px;color:var(--accent);margin-bottom:8px;display:block"></i>
+          <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:4px" id="mod-up-fld-hdr">رفع مجلد كامل بالملفات والمذكرات</div>
+          <div style="font-size:11.5px;color:var(--text3);margin-bottom:12px" id="mod-up-fld-desc">سيتم إنشاء مجلد باسم المجلد الأصلي من جهازك ورفع جميع ملفاته (PDF، Word، صور...) وتنظيمها تلقائياً.</div>
+          <button type="button" class="s-btn accent" onclick="triggerFolderUploadFromModal()" style="font-size:12px;padding:8px 18px">
+            <i class="fa-solid fa-folder-open"></i> <span id="mod-up-fld-btn">اختر مجلداً من جهازك</span>
+          </button>
         </div>
 
         <!-- File Fields -->
@@ -6772,6 +7040,93 @@
       </div>
     </div>
   </div>
+
+  <!-- ══ FILE PREVIEW VIEWER MODAL ══ -->
+  <div class="sh-overlay" id="mod-file-preview" style="display:none" onclick="if(event.target.id==='mod-file-preview')closeModal('mod-file-preview')">
+    <div class="sh-modal" onclick="event.stopPropagation()">
+      <div class="sh-mh">
+        <div style="display:flex;align-items:center;gap:10px;overflow:hidden">
+          <div id="fpv-icon" style="font-size:20px;color:var(--accent)"><i class="fa-solid fa-file-pdf"></i></div>
+          <div style="overflow:hidden">
+            <div id="fpv-title" style="font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)">معاينة الملف</div>
+            <div id="fpv-meta" style="font-size:11px;color:var(--text3);margin-top:2px">PDF • 3.5 MB</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+          <a id="fpv-dl-btn" href="#" download class="s-btn" style="font-size:12px;padding:6px 12px;background:var(--bg2);color:var(--text);border:1px solid var(--border);text-decoration:none">
+            <i class="fa-solid fa-download"></i> <span id="fpv-dl-txt">تحميل</span>
+          </a>
+          <a id="fpv-ext-btn" href="#" target="_blank" rel="noopener noreferrer" class="s-btn accent" style="font-size:12px;padding:6px 12px;text-decoration:none">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> <span id="fpv-ext-txt">فتح بنافذة جديدة</span>
+          </a>
+          <button class="sh-close" onclick="closeModal('mod-file-preview')"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      </div>
+      <div class="sh-mb" id="fpv-body" style="position:relative">
+        <!-- Rendered preview content dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ QUICK VIDEO ATTACHMENT MODAL ══ -->
+  <div class="sh-overlay" id="mod-video-attach" style="display:none" onclick="if(event.target.id==='mod-video-attach')closeModal('mod-video-attach')">
+    <div class="sh-modal" style="max-width:440px" onclick="event.stopPropagation()">
+      <div class="sh-mh">
+        <div class="sh-mt"><i class="fa-solid fa-paperclip"></i> <span id="mod-vatt-title">إرفاق ملف أو شيت بالفيديو</span></div>
+        <button class="sh-close" onclick="closeModal('mod-video-attach')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="sh-mb">
+        <input type="hidden" id="vatt-rev-id" value="">
+        <div class="f-grp">
+          <label class="f-lbl">عنوان الملف المرفق</label>
+          <input type="text" id="vatt-title" class="f-inp" placeholder="مثال: شيت واجب الحصة الأولى PDF أو ملخص القوانين">
+        </div>
+        <div class="f-grp">
+          <label class="f-lbl">طريقة الإرفاق</label>
+          <div style="display:flex;gap:14px;margin-bottom:8px">
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--text);cursor:pointer">
+              <input type="radio" name="vatt-src-type" value="link" checked onchange="toggleVattSourceUI('link')"> رابط سحابي (Google Drive...)
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--text);cursor:pointer">
+              <input type="radio" name="vatt-src-type" value="upload" onchange="toggleVattSourceUI('upload')"> رفع ملف مباشر من الجهاز
+            </label>
+          </div>
+        </div>
+        <div id="vatt-src-link-wrap" class="f-grp">
+          <label class="f-lbl">رابط الملف (URL)</label>
+          <input type="url" id="vatt-url" class="f-inp" placeholder="https://drive.google.com/file/d/... أو رابط التحميل">
+        </div>
+        <div id="vatt-src-upload-wrap" class="f-grp" style="display:none">
+          <label class="f-lbl">اختر الملف من جهازك</label>
+          <input type="file" id="vatt-file-input" class="f-inp" onchange="handleVattFileSelect(this)">
+          <div id="vatt-upload-status" style="font-size:11px;color:var(--text3);margin-top:4px">يدعم ملفات PDF، صور، Word وغيرها.</div>
+        </div>
+        <div class="f-row">
+          <div class="f-grp" style="flex:1">
+            <label class="f-lbl">نوع الملف</label>
+            <select id="vatt-type" class="f-inp">
+              <option value="pdf">PDF (مستند) 📕</option>
+              <option value="doc">Word / مستند نصي 📘</option>
+              <option value="sheet">Excel / جدول 📗</option>
+              <option value="image">صورة 🖼️</option>
+              <option value="other">رابط أو ملف آخر 📁</option>
+            </select>
+          </div>
+          <div class="f-grp" style="flex:1">
+            <label class="f-lbl">حجم الملف (اختياري)</label>
+            <input type="text" id="vatt-size" class="f-inp" placeholder="مثال: 1.5 MB">
+          </div>
+        </div>
+      </div>
+      <div class="sh-ma">
+        <button class="btn-cancel-mod" onclick="closeModal('mod-video-attach')"><span>إلغاء</span></button>
+        <button class="btn-save-mod" onclick="saveVideoAttachment()"><i class="fa-solid fa-paperclip"></i> <span>إرفاق الملف</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden input for whole folder uploads -->
+  <input type="file" id="rev-folder-upload-input" webkitdirectory directory multiple style="display:none" onchange="handleFolderUpload(this)">
 
 
 
@@ -9541,10 +9896,35 @@
             id: 'rev_seed_1',
             subject: 'اللغة العربية',
             title: 'مراجعة شاملة للوحدة الأولى (نحو وبلاغة)',
-            url: 'https://www.youtube.com/watch?v=sample1',
+            url: 'https://www.youtube.com/watch?v=vigQbRS47wM',
             platform: 'YouTube',
             type: 'مراجعة شاملة',
+            duration: '1h 45m',
+            group: 'الوحدة الأولى (نحو وبلاغة)',
             notes: 'تشمل حل تدريبات شاملة على همزة الوصل والقطع والمبتدأ والخبر.',
+            attachments: [
+              {
+                id: 'att_seed_1',
+                title: 'شيت تدريبات النحو الشاملة PDF',
+                url: 'https://drive.google.com/file/d/sample_arabic_nahw',
+                type: 'pdf',
+                size: '2.4 MB',
+                createdAt: ltTodayStr()
+              }
+            ],
+            createdAt: ltTodayStr()
+          },
+          {
+            id: 'rev_seed_1b',
+            subject: 'اللغة العربية',
+            title: 'حل أسئلة البلاغة المتحررة على الوحدة الأولى',
+            url: 'https://www.youtube.com/watch?v=sample1b',
+            platform: 'YouTube',
+            type: 'حل تدريبات',
+            duration: '45 min',
+            group: 'الوحدة الأولى (نحو وبلاغة)',
+            notes: 'تطبيق مباشر على الصور البيانية والمحسنات البديعية.',
+            attachments: [],
             createdAt: ltTodayStr()
           },
           {
@@ -9554,7 +9934,10 @@
             url: 'https://www.youtube.com/watch?v=sample2',
             platform: 'YouTube',
             type: 'شرح مكثف',
+            duration: '2h 10m',
+            group: 'Grammar Modules',
             notes: 'Covers Past Simple, Continuous, Perfect and key vocab idioms.',
+            attachments: [],
             createdAt: ltTodayStr()
           },
           {
@@ -9656,32 +10039,6 @@
     let revFileModalMode = 'file'; // 'file' or 'folder'
     let revTempUploadedData = null;
     let revOpenFolderIds = new Set(['fld_seed_1', 'fld_seed_2', 'fld_seed_3', 'fld_seed_4', 'fld_seed_5']);
-
-    function revLoad() {
-      const uid = getActiveSyncUid();
-      let raw = localStorage.getItem(uid + ':revisions_data') || localStorage.getItem('revisions_data');
-      if (raw) {
-        try {
-          revData = JSON.parse(raw);
-        } catch(e) {
-          console.warn('Error parsing revisions_data, using default', e);
-        }
-      }
-      if (!revData || !Array.isArray(revData.subjects)) {
-        revData = defaultRevisionsData();
-        revSave();
-      }
-    }
-
-    function revSave() {
-      if (!revData) return;
-      saveJ('revisions_data', revData);
-      const uid = getActiveSyncUid();
-      try {
-        localStorage.setItem(uid + ':revisions_data', JSON.stringify(revData));
-        localStorage.setItem('revisions_data', JSON.stringify(revData));
-      } catch(e){}
-    }
 
     function revSetSectionMode(mode) {
       revActiveSection = mode;
@@ -9856,6 +10213,408 @@
       return '#3b82f6';
     }
 
+            /* ── IndexedDB Engine for High-Capacity Persistence ── */
+    const IDB_NAME = 'BAC_HUB_STORAGE';
+    const IDB_VER = 1;
+    const IDB_STORE = 'app_data';
+
+    function getBACIDB() {
+      return new Promise((resolve) => {
+        if (!window.indexedDB) { resolve(null); return; }
+        try {
+          const req = window.indexedDB.open(IDB_NAME, IDB_VER);
+          req.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(IDB_STORE)) {
+              db.createObjectStore(IDB_STORE);
+            }
+          };
+          req.onsuccess = (e) => resolve(e.target.result);
+          req.onerror = () => resolve(null);
+        } catch(e) { resolve(null); }
+      });
+    }
+
+    async function idbSet(key, value) {
+      try {
+        const db = await getBACIDB();
+        if (!db) return false;
+        return new Promise((resolve) => {
+          const tx = db.transaction(IDB_STORE, 'readwrite');
+          const store = tx.objectStore(IDB_STORE);
+          store.put(value, key);
+          tx.oncomplete = () => resolve(true);
+          tx.onerror = () => resolve(false);
+        });
+      } catch(e) { return false; }
+    }
+
+    async function idbGet(key) {
+      try {
+        const db = await getBACIDB();
+        if (!db) return null;
+        return new Promise((resolve) => {
+          const tx = db.transaction(IDB_STORE, 'readonly');
+          const store = tx.objectStore(IDB_STORE);
+          const req = store.get(key);
+          req.onsuccess = () => resolve(req.result || null);
+          req.onerror = () => resolve(null);
+        });
+      } catch(e) { return null; }
+    }
+
+    let revTargetUploadSubject = null;
+    let revTargetUploadFolderId = null;
+    let revTempVattUploadedData = null;
+
+    function triggerFolderUpload(subj, folderId) {
+      revTargetUploadSubject = subj || (revActiveSubject !== 'all' ? revActiveSubject : (revData?.subjects?.[0] || 'اللغة العربية'));
+      revTargetUploadFolderId = folderId || null;
+      const input = document.getElementById('rev-folder-upload-input');
+      if (input) {
+        input.value = '';
+        input.click();
+      }
+    }
+
+    function triggerFolderUploadFromModal() {
+      const subj = document.getElementById('file-subj').value;
+      closeModal('mod-file');
+      triggerFolderUpload(subj);
+    }
+
+    async function handleFolderUpload(input) {
+      const isAr = (lang === 'ar');
+      if (!input.files || input.files.length === 0) return;
+      
+      const files = Array.from(input.files);
+      const subj = revTargetUploadSubject || (revActiveSubject !== 'all' ? revActiveSubject : (revData?.subjects?.[0] || 'اللغة العربية'));
+      
+      if (!revData.folders) revData.folders = [];
+      if (!revData.files) revData.files = [];
+
+      showToast('info', isAr ? ('جاري معالجة ورفع ' + files.length + ' ملف مع المجلدات الفرعية...') : ('Processing and uploading ' + files.length + ' files with subfolders...'));
+
+      // Cache folder path to folder ID: e.g. "Physics" -> fld_1, "Physics/Unit 1" -> fld_2
+      const folderPathToId = {};
+
+      function ensureFolderPath(parts) {
+        let currentPath = '';
+        let currentParentId = revTargetUploadFolderId || null;
+
+        for (let i = 0; i < parts.length; i++) {
+          const partName = parts[i];
+          currentPath = currentPath ? (currentPath + '/' + partName) : partName;
+
+          if (folderPathToId[currentPath]) {
+            currentParentId = folderPathToId[currentPath];
+          } else {
+            let existing = revData.folders.find(f => f.subject === subj && f.name.toLowerCase() === partName.toLowerCase() && (f.parentId || null) === (currentParentId || null));
+            if (existing) {
+              folderPathToId[currentPath] = existing.id;
+              currentParentId = existing.id;
+              revOpenFolderIds.add(existing.id);
+            } else {
+              const newFldId = 'fld_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+              revData.folders.push({
+                id: newFldId,
+                subject: subj,
+                name: partName,
+                parentId: currentParentId || null,
+                color: (i === 0 && !revTargetUploadFolderId) ? '#3b82f6' : '#8b5cf6',
+                icon: (i === 0 && !revTargetUploadFolderId) ? 'fa-folder' : 'fa-folder-tree',
+                createdAt: ltTodayStr()
+              });
+              folderPathToId[currentPath] = newFldId;
+              currentParentId = newFldId;
+              revOpenFolderIds.add(newFldId);
+            }
+          }
+        }
+        return currentParentId;
+      }
+
+      let successCount = 0;
+      for (const file of files) {
+        let targetFolderId = revTargetUploadFolderId || null;
+        if (file.webkitRelativePath) {
+          const pathParts = file.webkitRelativePath.split('/');
+          if (pathParts.length > 1) {
+            const dirParts = pathParts.slice(0, -1);
+            targetFolderId = ensureFolderPath(dirParts);
+          }
+        }
+
+        const ext = file.name.split('.').pop().toLowerCase();
+        let type = 'other';
+        if (ext === 'pdf') type = 'pdf';
+        else if (['doc', 'docx', 'txt', 'rtf'].includes(ext)) type = 'doc';
+        else if (['xls', 'xlsx', 'csv'].includes(ext)) type = 'sheet';
+        else if (['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg'].includes(ext)) type = 'image';
+        else if (['mp4', 'mov', 'webm'].includes(ext)) type = 'video';
+
+        const sizeStr = (file.size / (1024 * 1024) >= 1)
+          ? (file.size / (1024 * 1024)).toFixed(2) + ' MB'
+          : (file.size / 1024).toFixed(1) + ' KB';
+
+        let dataUrl = '';
+        try {
+          dataUrl = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => resolve('');
+            reader.readAsDataURL(file);
+          });
+        } catch(err){}
+
+        revData.files.push({
+          id: 'fil_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+          subject: subj,
+          folderId: targetFolderId,
+          title: file.name.replace(/\.[^/.]+$/, ''),
+          url: dataUrl || ('#' + encodeURIComponent(file.name)),
+          type: type,
+          size: sizeStr,
+          notes: file.webkitRelativePath || '',
+          createdAt: ltTodayStr()
+        });
+        successCount++;
+      }
+
+      await revSave();
+      revRenderAll();
+      showToast('success', isAr ? ('✅ تم رفع المجلد وهيكلته بنجاح مع ' + successCount + ' ملف!') : ('✅ Successfully uploaded folder structure with ' + successCount + ' files!'));
+    }
+
+    /* ── PDF & File Viewer ── */
+    function openFilePreviewModal(fileId) {
+      const file = (revData?.files || []).find(f => f.id === fileId);
+      if (!file) return;
+      openFilePreviewDirect(file.title, file.url, file.type, file.size);
+    }
+
+    function openFilePreviewDirect(title, url, type, size) {
+      const isAr = (lang === 'ar');
+      title = title || (isAr ? 'مستند بدون عنوان' : 'Untitled Document');
+      type = (type || 'pdf').toLowerCase();
+      url = url || '';
+
+      const fpvTitle = document.getElementById('fpv-title');
+      const fpvMeta = document.getElementById('fpv-meta');
+      const fpvIcon = document.getElementById('fpv-icon');
+      const fpvDlBtn = document.getElementById('fpv-dl-btn');
+      const fpvExtBtn = document.getElementById('fpv-ext-btn');
+      const fpvBody = document.getElementById('fpv-body');
+
+      if (fpvTitle) fpvTitle.textContent = title;
+      if (fpvMeta) fpvMeta.textContent = type.toUpperCase() + (size ? (' • ' + size) : '');
+
+      let iconClass = 'fa-file-pdf';
+      let iconColor = '#ef4444';
+      if (type === 'doc') { iconClass = 'fa-file-word'; iconColor = '#3b82f6'; }
+      else if (type === 'sheet') { iconClass = 'fa-file-excel'; iconColor = '#10b981'; }
+      else if (type === 'image') { iconClass = 'fa-file-image'; iconColor = '#8b5cf6'; }
+      else if (type === 'video') { iconClass = 'fa-file-video'; iconColor = '#ec4899'; }
+      else if (type === 'other') { iconClass = 'fa-file'; iconColor = 'var(--text2)'; }
+      if (fpvIcon) fpvIcon.innerHTML = '<i class="fa-solid ' + iconClass + '" style="color:' + iconColor + '"></i>';
+
+      if (fpvDlBtn) {
+        fpvDlBtn.href = url || '#';
+        fpvDlBtn.download = title;
+        fpvDlBtn.style.display = url && url !== '#' ? 'inline-flex' : 'none';
+      }
+      if (fpvExtBtn) {
+        fpvExtBtn.href = url || '#';
+        fpvExtBtn.style.display = url && url !== '#' ? 'inline-flex' : 'none';
+      }
+
+      let bodyHtml = '';
+      let embedUrl = url;
+
+      if (embedUrl.includes('drive.google.com/file/d/')) {
+        embedUrl = embedUrl.replace(/\/view(\?.*)?$/, '/preview');
+      }
+
+      if (type === 'pdf' || url.toLowerCase().includes('.pdf') || (url.startsWith('data:application/pdf'))) {
+        if (url.startsWith('data:') || url.startsWith('blob:') || url.includes('drive.google.com') || url.startsWith('http')) {
+          bodyHtml = '<iframe src="' + esc(embedUrl) + '" class="fpv-iframe-wrap" title="' + esc(title) + '" allow="autoplay"></iframe>';
+        } else {
+          bodyHtml = '<div style="padding:40px 20px;text-align:center;color:var(--text3)">' +
+            '<i class="fa-solid fa-file-pdf" style="font-size:48px;color:#ef4444;display:block;margin-bottom:12px"></i>' +
+            '<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px">' + esc(title) + '</div>' +
+            '<p style="font-size:12px">' + (isAr ? 'انقر على تحميل أو فتح في نافذة جديدة لعرض المستند.' : 'Click download or open in new tab to view document.') + '</p>' +
+            '</div>';
+        }
+      } else if (type === 'image' || ['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg'].some(ext => url.toLowerCase().includes('.' + ext))) {
+        bodyHtml = '<div style="display:flex;align-items:center;justify-content:center;height:100%;padding:20px;overflow:auto;background:var(--bg)">' +
+          '<img src="' + esc(url) + '" alt="' + esc(title) + '" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:10px;box-shadow:var(--sh);">' +
+          '</div>';
+      } else if (type === 'video' || ['mp4', 'webm', 'mov'].some(ext => url.toLowerCase().includes('.' + ext))) {
+        bodyHtml = '<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#000;">' +
+          '<video src="' + esc(url) + '" controls autoplay style="max-width:100%;max-height:100%;outline:none;"></video>' +
+          '</div>';
+      } else {
+        if (url.startsWith('http')) {
+          bodyHtml = '<iframe src="' + esc(embedUrl) + '" class="fpv-iframe-wrap" title="' + esc(title) + '"></iframe>';
+        } else {
+          bodyHtml = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:30px;text-align:center;gap:14px;">' +
+            '<i class="fa-solid fa-file-lines" style="font-size:48px;color:var(--accent)"></i>' +
+            '<div style="font-size:16px;font-weight:800;color:var(--text);">' + esc(title) + '</div>' +
+            '<div style="font-size:12.5px;color:var(--text3);max-width:400px;">' + (isAr ? 'يمكنك تحميل هذا الملف أو فتحه في نافذة جديدة للاطلاع عليه.' : 'You can download or open this file in a new tab to view it.') + '</div>' +
+            '<div style="display:flex;gap:10px;margin-top:6px">' +
+            (url ? ('<a href="' + esc(url) + '" download class="s-btn" style="font-size:12px;padding:8px 16px;background:var(--bg2);color:var(--text);border:1px solid var(--border)"><i class="fa-solid fa-download"></i> ' + (isAr ? 'تحميل الملف' : 'Download') + '</a>') : '') +
+            (url ? ('<a href="' + esc(url) + '" target="_blank" class="s-btn accent" style="font-size:12px;padding:8px 16px"><i class="fa-solid fa-arrow-up-right-from-square"></i> ' + (isAr ? 'فتح بنافذة جديدة' : 'Open in New Tab') + '</a>') : '') +
+            '</div>' +
+            '</div>';
+        }
+      }
+
+      if (fpvBody) fpvBody.innerHTML = bodyHtml;
+      openModal('mod-file-preview');
+    }
+
+    /* ── Video Attachments Management ── */
+    function openAttachFileModal(revId) {
+      revTempVattUploadedData = null;
+      document.getElementById('vatt-rev-id').value = revId || '';
+      document.getElementById('vatt-title').value = '';
+      document.getElementById('vatt-url').value = '';
+      document.getElementById('vatt-size').value = '';
+      document.getElementById('vatt-type').value = 'pdf';
+      toggleVattSourceUI('link');
+      const radio = document.querySelector('input[name="vatt-src-type"][value="link"]');
+      if (radio) radio.checked = true;
+      openModal('mod-video-attach');
+    }
+
+    function toggleVattSourceUI(type) {
+      const linkWrap = document.getElementById('vatt-src-link-wrap');
+      const uploadWrap = document.getElementById('vatt-src-upload-wrap');
+      if (linkWrap && uploadWrap) {
+        linkWrap.style.display = type === 'upload' ? 'none' : 'block';
+        uploadWrap.style.display = type === 'upload' ? 'block' : 'none';
+      }
+    }
+
+    function handleVattFileSelect(input) {
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const titleInp = document.getElementById('vatt-title');
+        const sizeInp = document.getElementById('vatt-size');
+        const isAr = (lang === 'ar');
+
+        if (!titleInp.value) titleInp.value = file.name.replace(/\.[^/.]+$/, '');
+        const sizeStr = (file.size / (1024 * 1024) >= 1) ? (file.size / (1024 * 1024)).toFixed(2) + ' MB' : (file.size / 1024).toFixed(1) + ' KB';
+        sizeInp.value = sizeStr;
+
+        const ext = file.name.split('.').pop().toLowerCase();
+        const typeSelect = document.getElementById('vatt-type');
+        if (ext === 'pdf') typeSelect.value = 'pdf';
+        else if (['doc', 'docx'].includes(ext)) typeSelect.value = 'doc';
+        else if (['xls', 'xlsx', 'csv'].includes(ext)) typeSelect.value = 'sheet';
+        else if (['png', 'jpg', 'jpeg', 'webp'].includes(ext)) typeSelect.value = 'image';
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          revTempVattUploadedData = e.target.result;
+          document.getElementById('vatt-upload-status').textContent = isAr 
+            ? ('✅ تم تجهيز: ' + file.name + ' (' + sizeStr + ')')
+            : ('✅ Ready: ' + file.name + ' (' + sizeStr + ')');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    async function saveVideoAttachment() {
+      const revId = document.getElementById('vatt-rev-id').value;
+      const isAr = (lang === 'ar');
+      const title = document.getElementById('vatt-title').value.trim();
+      const srcType = document.querySelector('input[name="vatt-src-type"]:checked')?.value || 'link';
+      let url = document.getElementById('vatt-url').value.trim();
+      const type = document.getElementById('vatt-type').value;
+      const size = document.getElementById('vatt-size').value.trim();
+
+      if (srcType === 'upload' && revTempVattUploadedData) {
+        url = revTempVattUploadedData;
+      }
+
+      if (!title) { showToast('error', isAr ? 'يرجى إدخال عنوان المرفق!' : 'Please enter attachment title!'); return; }
+      if (!url) { showToast('error', isAr ? 'يرجى إدخال رابط أو رفع ملف المرفق!' : 'Please provide attachment link or upload file!'); return; }
+
+      const targetId = revId || revEditRevId;
+      const rev = (revData?.revisions || []).find(r => r.id === targetId);
+      if (!rev) {
+        showToast('error', isAr ? 'لم يتم العثور على الفيديو!' : 'Video not found!');
+        return;
+      }
+
+      if (!rev.attachments) rev.attachments = [];
+      rev.attachments.push({
+        id: 'att_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        title, url, type, size,
+        createdAt: ltTodayStr()
+      });
+
+      await revSave();
+      closeModal('mod-video-attach');
+      renderRevModalAttachmentsList(rev);
+      revRenderAll();
+      showToast('success', isAr ? 'تم إرفاق الملف بالفيديو بنجاح!' : 'File attached to video successfully!');
+    }
+
+    function removeVideoAttachment(revId, attId) {
+      const isAr = (lang === 'ar');
+      mkConfirmPop(isAr ? 'هل أنت متأكد من إزالة هذا الملف المرفق؟' : 'Are you sure you want to remove this attached file?', async () => {
+        const rev = (revData?.revisions || []).find(r => r.id === revId);
+        if (rev && rev.attachments) {
+          rev.attachments = rev.attachments.filter(a => a.id !== attId);
+          await revSave();
+          renderRevModalAttachmentsList(rev);
+          revRenderAll();
+          showToast('info', isAr ? 'تمت إزالة المرفق.' : 'Attachment removed.');
+        }
+      });
+    }
+
+    function renderRevModalAttachmentsList(rev) {
+      const container = document.getElementById('rev-modal-attachments-list');
+      if (!container) return;
+      const isAr = (lang === 'ar');
+      const atts = rev?.attachments || [];
+      if (atts.length === 0) {
+        container.innerHTML = '<div style="font-size:11px;color:var(--text3);text-align:center;padding:6px" id="rev-modal-no-att">' +
+          (isAr ? 'لا توجد ملفات مرفقة بعد. انقر على "+ إضافة مرفق" لإرفاق شيت PDF أو رابط.' : 'No attached files yet. Click "+ Add Attachment" to attach a PDF sheet or link.') +
+          '</div>';
+        return;
+      }
+      let html = '';
+      atts.forEach(a => {
+        const aIcon = (a.type === 'pdf') ? 'fa-file-pdf' : 'fa-file';
+        const aColor = (a.type === 'pdf') ? '#ef4444' : 'var(--blue2)';
+        html += '<div style="display:flex;align-items:center;justify-content:space-between;background:var(--card);padding:4px 8px;border-radius:6px;border:1px solid var(--border);font-size:12px">';
+        html += '  <div style="display:flex;align-items:center;gap:6px;overflow:hidden;flex:1">';
+        html += '    <i class="fa-solid ' + aIcon + '" style="color:' + aColor + '"></i>';
+        html += '    <span style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(a.title) + '</span>';
+        if (a.size) html += '    <span style="font-size:10px;color:var(--text3)">(' + esc(a.size) + ')</span>';
+        html += '  </div>';
+        html += '  <div style="display:flex;align-items:center;gap:4px">';
+        html += '    <button type="button" class="rev-att-icon-btn" onclick="openFilePreviewDirect(\'' + esc(a.title) + '\', \'' + esc(a.url) + '\', \'' + esc(a.type) + '\', \'' + esc(a.size || '') + '\')" title="' + (isAr ? 'معاينة' : 'Preview') + '"><i class="fa-solid fa-eye"></i></button>';
+        html += '    <button type="button" class="rev-att-icon-btn del" onclick="removeVideoAttachment(\'' + rev.id + '\', \'' + a.id + '\')" title="' + (isAr ? 'حذف' : 'Remove') + '"><i class="fa-solid fa-trash"></i></button>';
+        html += '  </div>';
+        html += '</div>';
+      });
+      container.innerHTML = html;
+    }
+
+    function openAttachFileModalFromRevEdit() {
+      if (!revEditRevId) {
+        saveRevision();
+        return;
+      }
+      openAttachFileModal(revEditRevId);
+    }
+
+    /* ── Main Render Content ── */
     function revRenderContent() {
       const container = document.getElementById('rev-content-container');
       if (!container || !revData) return;
@@ -9883,7 +10642,7 @@
         let subjFiles = (revData.files || []).filter(f => f.subject === subj);
 
         if (q) {
-          subjRevs = subjRevs.filter(r => (r.title || '').toLowerCase().includes(q) || (r.notes || '').toLowerCase().includes(q) || (r.type || '').toLowerCase().includes(q));
+          subjRevs = subjRevs.filter(r => (r.title || '').toLowerCase().includes(q) || (r.notes || '').toLowerCase().includes(q) || (r.type || '').toLowerCase().includes(q) || (r.group || '').toLowerCase().includes(q));
           subjFiles = subjFiles.filter(f => (f.title || '').toLowerCase().includes(q) || (f.notes || '').toLowerCase().includes(q));
           subjFolders = subjFolders.filter(f => (f.name || '').toLowerCase().includes(q) || subjFiles.some(file => file.folderId === f.id));
         }
@@ -9919,7 +10678,8 @@
         if (isVidsMode) {
           html += '<button class="s-btn" onclick="openAddRevisionModal(\'' + esc(subj) + '\')" style="font-size:12px;padding:6px 12px;background:var(--bg2);border:1px solid var(--border);color:var(--text)"><i class="fa-solid fa-plus"></i> ' + (isAr ? 'إضافة فيديو' : 'Add Video') + '</button>';
         } else {
-          html += '<button class="s-btn" onclick="openAddFileModal(\'' + esc(subj) + '\', null, \'folder\')" style="font-size:12px;padding:6px 12px;background:var(--bg2);border:1px solid var(--border);color:var(--text)"><i class="fa-solid fa-folder-plus"></i> ' + (isAr ? 'مجلد' : 'Folder') + '</button>';
+          html += '<button class="s-btn" onclick="triggerFolderUpload(\'' + esc(subj) + '\')" style="font-size:12px;padding:6px 12px;background:var(--bg2);border:1px solid var(--border);color:var(--text)" title="' + (isAr ? 'رفع مجلد كامل بالملفات' : 'Upload entire folder') + '"><i class="fa-solid fa-folder-arrow-up"></i> ' + (isAr ? 'رفع مجلد كامل' : 'Upload Folder') + '</button>';
+          html += '<button class="s-btn" onclick="openAddFileModal(\'' + esc(subj) + '\', null, \'folder\')" style="font-size:12px;padding:6px 12px;background:var(--bg2);border:1px solid var(--border);color:var(--text)"><i class="fa-solid fa-folder-plus"></i> ' + (isAr ? 'مجلد جديد' : 'New Folder') + '</button>';
           html += '<button class="s-btn" onclick="openAddFileModal(\'' + esc(subj) + '\', null, \'file\')" style="font-size:12px;padding:6px 12px;background:var(--bg2);border:1px solid var(--border);color:var(--text)"><i class="fa-solid fa-file-plus"></i> ' + (isAr ? 'ملف' : 'File') + '</button>';
         }
         html += '  </div>';
@@ -9933,105 +10693,215 @@
             html += isAr ? 'لا توجد فيديوهات مراجعة لهذه المادة بعد. انقر على "+ إضافة فيديو" لإضافة روابط الحصص!' : 'No revision videos for this subject yet. Click "+ Add Video" to add sessions!';
             html += '</div>';
           } else {
-            html += '<div class="rev-links-grid">';
-            subjRevs.forEach(rev => {
+            const groups = [];
+            subjRevs.forEach(r => {
+              const g = (r.group || '').trim();
+              if (g && !groups.includes(g)) groups.push(g);
+            });
+
+            const renderCard = (rev) => {
               const platform = rev.platform || 'YouTube';
               const pClass = (platform.toLowerCase().includes('drive')) ? 'gdrive' : 'platform';
               const pIcon = (platform.toLowerCase().includes('youtube')) ? 'fa-brands fa-youtube' : (platform.toLowerCase().includes('drive') ? 'fa-brands fa-google-drive' : 'fa-solid fa-video');
 
-              html += '<div class="rev-link-card">';
-              html += '  <div>';
-              html += '    <div class="rev-card-top">';
+              let cardHtml = '<div class="rev-link-card">';
+              cardHtml += '  <div>';
+              cardHtml += '    <div class="rev-card-top">';
               const revDisp = getRevItemDisplay(rev);
-              html += '      <div class="rev-card-ttl">' + esc(revDisp.title) + '</div>';
-              html += '      <div class="admin-only" style="display:flex;gap:4px">';
-              html += '        <button class="ex-card-btn" title="' + (isAr ? 'تعديل' : 'Edit') + '" onclick="editRevision(\'' + rev.id + '\')"><i class="fa-solid fa-pen-to-square"></i></button>';
-              html += '        <button class="ex-card-btn del" title="' + (isAr ? 'حذف' : 'Delete') + '" onclick="delRevision(\'' + rev.id + '\')"><i class="fa-solid fa-trash"></i></button>';
-              html += '      </div>';
-              html += '    </div>';
-              html += '    <div class="rev-card-tags">';
-              html += '      <span class="rev-tag ' + pClass + '"><i class="' + pIcon + '"></i> ' + esc(platform) + '</span>';
-              if (rev.type) html += '<span class="rev-tag"><i class="fa-solid fa-bookmark"></i> ' + esc(getRevTypeDisplayName(rev.type)) + '</span>';
-              html += '    </div>';
+              cardHtml += '      <div class="rev-card-ttl">' + esc(revDisp.title) + '</div>';
+              cardHtml += '      <div class="admin-only" style="display:flex;gap:5px">';
+              cardHtml += '        <button class="ex-card-btn" title="' + (isAr ? 'تعديل' : 'Edit') + '" onclick="editRevision(\'' + rev.id + '\')"><i class="fa-solid fa-pen-to-square"></i> ' + (isAr ? 'تعديل' : 'Edit') + '</button>';
+              cardHtml += '        <button class="ex-card-btn del" title="' + (isAr ? 'حذف' : 'Delete') + '" onclick="delRevision(\'' + rev.id + '\')"><i class="fa-solid fa-trash"></i></button>';
+              cardHtml += '      </div>';
+              cardHtml += '    </div>';
+              cardHtml += '    <div class="rev-card-tags">';
+              cardHtml += '      <span class="rev-tag ' + pClass + '"><i class="' + pIcon + '"></i> ' + esc(platform) + '</span>';
+              if (rev.type) cardHtml += '<span class="rev-tag"><i class="fa-solid fa-bookmark"></i> ' + esc(getRevTypeDisplayName(rev.type)) + '</span>';
+              if (rev.duration) cardHtml += '<span class="rev-tag" style="background:rgba(245,158,11,0.12);color:#f59e0b"><i class="fa-regular fa-clock"></i> ' + esc(rev.duration) + '</span>';
+              if (rev.group) cardHtml += '<span class="rev-tag" style="background:rgba(139,92,246,0.12);color:#8b5cf6"><i class="fa-solid fa-layer-group"></i> ' + esc(rev.group) + '</span>';
+              cardHtml += '    </div>';
               if (rev.notes) {
-                html += '    <div class="rev-card-notes" style="margin-top:8px">' + esc(revDisp.notes) + '</div>';
+                cardHtml += '    <div class="rev-card-notes" style="margin-top:8px">' + esc(revDisp.notes) + '</div>';
               }
-              html += '  </div>';
-              html += '  <div class="rev-card-ftr">';
-              html += '    <span style="font-size:11px;color:var(--text3)"><i class="fa-regular fa-clock"></i> ' + (rev.createdAt || '') + '</span>';
-              html += '    <a href="' + esc(rev.url || '#') + '" target="_blank" rel="noopener noreferrer" class="rev-open-btn"><i class="fa-solid fa-arrow-up-right-from-square"></i> ' + (isAr ? 'مشاهدة المراجعة' : 'Watch Session') + '</a>';
-              html += '  </div>';
-              html += '</div>'; // end rev-link-card
-            });
-            html += '</div>';
+
+              // Attachments section inside the video card
+              const atts = rev.attachments || [];
+              cardHtml += '    <div class="rev-card-attachments">';
+              cardHtml += '      <div class="rev-attach-hdr">';
+              cardHtml += '        <span><i class="fa-solid fa-paperclip"></i> ' + (isAr ? 'الملفات المرفقة' : 'Attached Files') + ' (' + atts.length + ')</span>';
+              cardHtml += '        <button class="ex-card-btn attach-btn admin-only" onclick="openAttachFileModal(\'' + rev.id + '\')" title="' + (isAr ? 'إرفاق ملف' : 'Attach File') + '"><i class="fa-solid fa-plus"></i> ' + (isAr ? 'إرفاق' : 'Attach') + '</button>';
+              cardHtml += '      </div>';
+              if (atts.length > 0) {
+                cardHtml += '      <div class="rev-attach-list">';
+                atts.forEach(att => {
+                  const aIcon = (att.type === 'pdf') ? 'fa-file-pdf' : ((att.type === 'image') ? 'fa-file-image' : 'fa-file');
+                  const aColor = (att.type === 'pdf') ? '#ef4444' : ((att.type === 'image') ? '#8b5cf6' : 'var(--blue2)');
+                  cardHtml += '        <div class="rev-attach-chip">';
+                  cardHtml += '          <div class="rev-attach-chip-main" onclick="openFilePreviewDirect(\'' + esc(att.title) + '\', \'' + esc(att.url) + '\', \'' + esc(att.type) + '\', \'' + esc(att.size || '') + '\')" title="' + (isAr ? 'انقر للمعاينة' : 'Click to preview') + '">';
+                  cardHtml += '            <i class="fa-solid ' + aIcon + '" style="color:' + aColor + '"></i>';
+                  cardHtml += '            <span class="rev-attach-chip-ttl">' + esc(att.title) + '</span>';
+                  if (att.size) cardHtml += '<span style="font-size:10px;color:var(--text3);margin-left:4px">(' + esc(att.size) + ')</span>';
+                  cardHtml += '          </div>';
+                  cardHtml += '          <div class="rev-attach-chip-actions">';
+                  cardHtml += '            <button class="rev-att-icon-btn" onclick="openFilePreviewDirect(\'' + esc(att.title) + '\', \'' + esc(att.url) + '\', \'' + esc(att.type) + '\', \'' + esc(att.size || '') + '\')" title="' + (isAr ? 'معاينة' : 'Preview') + '"><i class="fa-solid fa-eye"></i></button>';
+                  if (att.url && att.url !== '#') {
+                    cardHtml += '            <a href="' + esc(att.url) + '" download="' + esc(att.title) + '" class="rev-att-icon-btn" title="' + (isAr ? 'تحميل' : 'Download') + '"><i class="fa-solid fa-arrow-down"></i></a>';
+                  }
+                  cardHtml += '            <button class="rev-att-icon-btn del admin-only" onclick="removeVideoAttachment(\'' + rev.id + '\', \'' + att.id + '\')" title="' + (isAr ? 'حذف' : 'Delete') + '"><i class="fa-solid fa-xmark"></i></button>';
+                  cardHtml += '          </div>';
+                  cardHtml += '        </div>';
+                });
+                cardHtml += '      </div>';
+              } else {
+                cardHtml += '      <div class="rev-attach-empty admin-only" onclick="openAttachFileModal(\'' + rev.id + '\')">';
+                cardHtml += '        <i class="fa-solid fa-cloud-arrow-up"></i> ' + (isAr ? '+ إرفاق شيت / ملخص PDF أو رابط' : '+ Attach PDF sheet, notes, or link');
+                cardHtml += '      </div>';
+              }
+              cardHtml += '    </div>';
+              cardHtml += '  </div>';
+
+              cardHtml += '  <div class="rev-card-ftr">';
+              cardHtml += '    <span style="font-size:11px;color:var(--text3)"><i class="fa-regular fa-clock"></i> ' + (rev.createdAt || '') + (rev.duration ? (' • <i class="fa-solid fa-stopwatch"></i> ' + esc(rev.duration)) : '') + '</span>';
+              cardHtml += '    <a href="' + esc(rev.url || '#') + '" target="_blank" rel="noopener noreferrer" class="rev-open-btn"><i class="fa-solid fa-arrow-up-right-from-square"></i> ' + (isAr ? 'مشاهدة المراجعة' : 'Watch Session') + '</a>';
+              cardHtml += '  </div>';
+              cardHtml += '</div>';
+              return cardHtml;
+            };
+
+            if (groups.length === 0) {
+              html += '<div class="rev-links-grid">';
+              subjRevs.forEach(rev => { html += renderCard(rev); });
+              html += '</div>';
+            } else {
+              groups.forEach(gName => {
+                const gRevs = subjRevs.filter(r => (r.group || '').trim() === gName);
+                html += '<div class="rev-vids-group">';
+                html += '  <div class="rev-vids-group-hdr">';
+                html += '    <div class="rev-vids-group-title">';
+                html += '      <i class="fa-solid fa-layer-group" style="color:var(--accent)"></i>';
+                html += '      <span>' + esc(gName) + '</span>';
+                html += '      <span class="rev-vids-group-count">' + gRevs.length + ' ' + (isAr ? 'فيديوهات' : 'videos') + '</span>';
+                html += '    </div>';
+                html += '    <button class="s-btn admin-only" onclick="openAddRevisionModal(\'' + esc(subj) + '\', \'' + esc(gName) + '\')" style="font-size:11px;padding:4px 10px;background:var(--bg2);border:1px solid var(--border);color:var(--text)" title="' + (isAr ? 'إضافة فيديو لهذه المجموعة' : 'Add video to group') + '"><i class="fa-solid fa-plus"></i> ' + (isAr ? 'إضافة فيديو' : 'Add Video') + '</button>';
+                html += '  </div>';
+                html += '  <div class="rev-links-grid">';
+                gRevs.forEach(rev => { html += renderCard(rev); });
+                html += '  </div>';
+                html += '</div>';
+              });
+
+              const standalone = subjRevs.filter(r => !(r.group || '').trim());
+              if (standalone.length > 0) {
+                html += '<div class="rev-vids-group" style="border-style:dashed">';
+                html += '  <div class="rev-vids-group-hdr">';
+                html += '    <div class="rev-vids-group-title">';
+                html += '      <i class="fa-solid fa-circle-play" style="color:var(--text3)"></i>';
+                html += '      <span>' + (isAr ? 'فيديوهات عامة / منفردة' : 'General / Standalone Videos') + '</span>';
+                html += '      <span class="rev-vids-group-count">' + standalone.length + '</span>';
+                html += '    </div>';
+                html += '  </div>';
+                html += '  <div class="rev-links-grid">';
+                standalone.forEach(rev => { html += renderCard(rev); });
+                html += '  </div>';
+                html += '</div>';
+              }
+            }
           }
         } 
-        // SECTION 2: FOLDERS & FILES
+        // SECTION 2: FOLDERS & SUBFOLDERS & FILES
         else {
           if (subjFolders.length === 0 && subjFiles.length === 0) {
             html += '<div style="text-align:center;padding:24px 16px;color:var(--text3);font-size:12.5px;background:var(--bg2);border-radius:10px">';
             html += '<i class="fa-solid fa-folder-open" style="font-size:24px;display:block;margin-bottom:6px;opacity:0.3"></i>';
-            html += isAr ? 'لا توجد مجلدات أو ملفات لهذه المادة بعد. انقر على "+ مجلد" لتنظيم مذكراتك!' : 'No folders or files for this subject yet. Click "+ Folder" to organize study notes!';
+            html += isAr ? 'لا توجد مجلدات أو ملفات لهذه المادة بعد. انقر على "+ مجلد" أو "+ رفع مجلد كامل" لتنظيم مذكراتك!' : 'No folders or files for this subject yet. Click "+ New Folder" or "+ Upload Folder" to organize notes!';
             html += '</div>';
           } else {
-            html += '<div class="rev-folders-grid">';
-            
-            // Render Folders
-            subjFolders.forEach(fld => {
+            // Recursive folder renderer supporting multi-level subfolders
+            function renderFolderTree(fld, depth) {
               const fldFiles = subjFiles.filter(f => f.folderId === fld.id);
+              const subFolders = subjFolders.filter(f => f.parentId === fld.id);
               const isOpen = revOpenFolderIds.has(fld.id);
-              const fColor = fld.color || '#3b82f6';
-              const fIcon = fld.icon || 'fa-folder';
+              const fColor = fld.color || (depth > 0 ? '#8b5cf6' : '#3b82f6');
+              const fIcon = fld.icon || (depth > 0 ? 'fa-folder-tree' : 'fa-folder');
+              const isSub = (depth > 0);
 
-              html += '<div class="rev-folder-card">';
-              html += '  <div class="rev-folder-hdr" onclick="revToggleFolder(\'' + fld.id + '\')">';
-              html += '    <div class="rev-folder-title-wrap">';
-              html += '      <div class="rev-folder-icon" style="color:' + fColor + '"><i class="fa-solid ' + fIcon + '"></i></div>';
-              html += '      <div>';
-              html += '        <div class="rev-folder-name">' + esc(getFolderDisplayName(fld.name)) + '</div>';
-              html += '        <div style="font-size:11px;color:var(--text3);margin-top:2px">' + fldFiles.length + ' ' + (isAr ? 'ملف' : 'files') + '</div>';
-              html += '      </div>';
-              html += '    </div>';
-              html += '    <div style="display:flex;align-items:center;gap:6px">';
-              html += '      <button class="ex-card-btn admin-only" onclick="event.stopPropagation();openAddFileModal(\'' + esc(subj) + '\', \'' + fld.id + '\', \'file\')" title="' + (isAr ? 'إضافة ملف لهذا المجلد' : 'Add File to Folder') + '"><i class="fa-solid fa-plus"></i></button>';
-              html += '      <button class="ex-card-btn del admin-only" onclick="event.stopPropagation();delFolder(\'' + fld.id + '\')" title="' + (isAr ? 'حذف المجلد' : 'Delete Folder') + '"><i class="fa-solid fa-trash"></i></button>';
-              html += '      <i class="fa-solid ' + (isOpen ? 'fa-chevron-up' : 'fa-chevron-down') + '" style="font-size:12px;color:var(--text3);margin-left:4px"></i>';
-              html += '    </div>';
-              html += '  </div>'; // end rev-folder-hdr
+              let fHtml = '<div class="rev-folder-card ' + (isSub ? 'is-subfolder' : '') + '" style="' + (isSub ? ('margin-top:8px;border-inline-start:3px solid ' + fColor + ';padding-inline-start:12px;') : '') + '">';
+              fHtml += '  <div class="rev-folder-hdr" onclick="revToggleFolder(\'' + fld.id + '\')">';
+              fHtml += '    <div class="rev-folder-title-wrap">';
+              fHtml += '      <div class="rev-folder-icon" style="color:' + fColor + '"><i class="fa-solid ' + fIcon + '"></i></div>';
+              fHtml += '      <div>';
+              fHtml += '        <div class="rev-folder-name">' + esc(getFolderDisplayName(fld.name)) + '</div>';
+              fHtml += '        <div style="font-size:11px;color:var(--text3);margin-top:2px">';
+              fHtml += fldFiles.length + ' ' + (isAr ? 'ملف' : 'files');
+              if (subFolders.length > 0) {
+                fHtml += ' • ' + subFolders.length + ' ' + (isAr ? 'مجلد فرعي' : 'subfolders');
+              }
+              fHtml += '        </div>';
+              fHtml += '      </div>';
+              fHtml += '    </div>';
+              fHtml += '    <div style="display:flex;align-items:center;gap:5px">';
+              // Add subfolder button
+              fHtml += '      <button class="ex-card-btn admin-only" onclick="event.stopPropagation();openAddFileModal(\'' + esc(subj) + '\', \'' + fld.id + '\', \'folder\')" title="' + (isAr ? 'إضافة مجلد فرعي داخل هذا المجلد' : 'Add Subfolder') + '"><i class="fa-solid fa-folder-plus"></i> <span style="font-size:10.5px">' + (isAr ? 'فرعي' : 'Sub') + '</span></button>';
+              // Add file button
+              fHtml += '      <button class="ex-card-btn admin-only" onclick="event.stopPropagation();openAddFileModal(\'' + esc(subj) + '\', \'' + fld.id + '\', \'file\')" title="' + (isAr ? 'إضافة ملف لهذا المجلد' : 'Add File to Folder') + '"><i class="fa-solid fa-plus"></i></button>';
+              // Delete folder button
+              fHtml += '      <button class="ex-card-btn del admin-only" onclick="event.stopPropagation();delFolder(\'' + fld.id + '\')" title="' + (isAr ? 'حذف المجلد وكل محتوياته' : 'Delete Folder') + '"><i class="fa-solid fa-trash"></i></button>';
+              fHtml += '      <i class="fa-solid ' + (isOpen ? 'fa-chevron-up' : 'fa-chevron-down') + '" style="font-size:12px;color:var(--text3);margin-left:4px"></i>';
+              fHtml += '    </div>';
+              fHtml += '  </div>';
 
               if (isOpen) {
-                html += '  <div class="rev-folder-files-box">';
-                if (fldFiles.length === 0) {
-                  html += '    <div style="text-align:center;padding:10px;font-size:11.5px;color:var(--text3)">' + (isAr ? 'المجلد فارغ. انقر + لإضافة ملف' : 'Folder is empty. Click + to add file') + '</div>';
-                } else {
+                fHtml += '  <div class="rev-folder-files-box">';
+                // Nested subfolders first
+                if (subFolders.length > 0) {
+                  fHtml += '    <div class="rev-subfolders-wrap" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px">';
+                  subFolders.forEach(subFld => {
+                    fHtml += renderFolderTree(subFld, depth + 1);
+                  });
+                  fHtml += '    </div>';
+                }
+
+                // Files in this folder
+                if (fldFiles.length === 0 && subFolders.length === 0) {
+                  fHtml += '    <div style="text-align:center;padding:10px;font-size:11.5px;color:var(--text3)">' + (isAr ? 'المجلد فارغ. انقر + لإضافة ملف أو مجلد فرعي' : 'Folder is empty. Click + to add file or subfolder') + '</div>';
+                } else if (fldFiles.length > 0) {
                   fldFiles.forEach(file => {
                     const fExt = file.type || 'pdf';
-                    const fIconClass = (fExt === 'pdf') ? 'fa-file-pdf' : ((fExt === 'doc') ? 'fa-file-word' : ((fExt === 'sheet') ? 'fa-file-excel' : 'fa-file'));
-                    const fIconColor = (fExt === 'pdf') ? '#ef4444' : ((fExt === 'doc') ? '#3b82f6' : ((fExt === 'sheet') ? '#10b981' : 'var(--text2)'));
+                    const fIconClass = (fExt === 'pdf') ? 'fa-file-pdf' : ((fExt === 'doc') ? 'fa-file-word' : ((fExt === 'sheet') ? 'fa-file-excel' : ((fExt === 'image') ? 'fa-file-image' : 'fa-file')));
+                    const fIconColor = (fExt === 'pdf') ? '#ef4444' : ((fExt === 'doc') ? '#3b82f6' : ((fExt === 'sheet') ? '#10b981' : ((fExt === 'image') ? '#8b5cf6' : 'var(--text2)')));
 
-                    html += '<div class="rev-file-row">';
-                    html += '  <div class="rev-file-info">';
-                    html += '    <i class="fa-solid ' + fIconClass + ' rev-file-icon" style="color:' + fIconColor + '"></i>';
-                    html += '    <div style="overflow:hidden;flex:1">';
+                    fHtml += '<div class="rev-file-row" style="cursor:pointer" onclick="openFilePreviewModal(\'' + file.id + '\')">';
+                    fHtml += '  <div class="rev-file-info">';
+                    fHtml += '    <i class="fa-solid ' + fIconClass + ' rev-file-icon" style="color:' + fIconColor + '"></i>';
+                    fHtml += '    <div style="overflow:hidden;flex:1">';
                     const filDisp = getRevItemDisplay(file);
-                    html += '      <div class="rev-file-name" title="' + esc(filDisp.title) + '">' + esc(filDisp.title) + '</div>';
-                    if (filDisp.notes) html += '<div style="font-size:11px;color:var(--text3)">' + esc(filDisp.notes) + '</div>';
-                    html += '    </div>';
-                    if (file.size) html += '    <span class="rev-file-meta">' + esc(file.size) + '</span>';
-                    html += '  </div>';
-                    html += '  <div class="rev-file-actions">';
-                    html += '    <a href="' + esc(file.url || '#') + '" target="_blank" download class="ex-card-btn" title="' + (isAr ? 'فتح / تحميل' : 'Open / Download') + '"><i class="fa-solid fa-arrow-down"></i></a>';
-                    html += '    <button class="ex-card-btn del admin-only" onclick="delFile(\'' + file.id + '\')"" title="' + (isAr ? 'حذف' : 'Delete') + '"><i class="fa-solid fa-trash"></i></button>';
-                    html += '  </div>';
-                    html += '</div>';
+                    fHtml += '      <div class="rev-file-name" title="' + esc(filDisp.title) + '">' + esc(filDisp.title) + '</div>';
+                    if (filDisp.notes) fHtml += '<div style="font-size:11px;color:var(--text3)">' + esc(filDisp.notes) + '</div>';
+                    fHtml += '    </div>';
+                    if (file.size) fHtml += '    <span class="rev-file-meta">' + esc(file.size) + '</span>';
+                    fHtml += '  </div>';
+                    fHtml += '  <div class="rev-file-actions" onclick="event.stopPropagation()">';
+                    fHtml += '    <button class="ex-card-btn" onclick="openFilePreviewModal(\'' + file.id + '\')" title="' + (isAr ? 'معاينة الملف' : 'View File') + '"><i class="fa-solid fa-eye"></i></button>';
+                    fHtml += '    <a href="' + esc(file.url || '#') + '" download="' + esc(file.title) + '" class="ex-card-btn" title="' + (isAr ? 'تحميل' : 'Download') + '"><i class="fa-solid fa-arrow-down"></i></a>';
+                    fHtml += '    <button class="ex-card-btn del admin-only" onclick="delFile(\'' + file.id + '\')" title="' + (isAr ? 'حذف' : 'Delete') + '"><i class="fa-solid fa-trash"></i></button>';
+                    fHtml += '  </div>';
+                    fHtml += '</div>';
                   });
                 }
-                html += '  </div>';
+                fHtml += '  </div>';
               }
-              html += '</div>'; // end rev-folder-card
+              fHtml += '</div>';
+              return fHtml;
+            }
+
+            html += '<div class="rev-folders-grid">';
+            // Render root folders (parentId is null or empty)
+            const rootFolders = subjFolders.filter(f => !f.parentId);
+            rootFolders.forEach(fld => {
+              html += renderFolderTree(fld, 0);
             });
 
-            // Root files (files not in a specific folder)
+            // Root files (not in any folder)
             const rootFiles = subjFiles.filter(f => !f.folderId);
             if (rootFiles.length > 0) {
               html += '<div class="rev-folder-card" style="border-style:dashed">';
@@ -10043,14 +10913,19 @@
               html += '  </div>';
               html += '  <div class="rev-folder-files-box" style="margin-top:10px">';
               rootFiles.forEach(file => {
-                html += '<div class="rev-file-row">';
+                const fExt = file.type || 'pdf';
+                const fIconClass = (fExt === 'pdf') ? 'fa-file-pdf' : ((fExt === 'doc') ? 'fa-file-word' : 'fa-file');
+                const fIconColor = (fExt === 'pdf') ? '#ef4444' : ((fExt === 'doc') ? '#3b82f6' : 'var(--text2)');
+
+                html += '<div class="rev-file-row" style="cursor:pointer" onclick="openFilePreviewModal(\'' + file.id + '\')">';
                 html += '  <div class="rev-file-info">';
-                html += '    <i class="fa-solid fa-file rev-file-icon" style="color:var(--text2)"></i>';
+                html += '    <i class="fa-solid ' + fIconClass + ' rev-file-icon" style="color:' + fIconColor + '"></i>';
                 html += '    <div class="rev-file-name">' + esc(file.title) + '</div>';
                 html += '  </div>';
-                html += '  <div class="rev-file-actions">';
-                html += '    <a href="' + esc(file.url || '#') + '" target="_blank" download class="ex-card-btn"><i class="fa-solid fa-arrow-down"></i></a>';
-                html += '    <button class="ex-card-btn del admin-only" onclick="delFile(\'' + file.id + '\')""><i class="fa-solid fa-trash"></i></button>';
+                html += '  <div class="rev-file-actions" onclick="event.stopPropagation()">';
+                html += '    <button class="ex-card-btn" onclick="openFilePreviewModal(\'' + file.id + '\')" title="' + (isAr ? 'معاينة الملف' : 'View File') + '"><i class="fa-solid fa-eye"></i></button>';
+                html += '    <a href="' + esc(file.url || '#') + '" download="' + esc(file.title) + '" class="ex-card-btn" title="' + (isAr ? 'تحميل' : 'Download') + '"><i class="fa-solid fa-arrow-down"></i></a>';
+                html += '    <button class="ex-card-btn del admin-only" onclick="delFile(\'' + file.id + '\')" title="' + (isAr ? 'حذف' : 'Delete') + '"><i class="fa-solid fa-trash"></i></button>';
                 html += '  </div>';
                 html += '</div>';
               });
@@ -10075,8 +10950,8 @@
       container.innerHTML = html;
     }
 
-    function revRenderAll() {
-      if (!revData) revLoad();
+    async function revRenderAll() {
+      if (!revData) await revLoad();
       revRenderSubjectChips();
       revRenderContent();
     }
@@ -10091,17 +10966,25 @@
     }
 
     /* ── Modal Handling for Videos ── */
-    function openAddRevisionModal(preSelectedSubj) {
+    function openAddRevisionModal(preSelectedSubj, preSelectedGroup) {
       revEditRevId = null;
       document.getElementById('mod-rev-title').textContent = (lang === 'ar') ? 'إضافة رابط مراجعة' : 'Add Revision Video';
       document.getElementById('rev-ttl').value = '';
       document.getElementById('rev-url').value = '';
+      document.getElementById('rev-duration').value = '';
+      document.getElementById('rev-group').value = preSelectedGroup || '';
       document.getElementById('rev-notes').value = '';
       document.getElementById('btn-del-rev').style.display = 'none';
 
       const sel = document.getElementById('rev-subj');
       sel.innerHTML = (revData?.subjects || DEF_REVISIONS_SUBJECTS).map(s => '<option value="' + esc(s) + '"' + ((preSelectedSubj === s || revActiveSubject === s) ? ' selected' : '') + '>' + esc(s) + '</option>').join('');
 
+      const curSubj = sel.value;
+      const groups = [...new Set((revData?.revisions || []).filter(r => r.subject === curSubj && r.group).map(r => r.group))];
+      const dl = document.getElementById('rev-group-datalist');
+      if (dl) dl.innerHTML = groups.map(g => '<option value="' + esc(g) + '"></option>').join('');
+
+      renderRevModalAttachmentsList(null);
       openModal('mod-revision');
     }
 
@@ -10112,6 +10995,8 @@
       document.getElementById('mod-rev-title').textContent = (lang === 'ar') ? 'تعديل رابط المراجعة' : 'Edit Revision Video';
       document.getElementById('rev-ttl').value = rev.title || '';
       document.getElementById('rev-url').value = rev.url || '';
+      document.getElementById('rev-duration').value = rev.duration || '';
+      document.getElementById('rev-group').value = rev.group || '';
       document.getElementById('rev-type').value = rev.type || 'مراجعة شاملة';
       document.getElementById('rev-platform').value = rev.platform || 'YouTube';
       document.getElementById('rev-notes').value = rev.notes || '';
@@ -10120,15 +11005,22 @@
       const sel = document.getElementById('rev-subj');
       sel.innerHTML = (revData?.subjects || DEF_REVISIONS_SUBJECTS).map(s => '<option value="' + esc(s) + '"' + (rev.subject === s ? ' selected' : '') + '>' + esc(getSubjectDisplayName(s)) + '</option>').join('');
 
+      const groups = [...new Set((revData?.revisions || []).filter(r => r.subject === rev.subject && r.group).map(r => r.group))];
+      const dl = document.getElementById('rev-group-datalist');
+      if (dl) dl.innerHTML = groups.map(g => '<option value="' + esc(g) + '"></option>').join('');
+
+      renderRevModalAttachmentsList(rev);
       openModal('mod-revision');
     }
 
-    function saveRevision() {
+    async function saveRevision() {
       const title = document.getElementById('rev-ttl').value.trim();
       const subject = document.getElementById('rev-subj').value;
       const type = document.getElementById('rev-type').value;
       const url = document.getElementById('rev-url').value.trim();
       const platform = document.getElementById('rev-platform').value;
+      const duration = document.getElementById('rev-duration').value.trim();
+      const group = document.getElementById('rev-group').value.trim();
       const notes = document.getElementById('rev-notes').value.trim();
       const isAr = (lang === 'ar');
 
@@ -10138,28 +11030,31 @@
       if (revEditRevId) {
         const idx = revData.revisions.findIndex(r => r.id === revEditRevId);
         if (idx !== -1) {
-          revData.revisions[idx] = { ...revData.revisions[idx], title, subject, type, url, platform, notes };
+          revData.revisions[idx] = { ...revData.revisions[idx], title, subject, type, url, platform, duration, group, notes };
           showToast('success', isAr ? 'تم تحديث المراجعة بنجاح!' : 'Revision video updated!');
         }
       } else {
-        revData.revisions.push({
+        const newRev = {
           id: 'rev_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-          title, subject, type, url, platform, notes,
+          title, subject, type, url, platform, duration, group, notes,
+          attachments: [],
           createdAt: ltTodayStr()
-        });
+        };
+        revData.revisions.push(newRev);
+        revEditRevId = newRev.id;
         showToast('success', isAr ? 'تمت إضافة رابط المراجعة بنجاح!' : 'Revision video added!');
       }
 
-      revSave();
+      await revSave();
       closeModal('mod-revision');
       revRenderAll();
     }
 
     function delRevision(id) {
       const isAr = (lang === 'ar');
-      mkConfirmPop(isAr ? 'هل أنت متأكد من حذف رابط المراجعة هذا؟' : 'Are you sure you want to delete this revision?', () => {
+      mkConfirmPop(isAr ? 'هل أنت متأكد من حذف رابط المراجعة هذا؟' : 'Are you sure you want to delete this revision?', async () => {
         revData.revisions = revData.revisions.filter(r => r.id !== id);
-        revSave();
+        await revSave();
         revRenderAll();
         showToast('info', isAr ? 'تم حذف المراجعة.' : 'Revision deleted.');
       });
@@ -10177,29 +11072,37 @@
       revFileModalMode = mode;
       const btnFile = document.getElementById('file-type-btn-file');
       const btnFolder = document.getElementById('file-type-btn-folder');
+      const btnUploadFolder = document.getElementById('file-type-btn-upload-folder');
       const fldFields = document.getElementById('modal-folder-fields');
       const filFields = document.getElementById('modal-file-fields');
+      const upFldFields = document.getElementById('modal-upload-folder-fields');
       const modalTitle = document.getElementById('mod-file-title');
       const isAr = (lang === 'ar');
 
+      [btnFile, btnFolder, btnUploadFolder].forEach(b => {
+        if (!b) return;
+        b.className = 's-btn';
+        b.style.background = 'none';
+        b.style.border = 'none';
+        b.style.color = 'var(--text2)';
+      });
+
+      if (fldFields) fldFields.style.display = 'none';
+      if (filFields) filFields.style.display = 'none';
+      if (upFldFields) upFldFields.style.display = 'none';
+
       if (mode === 'folder') {
-        btnFolder.className = 's-btn accent';
-        btnFile.className = 's-btn';
-        btnFile.style.background = 'none';
-        btnFile.style.border = 'none';
-        btnFile.style.color = 'var(--text2)';
-        fldFields.style.display = 'block';
-        filFields.style.display = 'none';
-        modalTitle.textContent = isAr ? 'إنشاء مجلد جديد' : 'Create New Folder';
+        if (btnFolder) { btnFolder.className = 's-btn accent'; btnFolder.style.color = '#fff'; }
+        if (fldFields) fldFields.style.display = 'block';
+        if (modalTitle) modalTitle.textContent = isAr ? 'إنشاء مجلد أو مجلد فرعي' : 'Create Folder / Subfolder';
+      } else if (mode === 'upload-folder') {
+        if (btnUploadFolder) { btnUploadFolder.className = 's-btn accent'; btnUploadFolder.style.color = '#fff'; }
+        if (upFldFields) upFldFields.style.display = 'block';
+        if (modalTitle) modalTitle.textContent = isAr ? 'رفع مجلد كامل' : 'Upload Entire Folder';
       } else {
-        btnFile.className = 's-btn accent';
-        btnFolder.className = 's-btn';
-        btnFolder.style.background = 'none';
-        btnFolder.style.border = 'none';
-        btnFolder.style.color = 'var(--text2)';
-        fldFields.style.display = 'none';
-        filFields.style.display = 'block';
-        modalTitle.textContent = isAr ? 'إضافة ملف دراسي' : 'Add Study File';
+        if (btnFile) { btnFile.className = 's-btn accent'; btnFile.style.color = '#fff'; }
+        if (filFields) filFields.style.display = 'block';
+        if (modalTitle) modalTitle.textContent = isAr ? 'إضافة ملف دراسي' : 'Add Study File';
       }
     }
 
@@ -10248,13 +11151,34 @@
     function updateModalFolderOptions(preSelectedFolderId) {
       const subj = document.getElementById('file-subj').value;
       const folderSelect = document.getElementById('file-folder');
+      const parentSelect = document.getElementById('fld-parent');
       const subjFolders = (revData?.folders || []).filter(f => f.subject === subj);
       const isAr = (lang === 'ar');
-      let opts = '<option value="">' + (isAr ? '(بدون مجلد - في الجذر)' : '(Root - No folder)') + '</option>';
-      subjFolders.forEach(f => {
-        opts += '<option value="' + f.id + '"' + (preSelectedFolderId === f.id ? ' selected' : '') + '>' + esc(getFolderDisplayName(f.name)) + '</option>';
-      });
-      folderSelect.innerHTML = opts;
+
+      // Helper to generate hierarchically indented options
+      function buildFolderOptions(parentId = null, depth = 0) {
+        let out = '';
+        const children = subjFolders.filter(f => (f.parentId || null) === parentId);
+        children.forEach(c => {
+          const prefix = depth > 0 ? ('&nbsp;&nbsp;'.repeat(depth) + '↳ ') : '';
+          const isSel = (preSelectedFolderId === c.id);
+          out += '<option value="' + c.id + '"' + (isSel ? ' selected' : '') + '>' + prefix + esc(getFolderDisplayName(c.name)) + '</option>';
+          out += buildFolderOptions(c.id, depth + 1);
+        });
+        return out;
+      }
+
+      if (folderSelect) {
+        let opts = '<option value="">' + (isAr ? '(بدون مجلد - في الجذر)' : '(Root - No folder)') + '</option>';
+        opts += buildFolderOptions(null, 0);
+        folderSelect.innerHTML = opts;
+      }
+
+      if (parentSelect) {
+        let pOpts = '<option value="">' + (isAr ? '(بدون مجلد رئيسي - في الجذر مباشرة)' : '(None - Top Level Root Folder)') + '</option>';
+        pOpts += buildFolderOptions(null, 0);
+        parentSelect.innerHTML = pOpts;
+      }
     }
 
     function openAddFileModal(preSelectedSubj, preSelectedFolderId, targetMode) {
@@ -10266,10 +11190,11 @@
       document.getElementById('file-size').value = '';
       document.getElementById('file-desc').value = '';
       document.getElementById('fld-name').value = '';
-      document.getElementById('fld-color').value = '#3b82f6';
+      document.getElementById('fld-color').value = (targetMode === 'folder' && preSelectedFolderId) ? '#8b5cf6' : '#3b82f6';
       document.getElementById('btn-del-file').style.display = 'none';
       toggleFileSourceUI('link');
-      document.querySelector('input[name="file-src-type"][value="link"]').checked = true;
+      const rLink = document.querySelector('input[name="file-src-type"][value="link"]');
+      if (rLink) rLink.checked = true;
 
       const sel = document.getElementById('file-subj');
       sel.innerHTML = (revData?.subjects || DEF_REVISIONS_SUBJECTS).map(s => '<option value="' + esc(s) + '"' + ((preSelectedSubj === s || revActiveSubject === s) ? ' selected' : '') + '>' + esc(s) + '</option>').join('');
@@ -10278,24 +11203,31 @@
       openModal('mod-file');
     }
 
-    function saveFileItem() {
+    async function saveFileItem() {
       const subject = document.getElementById('file-subj').value;
       const isAr = (lang === 'ar');
 
       if (revFileModalMode === 'folder') {
         const name = document.getElementById('fld-name').value.trim();
+        const parentId = document.getElementById('fld-parent')?.value || null;
         const color = document.getElementById('fld-color').value;
         const icon = document.getElementById('fld-icon').value;
         if (!name) { showToast('error', isAr ? 'يرجى إدخال اسم المجلد!' : 'Please enter folder name!'); return; }
 
-        const fldId = 'fld_' + Date.now();
+        const fldId = 'fld_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+        if (!revData.folders) revData.folders = [];
         revData.folders.push({
           id: fldId,
-          subject, name, color, icon,
+          subject, name, parentId, color, icon,
           createdAt: ltTodayStr()
         });
         revOpenFolderIds.add(fldId);
+        if (parentId) revOpenFolderIds.add(parentId);
         showToast('success', isAr ? 'تم إنشاء المجلد بنجاح!' : 'Folder created successfully!');
+      } else if (revFileModalMode === 'upload-folder') {
+        triggerFolderUpload(subject);
+        closeModal('mod-file');
+        return;
       } else {
         const title = document.getElementById('file-ttl').value.trim();
         const folderId = document.getElementById('file-folder').value || null;
@@ -10312,6 +11244,7 @@
         if (!title) { showToast('error', isAr ? 'يرجى إدخال اسم الملف!' : 'Please enter file title!'); return; }
         if (!url) { showToast('error', isAr ? 'يرجى إدخال رابط الملف أو رفع ملف مباشر!' : 'Please provide file link or upload file!'); return; }
 
+        if (!revData.files) revData.files = [];
         revData.files.push({
           id: 'fil_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
           subject, folderId, title, url, type, size, notes,
@@ -10321,30 +11254,120 @@
         showToast('success', isAr ? 'تمت إضافة الملف بنجاح!' : 'File added successfully!');
       }
 
-      revSave();
+      await revSave();
       closeModal('mod-file');
       revRenderAll();
     }
 
     function delFolder(id) {
       const isAr = (lang === 'ar');
-      mkConfirmPop(isAr ? 'هل أنت متأكد من حذف هذا المجلد وكل الملفات بداخله؟' : 'Are you sure you want to delete this folder and all its files?', () => {
-        revData.folders = revData.folders.filter(f => f.id !== id);
-        revData.files = revData.files.filter(f => f.folderId !== id);
-        revSave();
+      mkConfirmPop(isAr ? 'هل أنت متأكد من حذف هذا المجلد وكل المجلدات الفرعية والملفات بداخله؟' : 'Are you sure you want to delete this folder and all subfolders/files inside it?', async () => {
+        // Collect all descendant folder IDs recursively
+        const idsToDelete = new Set([id]);
+        let changed = true;
+        while (changed) {
+          changed = false;
+          (revData.folders || []).forEach(f => {
+            if (f.parentId && idsToDelete.has(f.parentId) && !idsToDelete.has(f.id)) {
+              idsToDelete.add(f.id);
+              changed = true;
+            }
+          });
+        }
+
+        revData.folders = (revData.folders || []).filter(f => !idsToDelete.has(f.id));
+        revData.files = (revData.files || []).filter(f => !idsToDelete.has(f.folderId));
+        await revSave();
         revRenderAll();
-        showToast('info', isAr ? 'تم حذف المجلد.' : 'Folder deleted.');
+        showToast('info', isAr ? 'تم حذف المجلد ومحتوياته.' : 'Folder and contents deleted.');
       });
     }
 
     function delFile(id) {
       const isAr = (lang === 'ar');
-      mkConfirmPop(isAr ? 'هل أنت متأكد من حذف هذا الملف؟' : 'Are you sure you want to delete this file?', () => {
-        revData.files = revData.files.filter(f => f.id !== id);
-        revSave();
+      mkConfirmPop(isAr ? 'هل أنت متأكد من حذف هذا الملف؟' : 'Are you sure you want to delete this file?', async () => {
+        revData.files = (revData.files || []).filter(f => f.id !== id);
+        await revSave();
         revRenderAll();
         showToast('info', isAr ? 'تم حذف الملف.' : 'File deleted.');
       });
+    }
+
+    /* ── Persistence: Save & Load with IndexedDB & Supabase Sync ── */
+    async function revSave() {
+      if (!revData) return;
+      const uid = getActiveSyncUid();
+
+      // 1. Save complete, uncompressed data with attachments & subfolders to IndexedDB
+      await idbSet(uid + ':revisions_data', revData);
+      await idbSet('revisions_data', revData);
+
+      // 2. Save to localStorage (with fallback if quota exceeded)
+      try {
+        localStorage.setItem(uid + ':revisions_data', JSON.stringify(revData));
+        localStorage.setItem('revisions_data', JSON.stringify(revData));
+      } catch(e) {
+        console.warn('LocalStorage quota limit reached, data safely kept in IndexedDB', e);
+        try {
+          // Strip base64 data payloads from localStorage backup to preserve other keys
+          const shallow = JSON.parse(JSON.stringify(revData));
+          if (shallow.files) {
+            shallow.files.forEach(f => { if (f.url && f.url.startsWith('data:')) f.url = '#' + encodeURIComponent(f.title); });
+          }
+          if (shallow.revisions) {
+            shallow.revisions.forEach(r => {
+              if (r.attachments) {
+                r.attachments.forEach(a => { if (a.url && a.url.startsWith('data:')) a.url = '#' + encodeURIComponent(a.title); });
+              }
+            });
+          }
+          localStorage.setItem(uid + ':revisions_data', JSON.stringify(shallow));
+          localStorage.setItem('revisions_data', JSON.stringify(shallow));
+        } catch(e2){}
+      }
+
+      // 3. Sync to Supabase cloud!
+      try {
+        saveJ('revisions_data', revData);
+      } catch(e){}
+    }
+
+    async function revLoad() {
+      const uid = getActiveSyncUid();
+
+      // 1. Initial quick read from localStorage
+      let raw = localStorage.getItem(uid + ':revisions_data') || localStorage.getItem('revisions_data');
+      if (raw) {
+        try {
+          revData = JSON.parse(raw);
+        } catch(e) {}
+      }
+
+      // 2. High-capacity IndexedDB read (guaranteed persistence for files & attachments)
+      try {
+        const idbData = await idbGet(uid + ':revisions_data') || await idbGet('revisions_data');
+        if (idbData && Array.isArray(idbData.subjects)) {
+          revData = idbData;
+        }
+      } catch(e){}
+
+      // 3. Fallback to default if completely empty
+      if (!revData || !Array.isArray(revData.subjects)) {
+        revData = defaultRevisionsData();
+        await revSave();
+      }
+
+      // 4. Cloud background sync from Supabase
+      if (typeof loadFromSupabase === 'function') {
+        loadFromSupabase('revisions_data', revData).then(cloudData => {
+          if (cloudData && Array.isArray(cloudData.subjects) && JSON.stringify(cloudData) !== JSON.stringify(revData)) {
+            revData = cloudData;
+            idbSet(uid + ':revisions_data', revData);
+            idbSet('revisions_data', revData);
+            revRenderAll();
+          }
+        }).catch(()=>{});
+      }
     }
 
     function openAddRevSubjectModal() {
