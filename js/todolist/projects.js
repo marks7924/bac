@@ -337,7 +337,11 @@ const Projects = (() => {
 
   function openProjectDetail(projectId) {
     currentProjectId = projectId;
-    try { localStorage.setItem('sh_last_project_id', projectId); } catch(e) {}
+    try {
+      localStorage.setItem('sh_last_project_id', projectId);
+      localStorage.setItem('sh_last_todo_view', 'project-detail');
+      localStorage.setItem('sh_last_page', 'todo');
+    } catch(e) {}
     App.navigate('project-detail');
     renderProjectDetail(projectId);
   }
@@ -510,7 +514,7 @@ const Projects = (() => {
 
       const archiveDoneBtn = document.createElement('button');
       archiveDoneBtn.type = 'button';
-      archiveDoneBtn.className = 'btn-archive-project-done';
+      archiveDoneBtn.className = 'btn-archive-project-done admin-only';
       archiveDoneBtn.innerHTML = `📦 Archive Done (${doneTasks.length})`;
       archiveDoneBtn.title = 'Archive all done tasks in this project';
       archiveDoneBtn.addEventListener('click', (e) => {

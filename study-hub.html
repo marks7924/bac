@@ -2527,9 +2527,12 @@
     }
 
     
+    
     /* ════════════════════════════════
-       CLOUD SYNC STATUS PILL
+       PUSH TO CLOUD BUTTON & PILL
     ════════════════════════════════ */
+    
+
     .cloud-sync-pill {
       display: inline-flex;
       align-items: center;
@@ -2544,6 +2547,7 @@
       cursor: pointer;
       transition: all 0.2s ease;
       user-select: none;
+      white-space: nowrap;
     }
     .cloud-sync-pill:hover {
       background: rgba(34, 197, 94, 0.22);
@@ -2556,7 +2560,7 @@
     }
 
     /* ════════════════════════════════
-       REVISIONS & FILES HUB STYLING
+       REVISIONS & FILES HUB V2 STYLING
     ════════════════════════════════ */
     .rev-wrap {
       max-width: 1400px;
@@ -2565,11 +2569,11 @@
     }
 
     .rev-hero {
-      background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(168, 85, 247, 0.12));
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.14), rgba(139, 92, 246, 0.14));
       border: 1px solid var(--border);
       border-radius: var(--r);
       padding: 22px 26px;
-      margin-bottom: 22px;
+      margin-bottom: 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -2595,6 +2599,7 @@
       justify-content: center;
       font-size: 24px;
       box-shadow: 0 4px 16px rgba(59, 130, 246, 0.35);
+      flex-shrink: 0;
     }
 
     .rev-hero-title {
@@ -2604,12 +2609,14 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      flex-wrap: wrap;
     }
 
     .rev-hero-sub {
       font-size: 13px;
       color: var(--text3);
       margin-top: 4px;
+      line-height: 1.45;
     }
 
     .rev-hero-actions {
@@ -2619,52 +2626,133 @@
       flex-wrap: wrap;
     }
 
-    .rev-stats-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 12px;
-      margin-bottom: 20px;
+    /* ── TWO PRIMARY BUTTONS SELECTOR ── */
+    .rev-mode-container {
+      margin-bottom: 22px;
     }
 
-    .rev-stat-card {
+    .rev-mode-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .rev-mode-btn {
       background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px 16px;
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 22px;
+      cursor: pointer;
+      text-align: right;
       display: flex;
       align-items: center;
-      gap: 12px;
-      transition: transform 0.2s, border-color 0.2s;
+      gap: 16px;
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+      outline: none;
     }
-    .rev-stat-card:hover {
-      transform: translateY(-2px);
-      border-color: var(--border2);
+    [dir="ltr"] .rev-mode-btn {
+      text-align: left;
     }
 
-    .rev-stat-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
+    .rev-mode-btn:hover {
+      transform: translateY(-2px);
+      border-color: var(--border2);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .rev-mode-btn.active {
+      border-color: var(--accent);
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+      box-shadow: 0 8px 26px rgba(59, 130, 246, 0.25);
+    }
+    .rev-mode-btn.active::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    }
+
+    .rev-mode-icon-box {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: 26px;
+      flex-shrink: 0;
+      transition: transform 0.2s;
+    }
+    .rev-mode-btn:hover .rev-mode-icon-box {
+      transform: scale(1.08);
+    }
+    .rev-mode-btn.vids-btn .rev-mode-icon-box {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(249, 115, 22, 0.2));
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    .rev-mode-btn.vids-btn.active .rev-mode-icon-box {
+      background: linear-gradient(135deg, #ef4444, #f97316);
+      color: #fff;
     }
 
-    .rev-stat-val {
-      font-size: 20px;
+    .rev-mode-btn.files-btn .rev-mode-icon-box {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(16, 185, 129, 0.2));
+      color: #3b82f6;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+    .rev-mode-btn.files-btn.active .rev-mode-icon-box {
+      background: linear-gradient(135deg, #3b82f6, #10b981);
+      color: #fff;
+    }
+
+    .rev-mode-meta {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .rev-mode-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .rev-mode-title {
+      font-size: 17px;
       font-weight: 900;
       color: var(--text);
-      line-height: 1.1;
     }
 
-    .rev-stat-lbl {
+    .rev-mode-pill-badge {
       font-size: 11px;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: 12px;
+      background: var(--bg2);
       color: var(--text3);
-      font-weight: 700;
-      margin-top: 2px;
+      border: 1px solid var(--border);
+    }
+    .rev-mode-btn.active .rev-mode-pill-badge {
+      background: rgba(59, 130, 246, 0.15);
+      color: var(--blue2);
+      border-color: rgba(59, 130, 246, 0.3);
     }
 
+    .rev-mode-desc {
+      font-size: 12.5px;
+      color: var(--text3);
+      line-height: 1.4;
+    }
+
+    /* ── Controls Bar: Search & Subj Chips ── */
     .rev-controls-card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -2721,36 +2809,6 @@
       right: 14px;
     }
 
-    .rev-view-tabs {
-      display: flex;
-      align-items: center;
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 3px;
-      gap: 4px;
-    }
-
-    .rev-vtab {
-      background: transparent;
-      border: none;
-      color: var(--text3);
-      padding: 6px 14px;
-      border-radius: 7px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.15s ease;
-    }
-    .rev-vtab.active {
-      background: var(--card);
-      color: var(--text);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-    }
-
     .rev-subj-chips {
       display: flex;
       align-items: center;
@@ -2758,6 +2816,7 @@
       overflow-x: auto;
       padding-bottom: 4px;
       scrollbar-width: thin;
+      -webkit-overflow-scrolling: touch;
     }
 
     .rev-schip {
@@ -2786,6 +2845,7 @@
       box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
     }
 
+    /* ── Subject Blocks ── */
     .rev-subj-block {
       background: var(--card);
       border: 1px solid var(--border);
@@ -2820,6 +2880,7 @@
       align-items: center;
       justify-content: center;
       font-size: 18px;
+      flex-shrink: 0;
     }
 
     .rev-subj-name {
@@ -2840,21 +2901,11 @@
       flex-wrap: wrap;
     }
 
-    .rev-section-title {
-      font-size: 13px;
-      font-weight: 800;
-      color: var(--text2);
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
+    /* ── Video Cards Grid ── */
     .rev-links-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
       gap: 14px;
-      margin-bottom: 22px;
     }
 
     .rev-link-card {
@@ -2908,8 +2959,12 @@
       gap: 4px;
     }
     .rev-tag.platform {
-      background: rgba(245, 158, 11, 0.12);
-      color: var(--gold);
+      background: rgba(239, 68, 68, 0.12);
+      color: #ef4444;
+    }
+    .rev-tag.platform.gdrive {
+      background: rgba(34, 197, 94, 0.12);
+      color: var(--green);
     }
 
     .rev-card-notes {
@@ -2944,11 +2999,11 @@
       opacity: 0.9;
     }
 
+    /* ── Folders & Files Grid ── */
     .rev-folders-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
       gap: 14px;
-      margin-bottom: 14px;
     }
 
     .rev-folder-card {
@@ -2969,6 +3024,7 @@
       justify-content: space-between;
       gap: 8px;
       cursor: pointer;
+      user-select: none;
     }
 
     .rev-folder-title-wrap {
@@ -3055,8 +3111,70 @@
       gap: 6px;
     }
 
+    /* ════════════════════════════════
+       MOBILE & PHONE RESPONSIVENESS
+    ════════════════════════════════ */
+    @media (max-width: 768px) {
+      .rev-wrap {
+        padding: 12px 14px 36px;
+      }
+      .rev-hero {
+        padding: 16px;
+      }
+      .rev-hero-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 20px;
+      }
+      .rev-hero-title {
+        font-size: 18px;
+      }
+      .rev-mode-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      .rev-mode-btn {
+        padding: 16px;
+      }
+      .rev-mode-icon-box {
+        width: 48px;
+        height: 48px;
+        font-size: 22px;
+      }
+      .rev-links-grid, .rev-folders-grid {
+        grid-template-columns: 1fr;
+      }
+      .btn-push-cloud {
+        padding: 5px 10px;
+        font-size: 11px;
+      }
+      .btn-push-cloud span {
+        display: inline;
+      }
+    }
 
-/* ════════════════════════════════
+    @media (max-width: 480px) {
+      .rev-search-row {
+        flex-direction: column;
+      }
+      .rev-search-box {
+        width: 100%;
+        min-width: 100%;
+      }
+      .rev-hero-actions {
+        width: 100%;
+      }
+      .rev-hero-actions button {
+        flex: 1;
+        justify-content: center;
+      }
+      .btn-push-cloud span {
+        display: none;
+      }
+    }
+
+
+    /* ════════════════════════════════
    CURRICULUM PAGE STYLING
 ════════════════════════════════ */
     .cur-wrap {
@@ -3941,7 +4059,18 @@
       color: #ffffff !important;
       box-shadow: 0 0 16px rgba(239, 68, 68, 0.4);
     }
-    body:not(.admin-mode-active) .admin-only {
+    body:not(.admin-mode-active) #cloud-sync-status,
+    body:not(.admin-mode-active) #tab-settings,
+    body:not(.admin-mode-active) #theme-btn,
+    body:not(.admin-mode-active) #lang-btn,
+    body:not(.admin-mode-active) button[onclick*="ltGenWeek"],
+    body:not(.admin-mode-active) .admin-only,
+    body:not(.admin-mode-active) #rev-hero-actions,
+    body:not(.admin-mode-active) .rev-sub-actions,
+    body:not(.admin-mode-active) button[onclick*="openAddRevSubjectModal"],
+    body:not(.admin-mode-active) .task-action-btn[aria-label="Archive task"],
+    body:not(.admin-mode-active) .task-action-btn[title="Archive"],
+    body:not(.admin-mode-active) .btn-archive-project-done {
       display: none !important;
     }
     body:not(.is-main-admin) .main-admin-only {
@@ -5099,7 +5228,7 @@
       <div class="lt-top-bar">
         <button class="lt-btn admin-only" onclick="openAddTeacherModal()"><i class="fa-solid fa-user-plus"></i> <span
             id="lt-btn-addteacher">إضافة أستاذ</span></button>
-        <button class="lt-btn primary" onclick="ltGenWeek()"><i class="fa-solid fa-rotate"></i> <span
+        <button class="lt-btn primary admin-only" onclick="ltGenWeek()"><i class="fa-solid fa-rotate"></i> <span
             id="lt-btn-update">تحديث الأسبوع</span></button>
       </div>
 
@@ -5220,7 +5349,7 @@
   </div>
 
   <!-- ══════════════════════════════════════════
-     PAGE: REVISIONS & SUBJECT FILES HUB
+     PAGE: REVISIONS & SUBJECT FILES HUB V2
   ══════════════════════════════════════════ -->
   <div class="page" id="page-revisions">
     <div class="rev-wrap">
@@ -5231,60 +5360,58 @@
           <div>
             <div class="rev-hero-title">
               <span id="rev-hero-title-txt">المراجعات والملفات</span>
-              <span class="ex-badge" style="background:rgba(59,130,246,0.2);color:var(--blue2)">شامل ومنظم</span>
+              <span class="ex-badge" style="background:rgba(59,130,246,0.2);color:var(--blue2)" id="rev-hero-badge-txt">منظم وشامل</span>
             </div>
-            <div class="rev-hero-sub" id="rev-hero-sub-txt">منصة متكاملة لتنظيم وتجميع روابط المراجعات، الحصص المكثفة، ومجلدات المذكرات والشيتات لكل مادة</div>
+            <div class="rev-hero-sub" id="rev-hero-sub-txt">اختر بين فيديوهات وحصص المراجعة أو مجلدات المذكرات والشيتات لكل مادة</div>
           </div>
         </div>
-        <div class="rev-hero-actions">
-          <button class="s-btn accent" onclick="openAddRevisionModal()"><i class="fa-solid fa-link"></i> <span id="btn-add-rev-txt">+ إضافة رابط مراجعة</span></button>
-          <button class="s-btn" onclick="openAddFileModal()" style="background:var(--card);border:1px solid var(--border);color:var(--text)"><i class="fa-solid fa-folder-plus"></i> <span id="btn-add-file-txt">+ إضافة ملف / مجلد</span></button>
+        <div class="rev-hero-actions admin-only" id="rev-hero-actions">
+          <button class="s-btn accent" id="btn-add-vids-top" onclick="openAddRevisionModal()"><i class="fa-solid fa-link"></i> <span id="btn-add-rev-txt">+ إضافة رابط مراجعة</span></button>
+          <button class="s-btn" id="btn-add-folder-top" onclick="openAddFileModal(null, null, 'folder')" style="background:var(--card);border:1px solid var(--border);color:var(--text)"><i class="fa-solid fa-folder-plus"></i> <span id="btn-add-folder-txt">+ مجلد جديد</span></button>
+          <button class="s-btn" id="btn-add-file-top" onclick="openAddFileModal(null, null, 'file')" style="background:var(--card);border:1px solid var(--border);color:var(--text)"><i class="fa-solid fa-file-arrow-up"></i> <span id="btn-add-file-txt">+ إضافة ملف</span></button>
         </div>
       </div>
 
-      <!-- Quick Stats -->
-      <div class="rev-stats-row">
-        <div class="rev-stat-card">
-          <div class="rev-stat-icon" style="background:rgba(59,130,246,0.15);color:var(--blue2)"><i class="fa-solid fa-link"></i></div>
-          <div>
-            <div class="rev-stat-val" id="rev-stat-links">0</div>
-            <div class="rev-stat-lbl" id="rev-stat-links-lbl">روابط المراجعات</div>
-          </div>
-        </div>
-        <div class="rev-stat-card">
-          <div class="rev-stat-icon" style="background:rgba(168,85,247,0.15);color:#a855f7"><i class="fa-solid fa-file-lines"></i></div>
-          <div>
-            <div class="rev-stat-val" id="rev-stat-files">0</div>
-            <div class="rev-stat-lbl" id="rev-stat-files-lbl">المذكرات والملفات</div>
-          </div>
-        </div>
-        <div class="rev-stat-card">
-          <div class="rev-stat-icon" style="background:rgba(245,158,11,0.15);color:var(--gold)"><i class="fa-solid fa-folder"></i></div>
-          <div>
-            <div class="rev-stat-val" id="rev-stat-folders">0</div>
-            <div class="rev-stat-lbl" id="rev-stat-folders-lbl">المجلدات المنظمة</div>
-          </div>
-        </div>
-        <div class="rev-stat-card">
-          <div class="rev-stat-icon" style="background:rgba(34,197,94,0.15);color:var(--green)"><i class="fa-solid fa-graduation-cap"></i></div>
-          <div>
-            <div class="rev-stat-val" id="rev-stat-subjects">0</div>
-            <div class="rev-stat-lbl" id="rev-stat-subjects-lbl">المواد الدراسية</div>
-          </div>
+      <!-- TWO PRIMARY BUTTONS SELECTOR (User requests: either vids revision or files) -->
+      <div class="rev-mode-container">
+        <div class="rev-mode-grid">
+          <!-- Button 1: Video Revisions -->
+          <button type="button" class="rev-mode-btn vids-btn active" id="rev-mode-vids" onclick="revSetSectionMode('vids')">
+            <div class="rev-mode-icon-box"><i class="fa-solid fa-circle-play"></i></div>
+            <div class="rev-mode-meta">
+              <div class="rev-mode-title-row">
+                <span class="rev-mode-title" id="rev-mode-vids-title">فيديوهات وحصص المراجعة</span>
+                <span class="rev-mode-pill-badge" id="rev-mode-vids-badge">🎬 فيديوهات</span>
+              </div>
+              <div class="rev-mode-desc" id="rev-mode-vids-desc">تجميع ومشاهدة روابط المراجعات، الحصص المكثفة، وحصص ليلة الامتحان من YouTube والمنصات</div>
+            </div>
+          </button>
+
+          <!-- Button 2: Files & Folders -->
+          <button type="button" class="rev-mode-btn files-btn" id="rev-mode-files" onclick="revSetSectionMode('files')">
+            <div class="rev-mode-icon-box"><i class="fa-solid fa-folder-open"></i></div>
+            <div class="rev-mode-meta">
+              <div class="rev-mode-title-row">
+                <span class="rev-mode-title" id="rev-mode-files-title">الملفات والمذكرات المنظمة</span>
+                <span class="rev-mode-pill-badge" id="rev-mode-files-badge">📁 مجلدات وشيتات</span>
+              </div>
+              <div class="rev-mode-desc" id="rev-mode-files-desc">مجلدات مرتبة للمذكرات، الشيتات، والملخصات مع رفع ملفاتك المباشرة أو روابط السحابة</div>
+            </div>
+          </button>
         </div>
       </div>
 
-      <!-- Controls & Search -->
+      <!-- Controls: Search & Subject Filter Chips -->
       <div class="rev-controls-card">
         <div class="rev-search-row">
           <div class="rev-search-box">
             <i class="fa-solid fa-magnifying-glass"></i>
             <input type="text" id="rev-search-input" placeholder="ابحث باسم المراجعة، الملف، المادة أو الملاحظات..." oninput="revOnSearchInput(this.value)">
           </div>
-          <div class="rev-view-tabs">
-            <button class="rev-vtab active" id="rev-vtab-all" onclick="revSetViewFilter('all')"><i class="fa-solid fa-layer-group"></i> <span>كل المحتوى</span></button>
-            <button class="rev-vtab" id="rev-vtab-links" onclick="revSetViewFilter('links')"><i class="fa-solid fa-link"></i> <span>روابط المراجعات</span></button>
-            <button class="rev-vtab" id="rev-vtab-files" onclick="revSetViewFilter('files')"><i class="fa-solid fa-folder"></i> <span>الملفات والمجلدات</span></button>
+          <div class="rev-sub-actions">
+            <button class="s-btn admin-only" onclick="openAddRevSubjectModal()" style="background:var(--bg2);border:1px solid var(--border);color:var(--text);font-size:12px;padding:6px 14px">
+              <i class="fa-solid fa-plus"></i> <span id="btn-add-new-subj-txt">مادة جديدة</span>
+            </button>
           </div>
         </div>
 
@@ -5292,14 +5419,10 @@
         <div class="rev-subj-chips" id="rev-subj-chips-container"></div>
       </div>
 
-      <!-- Main Subjects Container -->
-      <div id="rev-subjects-container"></div>
+      <!-- Main Content Container: switches dynamically between Video Revisions and Folders & Files -->
+      <div id="rev-content-container"></div>
     </div>
-  </div>
-
-
-
-  <!-- ══════════════════════════════════════════
+  </div><!-- ══════════════════════════════════════════
      PAGE 4: CURRICULUM & SYLLABUS
 ══════════════════════════════════════════ -->
   <div class="page" id="page-curric">
@@ -6463,7 +6586,6 @@
       </div>
     </div>
   </div>
-
   <!-- ══ REVISION LINK MODAL ══ -->
   <div class="sh-overlay" id="mod-revision" style="display:none" onclick="if(event.target.id==='mod-revision')closeModal('mod-revision')">
     <div class="sh-modal" onclick="event.stopPropagation()">
@@ -7151,26 +7273,48 @@
       if (p === 'todo' && window.App && typeof window.App.refresh === 'function') {
         window.App.refresh();
       }
+
+      // Persist last page so reload returns here
+      try { localStorage.setItem('sh_last_page', p); } catch(e) {}
     }
 
     /* ════════════════════════════════
-       SWITCH TO TODO SUB-VIEW (Today / Projects / Calendar)
+       SWITCH TO TODO SUB-VIEW (Today / Projects / Calendar / Project-Detail)
     ════════════════════════════════ */
     let _currentTodoView = 'today';
-    function switchToTodoView(view) {
+    function switchToTodoView(view, projectId) {
+      if (view === 'projects') {
+        try { localStorage.removeItem('sh_last_project_id'); } catch(e) {}
+      }
+      if (view === 'project-detail' && projectId) {
+        try {
+          localStorage.setItem('sh_last_project_id', projectId);
+          localStorage.setItem('sh_last_todo_view', 'project-detail');
+        } catch(e) {}
+      }
       _currentTodoView = view;
       closeMobileNav();
 
+      // Step 1: Activate the outer todo PAGE container
       document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.g-tab, .settings-btn').forEach(el => el.classList.remove('active'));
       const tp = document.getElementById('page-todo');
       if (tp) tp.classList.add('active');
 
-      const tabMap = { today: 'tab-today', projects: 'tab-projects', calendar: 'tab-calendar' };
+      // Step 2: Highlight the correct top-nav tab
+      const tabMap = { today: 'tab-today', projects: 'tab-projects', calendar: 'tab-calendar', 'project-detail': 'tab-projects' };
       const tt = document.getElementById(tabMap[view] || 'tab-today');
       if (tt) tt.classList.add('active');
 
+      // Step 3: Navigate the inner todo app
       const doNavigate = () => {
+        if (view === 'project-detail') {
+          const pid = projectId || localStorage.getItem('sh_last_project_id');
+          if (pid && window.Projects && typeof window.Projects.openProjectDetail === 'function') {
+            window.Projects.openProjectDetail(pid);
+            return;
+          }
+        }
         if (window.App && typeof window.App.navigate === 'function') {
           window.App.navigate(view);
         } else {
@@ -7178,14 +7322,74 @@
           const navBtn = document.getElementById(navIdMap[view]);
           if (navBtn) navBtn.click();
         }
+        if (view === 'today') {
+          setTimeout(() => renderTodayLectures(), 150);
+          setTimeout(() => updateMainTodayBadge(), 150);
+        }
       };
 
       if (window.App && typeof window.App.navigate === 'function') {
         doNavigate();
       } else {
-        setTimeout(doNavigate, 200);
+        setTimeout(doNavigate, 100);
+        setTimeout(doNavigate, 300);
       }
+
+      // Persist so reload returns to this view
+      try {
+        localStorage.setItem('sh_last_page', 'todo');
+        localStorage.setItem('sh_last_todo_view', view);
+      } catch(e) {}
     }
+
+    /* ════════════════════════════════
+       PAGE RELOAD PERSISTENCE RESTORER
+    ════════════════════════════════ */
+    window.restoreLastPage = function() {
+      let lastPage = 'todo';
+      let lastTodoView = 'today';
+      let lastProjectId = null;
+      try {
+        lastPage = localStorage.getItem('sh_last_page') || 'todo';
+        lastTodoView = localStorage.getItem('sh_last_todo_view') || 'today';
+        lastProjectId = localStorage.getItem('sh_last_project_id');
+      } catch(e) {}
+
+      const outerPages = ['sched', 'lt', 'exams', 'curric', 'settings', 'revisions'];
+      if (outerPages.includes(lastPage)) {
+        if (typeof switchPage === 'function') switchPage(lastPage);
+      } else {
+        const safeView = ['today', 'projects', 'calendar', 'inbox', 'project-detail'].includes(lastTodoView) ? lastTodoView : 'today';
+        if (safeView === 'project-detail' && lastProjectId) {
+          const restoreDetail = () => {
+            const tp = document.getElementById('page-todo');
+            if (tp) {
+              document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+              document.querySelectorAll('.g-tab, .settings-btn').forEach(el => el.classList.remove('active'));
+              tp.classList.add('active');
+            }
+            const tt = document.getElementById('tab-projects');
+            if (tt) tt.classList.add('active');
+
+            if (window.Projects && typeof window.Projects.openProjectDetail === 'function') {
+              window.Projects.openProjectDetail(lastProjectId);
+              return true;
+            }
+            return false;
+          };
+
+          if (!restoreDetail()) {
+            setTimeout(restoreDetail, 60);
+            setTimeout(restoreDetail, 180);
+            setTimeout(restoreDetail, 400);
+          }
+        } else if (typeof switchToTodoView === 'function') {
+          switchToTodoView(safeView);
+        } else if (typeof switchPage === 'function') {
+          switchPage('todo');
+        }
+      }
+    };
 
     /* ════════════════════════════════
        LANGUAGE
@@ -7254,6 +7458,53 @@
       si('s-todo', isAr ? 'المهام والإنتاجية' : 'Tasks & Productivity');
       si('md-todo-txt', isAr ? 'المهام والإنتاجية' : 'Tasks & Productivity');
       si('s-acad-yr', t('academicYear'));
+      si('tab-revisions-txt', isAr ? 'المراجعات والملفات' : 'Revisions & Files');
+      si('md-revisions-txt', isAr ? 'المراجعات والملفات' : 'Revisions & Files');
+      si('rev-hero-title-txt', isAr ? 'المراجعات والملفات' : 'Revisions & Study Files');
+      si('rev-hero-badge-txt', isAr ? 'منظم وشامل' : 'Comprehensive');
+      si('rev-hero-sub-txt', isAr ? 'اختر بين فيديوهات وحصص المراجعة أو مجلدات المذكرات والشيتات لكل مادة' : 'Choose between revision video sessions or organized study folders for each subject');
+      si('btn-add-rev-txt', isAr ? '+ إضافة رابط مراجعة' : '+ Add Video Revision');
+      si('btn-add-folder-txt', isAr ? '+ مجلد جديد' : '+ New Folder');
+      si('btn-add-file-txt', isAr ? '+ إضافة ملف' : '+ Add File');
+      si('rev-mode-vids-title', isAr ? 'فيديوهات وحصص المراجعة' : 'Video Revisions & Sessions');
+      si('rev-mode-vids-badge', isAr ? '🎬 فيديوهات' : '🎬 Videos');
+      si('rev-mode-vids-desc', isAr ? 'تجميع ومشاهدة روابط المراجعات، الحصص المكثفة، وحصص ليلة الامتحان من YouTube والمنصات' : 'Watch recorded revision lectures, intensive sessions & platform links');
+      si('rev-mode-files-title', isAr ? 'الملفات والمذكرات المنظمة' : 'Organized Files & Folders');
+      si('rev-mode-files-badge', isAr ? '📁 مجلدات وشيتات' : '📁 Folders & Sheets');
+      si('rev-mode-files-desc', isAr ? 'مجلدات مرتبة للمذكرات، الشيتات، والملخصات مع رفع ملفاتك المباشرة أو روابط السحابة' : 'Organized subject folders, summaries, and PDFs with direct upload or cloud links');
+      si('btn-add-new-subj-txt', isAr ? 'مادة جديدة' : 'New Subject');
+      
+      // Modals Bilingual Localization
+      const isEn = (lang === 'en');
+      const modRevTitle = document.getElementById('mod-rev-title');
+      if (modRevTitle && !revEditRevId) modRevTitle.textContent = isEn ? 'Add Revision Video' : 'إضافة رابط مراجعة';
+      const revTtlInp = document.getElementById('rev-ttl');
+      if (revTtlInp) revTtlInp.placeholder = isEn ? 'e.g. Unit 1 Grammar & Rhetoric Comprehensive Review' : 'مثال: مراجعة الباب الأول نحو وبلاغة';
+      const revUrlInp = document.getElementById('rev-url');
+      if (revUrlInp) revUrlInp.placeholder = isEn ? 'https://youtube.com/watch?v=... or platform link' : 'https://youtube.com/watch?v=... أو رابط المنصة';
+      const revNotesInp = document.getElementById('rev-notes');
+      if (revNotesInp) revNotesInp.placeholder = isEn ? 'Notes about the lecture, questions to solve beforehand...' : 'ملاحظات حول الحصة، ما يجب حله قبل المشاهدة...';
+
+      const fileTypeBtnFile = document.getElementById('file-type-btn-file');
+      if (fileTypeBtnFile) fileTypeBtnFile.innerHTML = '<i class="fa-solid fa-file"></i> ' + (isEn ? 'Study File' : 'ملف دراسي');
+      const fileTypeBtnFld = document.getElementById('file-type-btn-folder');
+      if (fileTypeBtnFld) fileTypeBtnFld.innerHTML = '<i class="fa-solid fa-folder"></i> ' + (isEn ? 'New Folder' : 'مجلد جديد');
+      const fldNameInp = document.getElementById('fld-name');
+      if (fldNameInp) fldNameInp.placeholder = isEn ? 'e.g. Grammar Booklets or Homework Sheets' : 'مثال: مذكرات الشرح أو شيتات الواجب';
+      const fileTtlInp = document.getElementById('file-ttl');
+      if (fileTtlInp) fileTtlInp.placeholder = isEn ? 'e.g. Comprehensive Grammar Notes PDF' : 'مثال: مذكرة النحو الشاملة PDF';
+      const fileUrlInp = document.getElementById('file-url');
+      if (fileUrlInp) fileUrlInp.placeholder = isEn ? 'https://drive.google.com/file/d/... or download link' : 'https://drive.google.com/file/d/... أو رابط التحميل';
+      const fileSizeInp = document.getElementById('file-size');
+      if (fileSizeInp) fileSizeInp.placeholder = isEn ? 'e.g. 3.5 MB or 20 pages' : 'مثال: 3.5 MB أو 20 صفحة';
+      const fileDescInp = document.getElementById('file-desc');
+      if (fileDescInp) fileDescInp.placeholder = isEn ? 'Additional notes and details...' : 'ملاحظات وتفاصيل إضافية...';
+      const newSubjInp = document.getElementById('new-rev-subj-name');
+      if (newSubjInp) newSubjInp.placeholder = isEn ? 'e.g. Physics, Chemistry, Philosophy...' : 'مثال: الفيزياء، الكيمياء، الفلسفة...';
+  
+      const rSearch = document.getElementById('rev-search-input');
+      if (rSearch) rSearch.placeholder = isAr ? 'ابحث باسم المراجعة، الملف، المادة أو الملاحظات...' : 'Search by title, subject, or notes...';
+      if (typeof revRenderAll === 'function') revRenderAll();
 
       // Header buttons title i18n
       const avatarBtn = document.getElementById('user-avatar-btn');
@@ -7958,6 +8209,8 @@
       if (typeof exRenderAll === 'function') exRenderAll();
       if (typeof curRenderAll === 'function') curRenderAll();
       if (typeof ltRenderAll === 'function') ltRenderAll();
+      if (typeof revRenderAll === 'function') revRenderAll();
+      if (window.App && typeof window.App.refresh === 'function') window.App.refresh();
     }
 
     function moveMobileDay(dir) {
@@ -9273,7 +9526,10 @@
 
     
     /* ════════════════════════════════
-       SYSTEM: REVISIONS & SUBJECT FILES HUB LOGIC
+       SYSTEM: REVISIONS & FILES V2 LOGIC
+       • User Choice: Video Revisions OR Files & Folders
+       • 10-Minute Continuous Background Auto-Sync
+       • Full English & Arabic Multi-lingual Support
     ════════════════════════════════ */
     const DEF_REVISIONS_SUBJECTS = ['اللغة العربية', 'اللغة الإنجليزية', 'التاريخ', 'البرمجة والتكنولوجيا'];
 
@@ -9282,100 +9538,139 @@
         subjects: [...DEF_REVISIONS_SUBJECTS],
         revisions: [
           {
-            id: 'rev_ar_1',
+            id: 'rev_seed_1',
             subject: 'اللغة العربية',
             title: 'مراجعة شاملة للوحدة الأولى (نحو وبلاغة)',
-            url: 'https://www.youtube.com',
+            url: 'https://www.youtube.com/watch?v=sample1',
             platform: 'YouTube',
             type: 'مراجعة شاملة',
             notes: 'تشمل حل تدريبات شاملة على همزة الوصل والقطع والمبتدأ والخبر.',
-            createdAt: '2026-10-14'
+            createdAt: ltTodayStr()
           },
           {
-            id: 'rev_en_1',
+            id: 'rev_seed_2',
             subject: 'اللغة الإنجليزية',
-            title: 'Units 1-3 Comprehensive Grammar Revision',
-            url: 'https://www.youtube.com',
+            title: 'Units 1-3 Grammar & Vocabulary Marathon',
+            url: 'https://www.youtube.com/watch?v=sample2',
             platform: 'YouTube',
             type: 'شرح مكثف',
-            notes: 'Tenses revision, active & passive, and modal verbs practice.',
-            createdAt: '2026-10-14'
+            notes: 'Covers Past Simple, Continuous, Perfect and key vocab idioms.',
+            createdAt: ltTodayStr()
           },
           {
-            id: 'rev_his_1',
+            id: 'rev_seed_3',
             subject: 'التاريخ',
-            title: 'مراجعة الفصل الأول: الحملة الفرنسية بالكامل',
-            url: 'https://www.youtube.com',
-            platform: 'YouTube',
-            type: 'مراجعة شاملة',
-            notes: 'تلخيص أسباب الحملة، المقاومة الشعبية، والنتائج العلمية والسياسية.',
-            createdAt: '2026-10-14'
-          },
-          {
-            id: 'rev_cs_1',
-            subject: 'البرمجة والتكنولوجيا',
-            title: 'مراجعة أساسيات الخوارزميات والتفكير المنطقي',
-            url: 'https://www.youtube.com',
+            title: 'مراجعة الفصل الأول: الحملة الفرنسية على مصر',
+            url: 'https://www.youtube.com/watch?v=sample3',
             platform: 'YouTube',
             type: 'حل تدريبات',
-            notes: 'حل أمثلة عملية على Loops و Functions والمصفوفات.',
-            createdAt: '2026-10-14'
+            notes: 'حل 80 سؤال استنتاجي بنظام البابل شيت وتحليل فرمانات نابليون.',
+            createdAt: ltTodayStr()
+          },
+          {
+            id: 'rev_seed_4',
+            subject: 'البرمجة والتكنولوجيا',
+            title: 'JavaScript & Web Fundamentals Crash Course',
+            url: 'https://www.youtube.com/watch?v=sample4',
+            platform: 'YouTube',
+            type: 'ملخص سريع',
+            notes: 'DOM manipulation, Async/Await, and API integrations.',
+            createdAt: ltTodayStr()
           }
         ],
         folders: [
-          { id: 'fld_ar_1', subject: 'اللغة العربية', name: 'مذكرات النحو والبلاغة', color: '#3b82f6', icon: 'fa-book-bookmark', createdAt: '2026-10-14' },
-          { id: 'fld_ar_2', subject: 'اللغة العربية', name: 'نماذج الامتحانات والحلول', color: '#10b981', icon: 'fa-file-lines', createdAt: '2026-10-14' },
-          { id: 'fld_en_1', subject: 'اللغة الإنجليزية', name: 'Grammar Summaries & Sheets', color: '#8b5cf6', icon: 'fa-folder', createdAt: '2026-10-14' },
-          { id: 'fld_his_1', subject: 'التاريخ', name: 'مذكرات الفصول والخرائط الذهنية', color: '#f59e0b', icon: 'fa-map', createdAt: '2026-10-14' },
-          { id: 'fld_cs_1', subject: 'البرمجة والتكنولوجيا', name: 'أكواد ومشاريع وتطبيقات عملية', color: '#06b6d4', icon: 'fa-code', createdAt: '2026-10-14' }
+          {
+            id: 'fld_seed_1',
+            subject: 'اللغة العربية',
+            name: 'مذكرات النحو والبلاغة',
+            color: '#3b82f6',
+            icon: 'fa-book-bookmark',
+            createdAt: ltTodayStr()
+          },
+          {
+            id: 'fld_seed_2',
+            subject: 'اللغة العربية',
+            name: 'نماذج الامتحانات والحلول',
+            color: '#ef4444',
+            icon: 'fa-file-lines',
+            createdAt: ltTodayStr()
+          },
+          {
+            id: 'fld_seed_3',
+            subject: 'اللغة الإنجليزية',
+            name: 'Grammar Booklets & Story PDFs',
+            color: '#8b5cf6',
+            icon: 'fa-folder',
+            createdAt: ltTodayStr()
+          },
+          {
+            id: 'fld_seed_4',
+            subject: 'التاريخ',
+            name: 'خرائط وتلخيصات الفصول',
+            color: '#f59e0b',
+            icon: 'fa-map',
+            createdAt: ltTodayStr()
+          },
+          {
+            id: 'fld_seed_5',
+            subject: 'البرمجة والتكنولوجيا',
+            name: 'Cheat Sheets & Code Snippets',
+            color: '#06b6d4',
+            icon: 'fa-code',
+            createdAt: ltTodayStr()
+          }
         ],
         files: [
           {
-            id: 'fil_ar_1',
+            id: 'fil_seed_1',
             subject: 'اللغة العربية',
-            folderId: 'fld_ar_1',
-            title: 'مذكرة القواعد النحوية كاملة PDF',
-            url: 'https://drive.google.com',
+            folderId: 'fld_seed_1',
+            title: 'مذكرة النحو الشاملة 2026 PDF',
+            url: 'https://drive.google.com/file/d/sample_arabic_nahw',
             type: 'pdf',
             size: '4.2 MB',
-            notes: 'ملف PDF ملون يحتوي على كافة خرائط الإعراب',
-            createdAt: '2026-10-14'
+            notes: 'ملخص لقواعد الإعراب كاملة مع 150 تدريب محلول.',
+            createdAt: ltTodayStr()
           },
           {
-            id: 'fil_en_1',
+            id: 'fil_seed_2',
             subject: 'اللغة الإنجليزية',
-            folderId: 'fld_en_1',
-            title: 'Grammar Cheat Sheet - All Rules',
-            url: 'https://drive.google.com',
+            folderId: 'fld_seed_3',
+            title: 'All Tenses & Irregular Verbs Cheat Sheet',
+            url: 'https://drive.google.com/file/d/sample_english_verbs',
             type: 'pdf',
-            size: '2.1 MB',
-            notes: 'Quick reference for English grammar rules',
-            createdAt: '2026-10-14'
+            size: '1.8 MB',
+            notes: 'Quick reference guide for all active and passive verb tenses.',
+            createdAt: ltTodayStr()
           }
         ]
       };
     }
 
     let revData = null;
+    let revActiveSection = 'vids'; // 'vids' (Video Revisions) or 'files' (Folders & Files)
     let revActiveSubject = 'all';
-    let revActiveView = 'all'; // 'all' | 'links' | 'files'
     let revSearchQuery = '';
-    let revOpenFolderIds = new Set(['fld_ar_1', 'fld_en_1', 'fld_his_1', 'fld_cs_1']);
     let revEditRevId = null;
     let revEditFileId = null;
-    let revFileModalMode = 'file'; // 'file' | 'folder'
+    let revFileModalMode = 'file'; // 'file' or 'folder'
     let revTempUploadedData = null;
+    let revOpenFolderIds = new Set(['fld_seed_1', 'fld_seed_2', 'fld_seed_3', 'fld_seed_4', 'fld_seed_5']);
 
     function revLoad() {
-      revData = loadJ('revisions_data', null);
-      if (!revData || !Array.isArray(revData.subjects) || revData.subjects.length === 0) {
+      const uid = getActiveSyncUid();
+      let raw = localStorage.getItem(uid + ':revisions_data') || localStorage.getItem('revisions_data');
+      if (raw) {
+        try {
+          revData = JSON.parse(raw);
+        } catch(e) {
+          console.warn('Error parsing revisions_data, using default', e);
+        }
+      }
+      if (!revData || !Array.isArray(revData.subjects)) {
         revData = defaultRevisionsData();
         revSave();
       }
-      if (!Array.isArray(revData.revisions)) revData.revisions = [];
-      if (!Array.isArray(revData.folders)) revData.folders = [];
-      if (!Array.isArray(revData.files)) revData.files = [];
-      if (!Array.isArray(revData.subjects)) revData.subjects = [...DEF_REVISIONS_SUBJECTS];
     }
 
     function revSave() {
@@ -9388,342 +9683,471 @@
       } catch(e){}
     }
 
-    function revOnSearchInput(val) {
-      revSearchQuery = (val || '').trim().toLowerCase();
-      revRenderAll();
+    function revSetSectionMode(mode) {
+      revActiveSection = mode;
+      const vidsBtn = document.getElementById('rev-mode-vids');
+      const filesBtn = document.getElementById('rev-mode-files');
+      if (vidsBtn && filesBtn) {
+        vidsBtn.classList.toggle('active', mode === 'vids');
+        filesBtn.classList.toggle('active', mode === 'files');
+      }
+
+      // Update Top Hero Action Buttons visibility
+      const btnAddVids = document.getElementById('btn-add-vids-top');
+      const btnAddFld = document.getElementById('btn-add-folder-top');
+      const btnAddFil = document.getElementById('btn-add-file-top');
+      if (btnAddVids) btnAddVids.style.display = mode === 'vids' ? 'inline-flex' : 'none';
+      if (btnAddFld) btnAddFld.style.display = mode === 'files' ? 'inline-flex' : 'none';
+      if (btnAddFil) btnAddFil.style.display = mode === 'files' ? 'inline-flex' : 'none';
+
+      revRenderContent();
     }
 
-    function revSetViewFilter(mode) {
-      revActiveView = mode;
-      ['all', 'links', 'files'].forEach(k => {
-        const el = document.getElementById('rev-vtab-' + k);
-        if (el) el.classList.toggle('active', k === mode);
-      });
-      revRenderAll();
+    function revOnSearchInput(val) {
+      revSearchQuery = (val || '').trim().toLowerCase();
+      revRenderContent();
     }
 
     function revSetSubjectFilter(subj) {
       revActiveSubject = subj;
       revRenderSubjectChips();
-      revRenderAll();
+      revRenderContent();
     }
+
+    
+    /* ── Subject & Content Bilingual Display Helpers ── */
+    const REV_SUBJ_I18N = {
+      'اللغة العربية': 'Arabic Language',
+      'عربي': 'Arabic Language',
+      'اللغة الإنجليزية': 'English Language',
+      'إنجليزي': 'English Language',
+      'انجليزي': 'English Language',
+      'التاريخ': 'History',
+      'تاريخ': 'History',
+      'البرمجة والتكنولوجيا': 'Computer Science & Programming',
+      'برمجة': 'Programming',
+      'الفيزياء': 'Physics',
+      'فيزياء': 'Physics',
+      'الكيمياء': 'Chemistry',
+      'كيمياء': 'Chemistry',
+      'الأحياء': 'Biology',
+      'أحياء': 'Biology',
+      'الرياضيات': 'Mathematics',
+      'رياضيات': 'Mathematics',
+      'الفلسفة': 'Philosophy',
+      'الجغرافيا': 'Geography',
+      'علم النفس': 'Psychology',
+      'الجيولوجيا': 'Geology',
+      'الفرنساوي': 'French',
+      'اللغة الفرنسية': 'French',
+      'الألماني': 'German',
+      'الإيطالي': 'Italian'
+    };
+
+    function getSubjectDisplayName(subj) {
+      if (!subj) return '';
+      if (lang === 'en') {
+        return REV_SUBJ_I18N[subj] || subj;
+      }
+      return subj;
+    }
+
+    const REV_TYPE_I18N = {
+      'مراجعة شاملة': 'Comprehensive Review',
+      'شرح مكثف': 'Intensive Explanation',
+      'حل تدريبات': 'Practice Questions',
+      'ليلة الامتحان': 'Exam Night Session',
+      'ملخص سريع': 'Quick Summary'
+    };
+
+    function getRevTypeDisplayName(type) {
+      if (!type) return '';
+      if (lang === 'en') {
+        return REV_TYPE_I18N[type] || type;
+      }
+      return type;
+    }
+
+    const REV_FOLDER_I18N = {
+      'مذكرات النحو والبلاغة': 'Grammar & Rhetoric Booklets',
+      'نماذج الامتحانات والحلول': 'Exam Models & Solutions',
+      'خرائط وتلخيصات الفصول': 'Chapter Maps & Summaries',
+      'ملفات عامة بدون مجلد': 'General Study Files'
+    };
+
+    function getFolderDisplayName(name) {
+      if (!name) return '';
+      if (lang === 'en') {
+        return REV_FOLDER_I18N[name] || name;
+      }
+      return name;
+    }
+
+    const REV_SEEDS_I18N = {
+      'مراجعة شاملة للوحدة الأولى (نحو وبلاغة)': {
+        enTitle: 'Arabic: Comprehensive Unit 1 Review (Grammar & Rhetoric)',
+        enNotes: 'Includes comprehensive practice on Hamzat Wasl & Qat and Inchoative & Enunciative rules.'
+      },
+      'مراجعة الفصل الأول: الحملة الفرنسية على مصر': {
+        enTitle: 'History: Chapter 1 Review - The French Campaign in Egypt',
+        enNotes: '80 deduction questions in bubble sheet format with analysis of Napoleon decrees.'
+      },
+      'مذكرة النحو الشاملة 2026 PDF': {
+        enTitle: '2026 Comprehensive Arabic Grammar Booklet PDF',
+        enNotes: 'Complete reference guide with 150 solved exercises.'
+      }
+    };
+
+    function getRevItemDisplay(item) {
+      if (lang === 'en' && REV_SEEDS_I18N[item.title]) {
+        return {
+          title: REV_SEEDS_I18N[item.title].enTitle,
+          notes: REV_SEEDS_I18N[item.title].enNotes || item.notes
+        };
+      }
+      return { title: item.title, notes: item.notes };
+    }
+
+    function getSubjectColor(subj) {
+      if (!subj) return '#3b82f6';
+      if (subj.includes('عرب') || subj.toLowerCase().includes('arab')) return '#3b82f6';
+      if (subj.includes('إنجل') || subj.includes('انجل') || subj.toLowerCase().includes('eng')) return '#8b5cf6';
+      if (subj.includes('تاريخ') || subj.toLowerCase().includes('hist')) return '#f59e0b';
+      if (subj.includes('برمج') || subj.includes('حاسب') || subj.includes('تكنول') || subj.toLowerCase().includes('prog') || subj.toLowerCase().includes('comp')) return '#06b6d4';
+      if (subj.includes('فيز') || subj.toLowerCase().includes('phys')) return '#ec4899';
+      if (subj.includes('كيم') || subj.toLowerCase().includes('chem')) return '#10b981';
+      return '#3b82f6';
+    }
+
 
     function revRenderSubjectChips() {
       const container = document.getElementById('rev-subj-chips-container');
       if (!container || !revData) return;
-      const subjects = revData.subjects || [];
-      const allActive = revActiveSubject === 'all';
-      let html = '<button class="rev-schip ' + (allActive ? 'active' : '') + '" onclick="revSetSubjectFilter(\'all\')"><i class="fa-solid fa-layer-group"></i> <span>جميع المواد</span></button>';
-      subjects.forEach(s => {
-        const active = revActiveSubject === s;
-        html += '<button class="rev-schip ' + (active ? 'active' : '') + '" onclick="revSetSubjectFilter(\'' + esc(s) + '\')"><i class="fa-solid fa-book-bookmark"></i> <span>' + esc(s) + '</span></button>';
+      const isAr = (lang === 'ar');
+
+      let html = '<button class="rev-schip ' + (revActiveSubject === 'all' ? 'active' : '') + '" onclick="revSetSubjectFilter(\'all\')">';
+      html += '<i class="fa-solid fa-layer-group"></i> <span>' + (isAr ? 'جميع المواد' : 'All Subjects') + '</span>';
+      html += '</button>';
+
+      (revData.subjects || []).forEach(subj => {
+        const isActive = (revActiveSubject === subj);
+        const count = (revActiveSection === 'vids')
+          ? (revData.revisions || []).filter(r => r.subject === subj).length
+          : (revData.folders || []).filter(f => f.subject === subj).length + (revData.files || []).filter(f => f.subject === subj).length;
+
+        html += '<button class="rev-schip ' + (isActive ? 'active' : '') + '" onclick="revSetSubjectFilter(\'' + esc(subj) + '\')">';
+        html += '<i class="fa-solid fa-book"></i> <span>' + esc(getSubjectDisplayName(subj)) + '</span>';
+        if (count > 0) html += '<span style="opacity:0.75;font-size:10.5px">(' + count + ')</span>';
+        html += '</button>';
       });
-      html += '<button class="rev-schip" onclick="openAddRevSubjectModal()" style="border-style:dashed;color:var(--accent)"><i class="fa-solid fa-plus"></i> <span>مادة جديدة</span></button>';
+
       container.innerHTML = html;
     }
 
-    function revRenderStats() {
-      if (!revData) return;
-      const totalLinks = revData.revisions.length;
-      const totalFiles = revData.files.length;
-      const totalFolders = revData.folders.length;
-      const totalSubj = revData.subjects.length;
-      si('rev-stat-links', totalLinks);
-      si('rev-stat-files', totalFiles);
-      si('rev-stat-folders', totalFolders);
-      si('rev-stat-subjects', totalSubj);
+    
+    function getSubjectColor(subj) {
+      if (!subj) return '#3b82f6';
+      if (subj.includes('عرب')) return '#3b82f6';
+      if (subj.includes('إنجل') || subj.includes('انجل') || subj.toLowerCase().includes('eng')) return '#8b5cf6';
+      if (subj.includes('تاريخ') || subj.toLowerCase().includes('hist')) return '#f59e0b';
+      if (subj.includes('برمج') || subj.includes('حاسب') || subj.includes('تكنول') || subj.toLowerCase().includes('prog')) return '#06b6d4';
+      if (subj.includes('فيز') || subj.toLowerCase().includes('phys')) return '#ec4899';
+      if (subj.includes('كيم') || subj.toLowerCase().includes('chem')) return '#10b981';
+      return '#3b82f6';
     }
 
-    function revRenderAll() {
-      if (!revData) revLoad();
-      revRenderStats();
-      revRenderSubjectChips();
+    function revRenderContent() {
+      const container = document.getElementById('rev-content-container');
+      if (!container || !revData) return;
+      const isAr = (lang === 'ar');
 
-      const container = document.getElementById('rev-subjects-container');
-      if (!container) return;
-
-      const subjects = (revActiveSubject === 'all') 
-        ? revData.subjects 
+      const subjects = (revActiveSubject === 'all')
+        ? revData.subjects
         : revData.subjects.filter(s => s === revActiveSubject);
 
       if (subjects.length === 0) {
-        container.innerHTML = '<div style="text-align:center;padding:50px 20px;color:var(--text3);font-size:14px;font-weight:700"><i class="fa-solid fa-folder-open" style="font-size:36px;display:block;margin-bottom:12px;opacity:0.3"></i>لا توجد مواد مسجلة بعد. أضف مادة أو رابط مراجعة للبدء!</div>';
+        container.innerHTML = '<div style="text-align:center;padding:50px 20px;color:var(--text3);font-size:14px;font-weight:700">' +
+          '<i class="fa-solid fa-folder-open" style="font-size:36px;display:block;margin-bottom:12px;opacity:0.3"></i>' +
+          (isAr ? 'لا توجد مواد مسجلة بعد. أضف مادة للبدء!' : 'No subjects registered yet. Add a subject to start!') +
+          '</div>';
         return;
       }
 
       const q = revSearchQuery;
-      let renderedBlocksCount = 0;
       let html = '';
+      let renderedBlocksCount = 0;
 
       subjects.forEach(subj => {
         let subjRevs = (revData.revisions || []).filter(r => r.subject === subj);
         let subjFolders = (revData.folders || []).filter(f => f.subject === subj);
         let subjFiles = (revData.files || []).filter(f => f.subject === subj);
 
-        // Apply Search query
         if (q) {
-          subjRevs = subjRevs.filter(r => (r.title || '').toLowerCase().includes(q) || (r.notes || '').toLowerCase().includes(q) || (r.type || '').toLowerCase().includes(q) || (r.platform || '').toLowerCase().includes(q));
-          subjFiles = subjFiles.filter(f => (f.title || '').toLowerCase().includes(q) || (f.notes || '').toLowerCase().includes(q) || (f.type || '').toLowerCase().includes(q));
+          subjRevs = subjRevs.filter(r => (r.title || '').toLowerCase().includes(q) || (r.notes || '').toLowerCase().includes(q) || (r.type || '').toLowerCase().includes(q));
+          subjFiles = subjFiles.filter(f => (f.title || '').toLowerCase().includes(q) || (f.notes || '').toLowerCase().includes(q));
           subjFolders = subjFolders.filter(f => (f.name || '').toLowerCase().includes(q) || subjFiles.some(file => file.folderId === f.id));
         }
 
-        const showLinks = (revActiveView === 'all' || revActiveView === 'links');
-        const showFiles = (revActiveView === 'all' || revActiveView === 'files');
+        const isVidsMode = (revActiveSection === 'vids');
+        const hasContent = isVidsMode ? (subjRevs.length > 0) : (subjFolders.length > 0 || subjFiles.length > 0);
 
-        const hasLinks = showLinks && subjRevs.length > 0;
-        const hasFolders = showFiles && (subjFolders.length > 0 || subjFiles.length > 0);
-
-        // If filtering by search and nothing matches this subject, skip it
-        if (q && !hasLinks && !hasFolders) return;
+        if (q && !hasContent) return;
 
         renderedBlocksCount++;
         const subjColor = getSubjectColor(subj);
 
         html += '<div class="rev-subj-block" style="border-top:4px solid ' + subjColor + '">';
-        // Subject header
+        
+        // Subject Header
         html += '<div class="rev-subj-hdr">';
         html += '  <div class="rev-subj-info">';
         html += '    <div class="rev-subj-badge" style="background:' + subjColor + '20;color:' + subjColor + '"><i class="fa-solid fa-book-open"></i></div>';
         html += '    <div>';
-        html += '      <div class="rev-subj-name">' + esc(subj) + '</div>';
-        html += '      <div class="rev-subj-counts">' + subjRevs.length + ' روابط مراجعة • ' + subjFolders.length + ' مجلدات • ' + subjFiles.length + ' ملفات</div>';
+        html += '      <div class="rev-subj-name">' + esc(getSubjectDisplayName(subj)) + '</div>';
+        html += '      <div class="rev-subj-counts">';
+        if (isVidsMode) {
+          html += subjRevs.length + ' ' + (isAr ? 'فيديو مراجعة' : 'revision videos');
+        } else {
+          html += subjFolders.length + ' ' + (isAr ? 'مجلدات' : 'folders') + ' • ' + subjFiles.length + ' ' + (isAr ? 'ملف ومذكرة' : 'files');
+        }
+        html += '      </div>';
         html += '    </div>';
         html += '  </div>';
-        html += '  <div class="rev-sub-actions">';
-        html += '    <button class="s-btn" style="font-size:11px;padding:5px 10px;background:var(--bg2);border:1px solid var(--border);color:var(--text)" onclick="openAddRevisionModal(\'' + esc(subj) + '\')"><i class="fa-solid fa-link"></i> + رابط مراجعة</button>';
-        html += '    <button class="s-btn" style="font-size:11px;padding:5px 10px;background:var(--bg2);border:1px solid var(--border);color:var(--text)" onclick="openAddFileModal(\'' + esc(subj) + '\')"><i class="fa-solid fa-folder-plus"></i> + ملف أو مجلد</button>';
-        html += '  </div>';
-        html += '</div>';
 
-        // Section A: Revision Links
-        if (showLinks) {
-          html += '<div class="rev-section-title"><i class="fa-solid fa-link" style="color:var(--accent)"></i> <span>روابط وحصص المراجعة (' + subjRevs.length + ')</span></div>';
+        // Action buttons inside subject block
+        html += '  <div class="rev-sub-actions admin-only">';
+        if (isVidsMode) {
+          html += '<button class="s-btn" onclick="openAddRevisionModal(\'' + esc(subj) + '\')" style="font-size:12px;padding:6px 12px;background:var(--bg2);border:1px solid var(--border);color:var(--text)"><i class="fa-solid fa-plus"></i> ' + (isAr ? 'إضافة فيديو' : 'Add Video') + '</button>';
+        } else {
+          html += '<button class="s-btn" onclick="openAddFileModal(\'' + esc(subj) + '\', null, \'folder\')" style="font-size:12px;padding:6px 12px;background:var(--bg2);border:1px solid var(--border);color:var(--text)"><i class="fa-solid fa-folder-plus"></i> ' + (isAr ? 'مجلد' : 'Folder') + '</button>';
+          html += '<button class="s-btn" onclick="openAddFileModal(\'' + esc(subj) + '\', null, \'file\')" style="font-size:12px;padding:6px 12px;background:var(--bg2);border:1px solid var(--border);color:var(--text)"><i class="fa-solid fa-file-plus"></i> ' + (isAr ? 'ملف' : 'File') + '</button>';
+        }
+        html += '  </div>';
+        html += '</div>'; // end rev-subj-hdr
+
+        // SECTION 1: VIDEOS REVISION
+        if (isVidsMode) {
           if (subjRevs.length === 0) {
-            html += '<div style="background:var(--bg2);border-radius:10px;padding:14px;text-align:center;color:var(--text3);font-size:12px;margin-bottom:18px"><i class="fa-solid fa-link-slash" style="margin-inline-end:6px"></i>لا توجد روابط مراجعة مضافة لهذه المادة حتى الآن. <a href="javascript:void(0)" onclick="openAddRevisionModal(\'' + esc(subj) + '\')" style="color:var(--accent);font-weight:700">أضف أول رابط مراجعة</a></div>';
+            html += '<div style="text-align:center;padding:24px 16px;color:var(--text3);font-size:12.5px;background:var(--bg2);border-radius:10px">';
+            html += '<i class="fa-solid fa-circle-play" style="font-size:24px;display:block;margin-bottom:6px;opacity:0.3"></i>';
+            html += isAr ? 'لا توجد فيديوهات مراجعة لهذه المادة بعد. انقر على "+ إضافة فيديو" لإضافة روابط الحصص!' : 'No revision videos for this subject yet. Click "+ Add Video" to add sessions!';
+            html += '</div>';
           } else {
             html += '<div class="rev-links-grid">';
-            subjRevs.forEach(r => {
-              const platformIcon = getPlatformIcon(r.platform);
+            subjRevs.forEach(rev => {
+              const platform = rev.platform || 'YouTube';
+              const pClass = (platform.toLowerCase().includes('drive')) ? 'gdrive' : 'platform';
+              const pIcon = (platform.toLowerCase().includes('youtube')) ? 'fa-brands fa-youtube' : (platform.toLowerCase().includes('drive') ? 'fa-brands fa-google-drive' : 'fa-solid fa-video');
+
               html += '<div class="rev-link-card">';
               html += '  <div>';
               html += '    <div class="rev-card-top">';
-              html += '      <div class="rev-card-ttl">' + esc(r.title) + '</div>';
-              html += '      <div style="display:flex;gap:4px">';
-              html += '        <button onclick="openEditRevisionModal(\'' + r.id + '\')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;padding:2px" title="تعديل"><i class="fa-solid fa-pen"></i></button>';
-              html += '        <button onclick="delRevision(\'' + r.id + '\')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:11px;padding:2px" title="حذف"><i class="fa-solid fa-trash"></i></button>';
+              const revDisp = getRevItemDisplay(rev);
+              html += '      <div class="rev-card-ttl">' + esc(revDisp.title) + '</div>';
+              html += '      <div class="admin-only" style="display:flex;gap:4px">';
+              html += '        <button class="ex-card-btn" title="' + (isAr ? 'تعديل' : 'Edit') + '" onclick="editRevision(\'' + rev.id + '\')"><i class="fa-solid fa-pen-to-square"></i></button>';
+              html += '        <button class="ex-card-btn del" title="' + (isAr ? 'حذف' : 'Delete') + '" onclick="delRevision(\'' + rev.id + '\')"><i class="fa-solid fa-trash"></i></button>';
               html += '      </div>';
               html += '    </div>';
               html += '    <div class="rev-card-tags">';
-              html += '      <span class="rev-tag"><i class="fa-solid fa-tag"></i> ' + esc(r.type || 'مراجعة') + '</span>';
-              html += '      <span class="rev-tag platform"><i class="' + platformIcon + '"></i> ' + esc(r.platform || 'Link') + '</span>';
+              html += '      <span class="rev-tag ' + pClass + '"><i class="' + pIcon + '"></i> ' + esc(platform) + '</span>';
+              if (rev.type) html += '<span class="rev-tag"><i class="fa-solid fa-bookmark"></i> ' + esc(getRevTypeDisplayName(rev.type)) + '</span>';
               html += '    </div>';
-              if (r.notes) {
-                html += '    <div class="rev-card-notes" style="margin-top:8px">' + esc(r.notes) + '</div>';
+              if (rev.notes) {
+                html += '    <div class="rev-card-notes" style="margin-top:8px">' + esc(revDisp.notes) + '</div>';
               }
               html += '  </div>';
               html += '  <div class="rev-card-ftr">';
-              html += '    <span style="font-size:11px;color:var(--text3)"><i class="fa-regular fa-clock"></i> ' + esc(r.createdAt || '') + '</span>';
-              html += '    <a href="' + esc(r.url) + '" target="_blank" rel="noopener noreferrer" class="rev-open-btn"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span>فتح الرابط</span></a>';
+              html += '    <span style="font-size:11px;color:var(--text3)"><i class="fa-regular fa-clock"></i> ' + (rev.createdAt || '') + '</span>';
+              html += '    <a href="' + esc(rev.url || '#') + '" target="_blank" rel="noopener noreferrer" class="rev-open-btn"><i class="fa-solid fa-arrow-up-right-from-square"></i> ' + (isAr ? 'مشاهدة المراجعة' : 'Watch Session') + '</a>';
               html += '  </div>';
-              html += '</div>';
+              html += '</div>'; // end rev-link-card
             });
             html += '</div>';
           }
-        }
-
-        // Section B: Folders & Files
-        if (showFiles) {
-          html += '<div class="rev-section-title" style="margin-top:10px"><i class="fa-solid fa-folder-tree" style="color:var(--gold)"></i> <span>المجلدات والملفات المنظمة (' + subjFiles.length + ')</span></div>';
+        } 
+        // SECTION 2: FOLDERS & FILES
+        else {
           if (subjFolders.length === 0 && subjFiles.length === 0) {
-            html += '<div style="background:var(--bg2);border-radius:10px;padding:14px;text-align:center;color:var(--text3);font-size:12px"><i class="fa-solid fa-folder-open" style="margin-inline-end:6px"></i>لا توجد ملفات أو مجلدات لهذه المادة. <a href="javascript:void(0)" onclick="openAddFileModal(\'' + esc(subj) + '\')" style="color:var(--accent);font-weight:700">إنشاء مجلد أو إضافة ملف</a></div>';
+            html += '<div style="text-align:center;padding:24px 16px;color:var(--text3);font-size:12.5px;background:var(--bg2);border-radius:10px">';
+            html += '<i class="fa-solid fa-folder-open" style="font-size:24px;display:block;margin-bottom:6px;opacity:0.3"></i>';
+            html += isAr ? 'لا توجد مجلدات أو ملفات لهذه المادة بعد. انقر على "+ مجلد" لتنظيم مذكراتك!' : 'No folders or files for this subject yet. Click "+ Folder" to organize study notes!';
+            html += '</div>';
           } else {
-            // Folders Grid
             html += '<div class="rev-folders-grid">';
+            
+            // Render Folders
             subjFolders.forEach(fld => {
               const fldFiles = subjFiles.filter(f => f.folderId === fld.id);
               const isOpen = revOpenFolderIds.has(fld.id);
-              html += '<div class="rev-folder-card ' + (isOpen ? 'open' : '') + '">';
+              const fColor = fld.color || '#3b82f6';
+              const fIcon = fld.icon || 'fa-folder';
+
+              html += '<div class="rev-folder-card">';
               html += '  <div class="rev-folder-hdr" onclick="revToggleFolder(\'' + fld.id + '\')">';
               html += '    <div class="rev-folder-title-wrap">';
-              html += '      <i class="fa-solid ' + (fld.icon || 'fa-folder') + ' rev-folder-icon" style="color:' + (fld.color || 'var(--gold)') + '"></i>';
+              html += '      <div class="rev-folder-icon" style="color:' + fColor + '"><i class="fa-solid ' + fIcon + '"></i></div>';
               html += '      <div>';
-              html += '        <div class="rev-folder-name">' + esc(fld.name) + '</div>';
+              html += '        <div class="rev-folder-name">' + esc(getFolderDisplayName(fld.name)) + '</div>';
+              html += '        <div style="font-size:11px;color:var(--text3);margin-top:2px">' + fldFiles.length + ' ' + (isAr ? 'ملف' : 'files') + '</div>';
               html += '      </div>';
               html += '    </div>';
               html += '    <div style="display:flex;align-items:center;gap:6px">';
-              html += '      <span class="rev-folder-badge">' + fldFiles.length + ' ملف</span>';
-              html += '      <button onclick="event.stopPropagation();openAddFileModal(\'' + esc(subj) + '\', \'' + fld.id + '\')" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:12px;padding:3px" title="إضافة ملف داخل المجلد"><i class="fa-solid fa-plus"></i></button>';
-              html += '      <button onclick="event.stopPropagation();delFolder(\'' + fld.id + '\')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;padding:3px" title="حذف المجلد"><i class="fa-solid fa-trash"></i></button>';
-              html += '      <i class="fa-solid ' + (isOpen ? 'fa-chevron-up' : 'fa-chevron-down') + '" style="font-size:11px;color:var(--text3)"></i>';
+              html += '      <button class="ex-card-btn admin-only" onclick="event.stopPropagation();openAddFileModal(\'' + esc(subj) + '\', \'' + fld.id + '\', \'file\')" title="' + (isAr ? 'إضافة ملف لهذا المجلد' : 'Add File to Folder') + '"><i class="fa-solid fa-plus"></i></button>';
+              html += '      <button class="ex-card-btn del admin-only" onclick="event.stopPropagation();delFolder(\'' + fld.id + '\')" title="' + (isAr ? 'حذف المجلد' : 'Delete Folder') + '"><i class="fa-solid fa-trash"></i></button>';
+              html += '      <i class="fa-solid ' + (isOpen ? 'fa-chevron-up' : 'fa-chevron-down') + '" style="font-size:12px;color:var(--text3);margin-left:4px"></i>';
               html += '    </div>';
-              html += '  </div>';
+              html += '  </div>'; // end rev-folder-hdr
 
-              // Expanded Files List
               if (isOpen) {
                 html += '  <div class="rev-folder-files-box">';
                 if (fldFiles.length === 0) {
-                  html += '    <div style="font-size:11.5px;color:var(--text3);text-align:center;padding:8px">المجلد فارغ. <a href="javascript:void(0)" onclick="openAddFileModal(\'' + esc(subj) + '\', \'' + fld.id + '\')" style="color:var(--accent);font-weight:700">+ أضف ملفاً</a></div>';
+                  html += '    <div style="text-align:center;padding:10px;font-size:11.5px;color:var(--text3)">' + (isAr ? 'المجلد فارغ. انقر + لإضافة ملف' : 'Folder is empty. Click + to add file') + '</div>';
                 } else {
-                  fldFiles.forEach(fl => {
-                    const iconObj = getFileIconObj(fl.type);
-                    html += '    <div class="rev-file-row">';
-                    html += '      <div class="rev-file-info">';
-                    html += '        <i class="' + iconObj.icon + ' rev-file-icon" style="color:' + iconObj.color + '"></i>';
-                    html += '        <span class="rev-file-name" title="' + esc(fl.title) + '">' + esc(fl.title) + '</span>';
-                    if (fl.size) {
-                      html += '        <span class="rev-file-meta">(' + esc(fl.size) + ')</span>';
-                    }
-                    html += '      </div>';
-                    html += '      <div class="rev-file-actions">';
-                    html += '        <a href="' + esc(fl.url) + '" target="_blank" rel="noopener noreferrer" download="' + esc(fl.title) + '" style="color:var(--accent);font-weight:700;font-size:12px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;background:rgba(59,130,246,0.1)"><i class="fa-solid fa-download"></i> فتح</a>';
-                    html += '        <button onclick="delFile(\'' + fl.id + '\')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;padding:3px" title="حذف"><i class="fa-solid fa-trash"></i></button>';
-                    html += '      </div>';
+                  fldFiles.forEach(file => {
+                    const fExt = file.type || 'pdf';
+                    const fIconClass = (fExt === 'pdf') ? 'fa-file-pdf' : ((fExt === 'doc') ? 'fa-file-word' : ((fExt === 'sheet') ? 'fa-file-excel' : 'fa-file'));
+                    const fIconColor = (fExt === 'pdf') ? '#ef4444' : ((fExt === 'doc') ? '#3b82f6' : ((fExt === 'sheet') ? '#10b981' : 'var(--text2)'));
+
+                    html += '<div class="rev-file-row">';
+                    html += '  <div class="rev-file-info">';
+                    html += '    <i class="fa-solid ' + fIconClass + ' rev-file-icon" style="color:' + fIconColor + '"></i>';
+                    html += '    <div style="overflow:hidden;flex:1">';
+                    const filDisp = getRevItemDisplay(file);
+                    html += '      <div class="rev-file-name" title="' + esc(filDisp.title) + '">' + esc(filDisp.title) + '</div>';
+                    if (filDisp.notes) html += '<div style="font-size:11px;color:var(--text3)">' + esc(filDisp.notes) + '</div>';
                     html += '    </div>';
+                    if (file.size) html += '    <span class="rev-file-meta">' + esc(file.size) + '</span>';
+                    html += '  </div>';
+                    html += '  <div class="rev-file-actions">';
+                    html += '    <a href="' + esc(file.url || '#') + '" target="_blank" download class="ex-card-btn" title="' + (isAr ? 'فتح / تحميل' : 'Open / Download') + '"><i class="fa-solid fa-arrow-down"></i></a>';
+                    html += '    <button class="ex-card-btn del admin-only" onclick="delFile(\'' + file.id + '\')"" title="' + (isAr ? 'حذف' : 'Delete') + '"><i class="fa-solid fa-trash"></i></button>';
+                    html += '  </div>';
+                    html += '</div>';
                   });
                 }
                 html += '  </div>';
               }
-
-              html += '</div>';
+              html += '</div>'; // end rev-folder-card
             });
-            html += '</div>';
 
-            // Root files (without folder)
-            const rootFiles = subjFiles.filter(f => !f.folderId || !subjFolders.some(fld => fld.id === f.folderId));
+            // Root files (files not in a specific folder)
+            const rootFiles = subjFiles.filter(f => !f.folderId);
             if (rootFiles.length > 0) {
-              html += '<div style="margin-top:10px">';
-              html += '  <div style="font-size:12px;font-weight:700;color:var(--text3);margin-bottom:6px">ملفات عامة بدون مجلد:</div>';
-              html += '  <div style="display:flex;flex-direction:column;gap:6px">';
-              rootFiles.forEach(fl => {
-                const iconObj = getFileIconObj(fl.type);
-                html += '    <div class="rev-file-row">';
-                html += '      <div class="rev-file-info">';
-                html += '        <i class="' + iconObj.icon + ' rev-file-icon" style="color:' + iconObj.color + '"></i>';
-                html += '        <span class="rev-file-name" title="' + esc(fl.title) + '">' + esc(fl.title) + '</span>';
-                if (fl.size) html += '        <span class="rev-file-meta">(' + esc(fl.size) + ')</span>';
-                html += '      </div>';
-                html += '      <div class="rev-file-actions">';
-                html += '        <a href="' + esc(fl.url) + '" target="_blank" rel="noopener noreferrer" style="color:var(--accent);font-weight:700;font-size:12px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;background:rgba(59,130,246,0.1)"><i class="fa-solid fa-download"></i> فتح</a>';
-                html += '        <button onclick="delFile(\'' + fl.id + '\')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;padding:3px" title="حذف"><i class="fa-solid fa-trash"></i></button>';
-                html += '      </div>';
-                html += '    </div>';
+              html += '<div class="rev-folder-card" style="border-style:dashed">';
+              html += '  <div class="rev-folder-hdr">';
+              html += '    <div class="rev-folder-title-wrap">';
+              html += '      <div class="rev-folder-icon" style="color:var(--text3)"><i class="fa-solid fa-paperclip"></i></div>';
+              html += '      <div class="rev-folder-name">' + (isAr ? 'ملفات عامة بدون مجلد' : 'General Study Files') + '</div>';
+              html += '    </div>';
+              html += '  </div>';
+              html += '  <div class="rev-folder-files-box" style="margin-top:10px">';
+              rootFiles.forEach(file => {
+                html += '<div class="rev-file-row">';
+                html += '  <div class="rev-file-info">';
+                html += '    <i class="fa-solid fa-file rev-file-icon" style="color:var(--text2)"></i>';
+                html += '    <div class="rev-file-name">' + esc(file.title) + '</div>';
+                html += '  </div>';
+                html += '  <div class="rev-file-actions">';
+                html += '    <a href="' + esc(file.url || '#') + '" target="_blank" download class="ex-card-btn"><i class="fa-solid fa-arrow-down"></i></a>';
+                html += '    <button class="ex-card-btn del admin-only" onclick="delFile(\'' + file.id + '\')""><i class="fa-solid fa-trash"></i></button>';
+                html += '  </div>';
+                html += '</div>';
               });
               html += '  </div>';
               html += '</div>';
             }
+
+            html += '</div>'; // end rev-folders-grid
           }
         }
 
-        html += '</div>'; // End subj-block
+        html += '</div>'; // end rev-subj-block
       });
 
       if (renderedBlocksCount === 0 && q) {
-        container.innerHTML = '<div style="text-align:center;padding:50px 20px;color:var(--text3);font-size:14px;font-weight:700"><i class="fa-solid fa-magnifying-glass" style="font-size:36px;display:block;margin-bottom:12px;opacity:0.3"></i>لا توجد نتائج مطابقة لبحثك: "' + esc(q) + '"</div>';
-        return;
+        html = '<div style="text-align:center;padding:50px 20px;color:var(--text3);font-size:14px;font-weight:700">' +
+          '<i class="fa-solid fa-magnifying-glass" style="font-size:36px;display:block;margin-bottom:12px;opacity:0.3"></i>' +
+          (isAr ? 'لا توجد نتائج تطابق بحثك: "' + esc(q) + '"' : 'No results found matching: "' + esc(q) + '"') +
+          '</div>';
       }
 
       container.innerHTML = html;
     }
 
-    function revToggleFolder(folderId) {
-      if (revOpenFolderIds.has(folderId)) {
-        revOpenFolderIds.delete(folderId);
+    function revRenderAll() {
+      if (!revData) revLoad();
+      revRenderSubjectChips();
+      revRenderContent();
+    }
+
+    function revToggleFolder(id) {
+      if (revOpenFolderIds.has(id)) {
+        revOpenFolderIds.delete(id);
       } else {
-        revOpenFolderIds.add(folderId);
+        revOpenFolderIds.add(id);
       }
-      revRenderAll();
+      revRenderContent();
     }
 
-    function getSubjectColor(subj) {
-      if (!subj) return '#3b82f6';
-      if (subj.includes('عرب')) return '#3b82f6';
-      if (subj.includes('إنجل') || subj.includes('انجل')) return '#8b5cf6';
-      if (subj.includes('تاريخ')) return '#f59e0b';
-      if (subj.includes('برمج') || subj.includes('حاسب') || subj.includes('تكنول')) return '#06b6d4';
-      if (subj.includes('فيز')) return '#ec4899';
-      if (subj.includes('كيم')) return '#10b981';
-      return '#3b82f6';
-    }
-
-    function getPlatformIcon(platform) {
-      const p = (platform || '').toLowerCase();
-      if (p.includes('youtube')) return 'fa-brands fa-youtube';
-      if (p.includes('drive')) return 'fa-brands fa-google-drive';
-      if (p.includes('telegram')) return 'fa-brands fa-telegram';
-      if (p.includes('zoom')) return 'fa-solid fa-video';
-      return 'fa-solid fa-arrow-up-right-from-square';
-    }
-
-    function getFileIconObj(type) {
-      const t = (type || '').toLowerCase();
-      if (t === 'pdf') return { icon: 'fa-solid fa-file-pdf', color: '#ef4444' };
-      if (t === 'doc' || t === 'docx') return { icon: 'fa-solid fa-file-word', color: '#3b82f6' };
-      if (t === 'sheet' || t === 'excel' || t === 'xlsx') return { icon: 'fa-solid fa-file-excel', color: '#10b981' };
-      if (t === 'image' || t === 'img' || t === 'png' || t === 'jpg') return { icon: 'fa-solid fa-file-image', color: '#8b5cf6' };
-      if (t === 'video' || t === 'mp4') return { icon: 'fa-solid fa-file-video', color: '#f59e0b' };
-      return { icon: 'fa-solid fa-file', color: 'var(--text2)' };
-    }
-
-    /* ── Revision Modal Handlers ── */
+    /* ── Modal Handling for Videos ── */
     function openAddRevisionModal(preSelectedSubj) {
       revEditRevId = null;
-      si('mod-rev-title', 'إضافة رابط مراجعة جديد');
+      document.getElementById('mod-rev-title').textContent = (lang === 'ar') ? 'إضافة رابط مراجعة' : 'Add Revision Video';
       document.getElementById('rev-ttl').value = '';
       document.getElementById('rev-url').value = '';
       document.getElementById('rev-notes').value = '';
-      document.getElementById('rev-type').value = 'مراجعة شاملة';
-      document.getElementById('rev-platform').value = 'YouTube';
       document.getElementById('btn-del-rev').style.display = 'none';
 
-      // Populate subjects dropdown
       const sel = document.getElementById('rev-subj');
       sel.innerHTML = (revData?.subjects || DEF_REVISIONS_SUBJECTS).map(s => '<option value="' + esc(s) + '"' + ((preSelectedSubj === s || revActiveSubject === s) ? ' selected' : '') + '>' + esc(s) + '</option>').join('');
 
       openModal('mod-revision');
     }
 
-    function openEditRevisionModal(id) {
-      const r = (revData?.revisions || []).find(x => x.id === id);
-      if (!r) return;
+    function editRevision(id) {
+      const rev = (revData?.revisions || []).find(r => r.id === id);
+      if (!rev) return;
       revEditRevId = id;
-      si('mod-rev-title', 'تعديل رابط المراجعة');
-      document.getElementById('rev-ttl').value = r.title || '';
-      document.getElementById('rev-url').value = r.url || '';
-      document.getElementById('rev-notes').value = r.notes || '';
-      document.getElementById('rev-type').value = r.type || 'مراجعة شاملة';
-      document.getElementById('rev-platform').value = r.platform || 'YouTube';
-      document.getElementById('btn-del-rev').style.display = 'block';
+      document.getElementById('mod-rev-title').textContent = (lang === 'ar') ? 'تعديل رابط المراجعة' : 'Edit Revision Video';
+      document.getElementById('rev-ttl').value = rev.title || '';
+      document.getElementById('rev-url').value = rev.url || '';
+      document.getElementById('rev-type').value = rev.type || 'مراجعة شاملة';
+      document.getElementById('rev-platform').value = rev.platform || 'YouTube';
+      document.getElementById('rev-notes').value = rev.notes || '';
+      document.getElementById('btn-del-rev').style.display = 'inline-flex';
 
       const sel = document.getElementById('rev-subj');
-      sel.innerHTML = (revData?.subjects || DEF_REVISIONS_SUBJECTS).map(s => '<option value="' + esc(s) + '"' + (r.subject === s ? ' selected' : '') + '>' + esc(s) + '</option>').join('');
+      sel.innerHTML = (revData?.subjects || DEF_REVISIONS_SUBJECTS).map(s => '<option value="' + esc(s) + '"' + (rev.subject === s ? ' selected' : '') + '>' + esc(getSubjectDisplayName(s)) + '</option>').join('');
 
       openModal('mod-revision');
     }
 
     function saveRevision() {
       const title = document.getElementById('rev-ttl').value.trim();
-      const url = document.getElementById('rev-url').value.trim();
       const subject = document.getElementById('rev-subj').value;
       const type = document.getElementById('rev-type').value;
+      const url = document.getElementById('rev-url').value.trim();
       const platform = document.getElementById('rev-platform').value;
       const notes = document.getElementById('rev-notes').value.trim();
+      const isAr = (lang === 'ar');
 
-      if (!title) { showToast('error', 'يرجى إدخال عنوان المراجعة!'); return; }
-      if (!url) { showToast('error', 'يرجى إدخال رابط المراجعة!'); return; }
+      if (!title) { showToast('error', isAr ? 'يرجى إدخال عنوان المراجعة!' : 'Please enter revision title!'); return; }
+      if (!url) { showToast('error', isAr ? 'يرجى إدخال رابط المراجعة!' : 'Please enter revision URL!'); return; }
 
       if (revEditRevId) {
-        const item = revData.revisions.find(x => x.id === revEditRevId);
-        if (item) {
-          Object.assign(item, { title, url, subject, type, platform, notes });
-          showToast('success', 'تم تعديل رابط المراجعة بنجاح!');
+        const idx = revData.revisions.findIndex(r => r.id === revEditRevId);
+        if (idx !== -1) {
+          revData.revisions[idx] = { ...revData.revisions[idx], title, subject, type, url, platform, notes };
+          showToast('success', isAr ? 'تم تحديث المراجعة بنجاح!' : 'Revision video updated!');
         }
       } else {
         revData.revisions.push({
           id: 'rev_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-          subject, title, url, type, platform, notes,
+          title, subject, type, url, platform, notes,
           createdAt: ltTodayStr()
         });
-        showToast('success', 'تمت إضافة رابط المراجعة بنجاح!');
+        showToast('success', isAr ? 'تمت إضافة رابط المراجعة بنجاح!' : 'Revision video added!');
       }
 
       revSave();
@@ -9731,53 +10155,77 @@
       revRenderAll();
     }
 
-    function delRevisionFromModal() {
-      if (!revEditRevId) return;
-      delRevision(revEditRevId);
-      closeModal('mod-revision');
-    }
-
     function delRevision(id) {
-      mkConfirmPop('هل أنت متأكد من حذف رابط المراجعة هذا؟', () => {
+      const isAr = (lang === 'ar');
+      mkConfirmPop(isAr ? 'هل أنت متأكد من حذف رابط المراجعة هذا؟' : 'Are you sure you want to delete this revision?', () => {
         revData.revisions = revData.revisions.filter(r => r.id !== id);
         revSave();
         revRenderAll();
-        showToast('info', 'تم حذف رابط المراجعة.');
+        showToast('info', isAr ? 'تم حذف المراجعة.' : 'Revision deleted.');
       });
     }
 
-    /* ── File & Folder Modal Handlers ── */
+    function delRevisionFromModal() {
+      if (revEditRevId) {
+        delRevision(revEditRevId);
+        closeModal('mod-revision');
+      }
+    }
+
+    /* ── Modal Handling for Files & Folders ── */
     function setFileModalMode(mode) {
       revFileModalMode = mode;
-      const isFile = mode === 'file';
-      document.getElementById('modal-file-fields').style.display = isFile ? 'block' : 'none';
-      document.getElementById('modal-folder-fields').style.display = isFile ? 'none' : 'block';
-      document.getElementById('file-type-btn-file').className = isFile ? 's-btn accent' : 's-btn';
-      document.getElementById('file-type-btn-file').style.background = isFile ? '' : 'none';
-      document.getElementById('file-type-btn-file').style.color = isFile ? '' : 'var(--text2)';
-      document.getElementById('file-type-btn-folder').className = isFile ? 's-btn' : 's-btn accent';
-      document.getElementById('file-type-btn-folder').style.background = isFile ? 'none' : '';
-      document.getElementById('file-type-btn-folder').style.color = isFile ? 'var(--text2)' : '';
-      si('mod-file-title', isFile ? 'إضافة ملف دراسي' : 'إنشاء مجلد جديد');
-      si('btn-save-file-txt', isFile ? 'حفظ الملف' : 'إنشاء المجلد');
+      const btnFile = document.getElementById('file-type-btn-file');
+      const btnFolder = document.getElementById('file-type-btn-folder');
+      const fldFields = document.getElementById('modal-folder-fields');
+      const filFields = document.getElementById('modal-file-fields');
+      const modalTitle = document.getElementById('mod-file-title');
+      const isAr = (lang === 'ar');
+
+      if (mode === 'folder') {
+        btnFolder.className = 's-btn accent';
+        btnFile.className = 's-btn';
+        btnFile.style.background = 'none';
+        btnFile.style.border = 'none';
+        btnFile.style.color = 'var(--text2)';
+        fldFields.style.display = 'block';
+        filFields.style.display = 'none';
+        modalTitle.textContent = isAr ? 'إنشاء مجلد جديد' : 'Create New Folder';
+      } else {
+        btnFile.className = 's-btn accent';
+        btnFolder.className = 's-btn';
+        btnFolder.style.background = 'none';
+        btnFolder.style.border = 'none';
+        btnFolder.style.color = 'var(--text2)';
+        fldFields.style.display = 'none';
+        filFields.style.display = 'block';
+        modalTitle.textContent = isAr ? 'إضافة ملف دراسي' : 'Add Study File';
+      }
     }
 
     function toggleFileSourceUI(type) {
-      document.getElementById('file-src-link-wrap').style.display = (type === 'link') ? 'block' : 'none';
-      document.getElementById('file-src-upload-wrap').style.display = (type === 'upload') ? 'block' : 'none';
+      const linkWrap = document.getElementById('file-src-link-wrap');
+      const uploadWrap = document.getElementById('file-src-upload-wrap');
+      if (type === 'upload') {
+        linkWrap.style.display = 'none';
+        uploadWrap.style.display = 'block';
+      } else {
+        linkWrap.style.display = 'block';
+        uploadWrap.style.display = 'none';
+      }
     }
 
     function handleFileSelectDirect(input) {
       if (input.files && input.files[0]) {
         const file = input.files[0];
-        const titleInput = document.getElementById('file-ttl');
-        if (!titleInput.value) {
-          titleInput.value = file.name;
-        }
-        const sizeMb = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
-        document.getElementById('file-size').value = sizeMb;
+        const titleInp = document.getElementById('file-ttl');
+        const sizeInp = document.getElementById('file-size');
+        const isAr = (lang === 'ar');
 
-        // Auto select type
+        if (!titleInp.value) titleInp.value = file.name.replace(/\.[^/.]+$/, '');
+        const sizeMb = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+        sizeInp.value = sizeMb;
+
         const ext = file.name.split('.').pop().toLowerCase();
         const typeSelect = document.getElementById('file-type');
         if (ext === 'pdf') typeSelect.value = 'pdf';
@@ -9789,7 +10237,9 @@
         const reader = new FileReader();
         reader.onload = function(e) {
           revTempUploadedData = e.target.result;
-          document.getElementById('file-upload-status').textContent = '✅ تم تحميل ' + file.name + ' (' + sizeMb + ') بنجاح!';
+          document.getElementById('file-upload-status').textContent = isAr 
+            ? ('✅ تم تجهيز ' + file.name + ' (' + sizeMb + ') للحفظ!')
+            : ('✅ Ready: ' + file.name + ' (' + sizeMb + ')!');
         };
         reader.readAsDataURL(file);
       }
@@ -9799,17 +10249,18 @@
       const subj = document.getElementById('file-subj').value;
       const folderSelect = document.getElementById('file-folder');
       const subjFolders = (revData?.folders || []).filter(f => f.subject === subj);
-      let opts = '<option value="">(بدون مجلد - في الجذر)</option>';
+      const isAr = (lang === 'ar');
+      let opts = '<option value="">' + (isAr ? '(بدون مجلد - في الجذر)' : '(Root - No folder)') + '</option>';
       subjFolders.forEach(f => {
-        opts += '<option value="' + f.id + '"' + (preSelectedFolderId === f.id ? ' selected' : '') + '>' + esc(f.name) + '</option>';
+        opts += '<option value="' + f.id + '"' + (preSelectedFolderId === f.id ? ' selected' : '') + '>' + esc(getFolderDisplayName(f.name)) + '</option>';
       });
       folderSelect.innerHTML = opts;
     }
 
-    function openAddFileModal(preSelectedSubj, preSelectedFolderId) {
+    function openAddFileModal(preSelectedSubj, preSelectedFolderId, targetMode) {
       revEditFileId = null;
       revTempUploadedData = null;
-      setFileModalMode('file');
+      setFileModalMode(targetMode || 'file');
       document.getElementById('file-ttl').value = '';
       document.getElementById('file-url').value = '';
       document.getElementById('file-size').value = '';
@@ -9829,11 +10280,13 @@
 
     function saveFileItem() {
       const subject = document.getElementById('file-subj').value;
+      const isAr = (lang === 'ar');
+
       if (revFileModalMode === 'folder') {
         const name = document.getElementById('fld-name').value.trim();
         const color = document.getElementById('fld-color').value;
         const icon = document.getElementById('fld-icon').value;
-        if (!name) { showToast('error', 'يرجى إدخال اسم المجلد!'); return; }
+        if (!name) { showToast('error', isAr ? 'يرجى إدخال اسم المجلد!' : 'Please enter folder name!'); return; }
 
         const fldId = 'fld_' + Date.now();
         revData.folders.push({
@@ -9842,9 +10295,8 @@
           createdAt: ltTodayStr()
         });
         revOpenFolderIds.add(fldId);
-        showToast('success', 'تم إنشاء المجلد بنجاح!');
+        showToast('success', isAr ? 'تم إنشاء المجلد بنجاح!' : 'Folder created successfully!');
       } else {
-        // File item
         const title = document.getElementById('file-ttl').value.trim();
         const folderId = document.getElementById('file-folder').value || null;
         const srcType = document.querySelector('input[name="file-src-type"]:checked').value;
@@ -9857,8 +10309,8 @@
           url = revTempUploadedData;
         }
 
-        if (!title) { showToast('error', 'يرجى إدخال اسم الملف!'); return; }
-        if (!url) { showToast('error', 'يرجى إدخال رابط الملف أو رفع ملف مباشر!'); return; }
+        if (!title) { showToast('error', isAr ? 'يرجى إدخال اسم الملف!' : 'Please enter file title!'); return; }
+        if (!url) { showToast('error', isAr ? 'يرجى إدخال رابط الملف أو رفع ملف مباشر!' : 'Please provide file link or upload file!'); return; }
 
         revData.files.push({
           id: 'fil_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
@@ -9866,7 +10318,7 @@
           createdAt: ltTodayStr()
         });
         if (folderId) revOpenFolderIds.add(folderId);
-        showToast('success', 'تمت إضافة الملف بنجاح!');
+        showToast('success', isAr ? 'تمت إضافة الملف بنجاح!' : 'File added successfully!');
       }
 
       revSave();
@@ -9875,25 +10327,26 @@
     }
 
     function delFolder(id) {
-      mkConfirmPop('هل أنت متأكد من حذف هذا المجلد وكل الملفات بداخله؟', () => {
+      const isAr = (lang === 'ar');
+      mkConfirmPop(isAr ? 'هل أنت متأكد من حذف هذا المجلد وكل الملفات بداخله؟' : 'Are you sure you want to delete this folder and all its files?', () => {
         revData.folders = revData.folders.filter(f => f.id !== id);
         revData.files = revData.files.filter(f => f.folderId !== id);
         revSave();
         revRenderAll();
-        showToast('info', 'تم حذف المجلد بنجاح.');
+        showToast('info', isAr ? 'تم حذف المجلد.' : 'Folder deleted.');
       });
     }
 
     function delFile(id) {
-      mkConfirmPop('هل أنت متأكد من حذف هذا الملف؟', () => {
+      const isAr = (lang === 'ar');
+      mkConfirmPop(isAr ? 'هل أنت متأكد من حذف هذا الملف؟' : 'Are you sure you want to delete this file?', () => {
         revData.files = revData.files.filter(f => f.id !== id);
         revSave();
         revRenderAll();
-        showToast('info', 'تم حذف الملف.');
+        showToast('info', isAr ? 'تم حذف الملف.' : 'File deleted.');
       });
     }
 
-    /* ── Subject Management ── */
     function openAddRevSubjectModal() {
       document.getElementById('new-rev-subj-name').value = '';
       openModal('mod-rev-subject');
@@ -9901,17 +10354,20 @@
 
     function addNewRevSubject() {
       const name = document.getElementById('new-rev-subj-name').value.trim();
-      if (!name) { showToast('error', 'يرجى إدخال اسم المادة!'); return; }
+      const isAr = (lang === 'ar');
+      if (!name) { showToast('error', isAr ? 'يرجى إدخال اسم المادة!' : 'Please enter subject name!'); return; }
       if (!revData.subjects.includes(name)) {
         revData.subjects.push(name);
         revSave();
         revSetSubjectFilter(name);
-        showToast('success', 'تمت إضافة المادة بنجاح!');
+        showToast('success', isAr ? 'تمت إضافة المادة بنجاح!' : 'Subject added successfully!');
       }
       closeModal('mod-rev-subject');
     }
 
-/* ════════════════════════════════
+    
+
+    /* ════════════════════════════════
        SYSTEM 1: EXAM CENTER LOGIC
     ════════════════════════════════ */
     let exFilter = 'all';
@@ -11852,6 +12308,9 @@
 
       hideLoader();
       init();
+      if (typeof window.restoreLastPage === 'function') {
+        window.restoreLastPage();
+      }
       setupRealtimeSync();
     }
 
@@ -13975,6 +14434,9 @@
         } catch(e) {}
         hideLoader();
         init();
+        if (typeof window.restoreLastPage === 'function') {
+          window.restoreLastPage();
+        }
       } else {
         hideLoader();
         showAuthScreen();

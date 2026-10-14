@@ -124,6 +124,10 @@ const App = (() => {
 
     // Back button from project detail
     document.getElementById('back-to-projects')?.addEventListener('click', () => {
+      try {
+        localStorage.removeItem('sh_last_project_id');
+        localStorage.setItem('sh_last_todo_view', 'projects');
+      } catch(e) {}
       navigate('projects');
     });
 
@@ -268,7 +272,7 @@ const App = (() => {
 
   // -- Init -----------------------------------------------
 
-  function init() {
+  function init(initialView) {
     // Load persisted data
     Store.load();
 
@@ -320,7 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
     lastProjectId = localStorage.getItem('sh_last_project_id');
   } catch(e) {}
 
-  const outerPages = ['sched', 'lt', 'exams', 'curric', 'settings'];
+  const outerPages = ['sched', 'lt', 'exams', 'curric', 'settings', 'revisions'];
 
   if (outerPages.includes(lastPage)) {
     // Outer page: init App structure without navigating to 'today' (keeps saved view intact!)
@@ -335,14 +339,29 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(restoreOuter, 60);
     setTimeout(restoreOuter, 250);
   } else {
-    // Todo page: determine safe view
+    // Always init App first so Store.load() loads all projects and tasks from storage!
+    App.init();
+
+    // Now Store is loaded, determine safe view
     const safeView = ['today', 'projects', 'calendar', 'inbox', 'project-detail'].includes(lastTodoView) ? lastTodoView : 'today';
 
-    if (safeView === 'project-detail' && lastProjectId && Store.getProject(lastProjectId)) {
-      App.init();
+    if (safeView === 'project-detail' && lastProjectId) {
       Projects.openProjectDetail(lastProjectId);
+      // Secondary re-renders in case Store project load or sync completed slightly after init
+      setTimeout(() => {
+        if (Projects.getCurrentProjectId() !== lastProjectId) {
+          Projects.openProjectDetail(lastProjectId);
+        } else {
+          Projects.renderProjectDetail(lastProjectId);
+        }
+      }, 150);
+      setTimeout(() => {
+        if (Projects.getCurrentProjectId() === lastProjectId) {
+          Projects.renderProjectDetail(lastProjectId);
+        }
+      }, 400);
     } else {
-      App.init(safeView === 'project-detail' ? 'projects' : safeView);
+      App.navigate(safeView === 'project-detail' ? 'projects' : safeView);
     }
 
     const todoPage = document.getElementById('page-todo');

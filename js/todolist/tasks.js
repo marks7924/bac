@@ -161,7 +161,7 @@ const Tasks = (() => {
     // Archive button (for any task in a project or when requested, whether done or undone)
     if (showArchiveBtn || task.projectId) {
       const archiveBtn = document.createElement('button');
-      archiveBtn.className = 'task-action-btn';
+      archiveBtn.className = 'task-action-btn admin-only';
       archiveBtn.setAttribute('aria-label', 'Archive task');
       archiveBtn.title = 'Archive';
       archiveBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M2 3h10v2H2V3zm1 2v6a1 1 0 001 1h6a1 1 0 001-1V5H3zm3 2h2v2H6V7z" fill="currentColor"/></svg>`;

@@ -614,8 +614,7 @@ const UI = (() => {
 
     if (task.projectId) {
       const archiveBtn = document.createElement('button');
-      archiveBtn.className = 'btn-ghost';
-      archiveBtn.style.fontSize = 'var(--text-sm)';
+      archiveBtn.className = 'btn-ghost admin-only'; archiveBtn.style.fontSize = 'var(--text-sm)';
       archiveBtn.style.padding = '7px 14px';
       archiveBtn.innerHTML = task.archived ? '↩️ Unarchive' : '📦 Archive';
       archiveBtn.title = task.archived ? 'Restore task to project' : 'Archive task';
